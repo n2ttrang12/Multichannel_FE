@@ -12,8 +12,7 @@ import OrderManagement from "../layouts/dashboard/order-management";
 export const MineRouters = [
   {
     path: "/",
-    //element: <OrderManagement />,
-    element: <Default />,
+    element: <OrderManagement />,
     children: [
       {
         path: "dashboard/order-management/list",

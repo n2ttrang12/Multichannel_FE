@@ -88,186 +88,179 @@ const Data_table = [
 
 const List = () => {
   return (
-    <>
-      <Row>
-        <Col sm="12">
-          <Card>
-            <Card.Header className="d-flex justify-content-between">
-              <div className="header-title">
-                <h4 className="card-title">Danh sách đơn hàng</h4>
+    <Card>
+      <Card.Header className="d-flex justify-content-between">
+        <div className="header-title">
+          <h4 className="card-title">Danh sách đơn hàng</h4>
+        </div>
+      </Card.Header>
+      <Card.Body>
+        <p>
+          Images in Bootstrap are made responsive with <code>.img-fluid</code>.{" "}
+          <code>max-width: 100%;</code> and <code>height: auto;</code> are
+          applied to the image so that it scales with the parent element.
+        </p>
+        <div className="border-bottom my-3">
+          <Table
+            responsive
+            striped
+            id="datatable"
+            className=""
+            data-toggle="data-table"
+          >
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Office</th>
+                <th>Age</th>
+                <th>Start date</th>
+                <th>Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Data_table.map((item) => (
+                <tr key={item.age}>
+                  <td>{item.name}</td>
+                  <td>{item.position}</td>
+                  <td>{item.office}</td>
+                  <td>{item.age}</td>
+                  <td>{item.startdate}</td>
+                  <td>{item.salary}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Office</th>
+                <th>Age</th>
+                <th>Start date</th>
+                <th>Salary</th>
+              </tr>
+            </tfoot>
+          </Table>
+          <Row className="align-items-center">
+            <Col md="6">
+              <div
+                className="dataTables_info"
+                id="datatable_info"
+                role="status"
+                aria-live="polite"
+              >
+                Showing 1 to 10 of 57 entries
               </div>
-            </Card.Header>
-            <Card.Body>
-              <p>
-                Images in Bootstrap are made responsive with{" "}
-                <code>.img-fluid</code>. <code>max-width: 100%;</code> and{" "}
-                <code>height: auto;</code> are applied to the image so that it
-                scales with the parent element.
-              </p>
-              <div className="table-responsive border-bottom my-3">
-                <Table
-                  responsive
-                  striped
-                  id="datatable"
-                  className=""
-                  data-toggle="data-table"
-                >
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Office</th>
-                      <th>Age</th>
-                      <th>Start date</th>
-                      <th>Salary</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Data_table.map((item) => (
-                      <tr key={item.age}>
-                        <td>{item.name}</td>
-                        <td>{item.position}</td>
-                        <td>{item.office}</td>
-                        <td>{item.age}</td>
-                        <td>{item.startdate}</td>
-                        <td>{item.salary}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Office</th>
-                      <th>Age</th>
-                      <th>Start date</th>
-                      <th>Salary</th>
-                    </tr>
-                  </tfoot>
-                </Table>
-                <Row className="align-items-center">
-                  <Col md="6">
-                    <div
-                      className="dataTables_info"
-                      id="datatable_info"
-                      role="status"
-                      aria-live="polite"
+            </Col>
+            <Col md="6">
+              <div
+                className="dataTables_paginate paging_simple_numbers"
+                id="datatable_paginate"
+              >
+                <ul className="pagination">
+                  <li
+                    className="paginate_button page-item previous disabled"
+                    id="datatable_previous"
+                  >
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      aria-disabled="true"
+                      data-dt-idx="previous"
+                      tabIndex="0"
+                      className="page-link"
                     >
-                      Showing 1 to 10 of 57 entries
-                    </div>
-                  </Col>
-                  <Col md="6">
-                    <div
-                      className="dataTables_paginate paging_simple_numbers"
-                      id="datatable_paginate"
+                      Previous
+                    </Link>
+                  </li>
+                  <li className="paginate_button page-item active">
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      aria-current="page"
+                      data-dt-idx="0"
+                      tabIndex="0"
+                      className="page-link"
                     >
-                      <ul className="pagination">
-                        <li
-                          className="paginate_button page-item previous disabled"
-                          id="datatable_previous"
-                        >
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            aria-disabled="true"
-                            data-dt-idx="previous"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            Previous
-                          </Link>
-                        </li>
-                        <li className="paginate_button page-item active">
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            aria-current="page"
-                            data-dt-idx="0"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            1
-                          </Link>
-                        </li>
-                        <li className="paginate_button page-item ">
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            data-dt-idx="1"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            2
-                          </Link>
-                        </li>
-                        <li className="paginate_button page-item ">
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            data-dt-idx="2"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            3
-                          </Link>
-                        </li>
-                        <li className="paginate_button page-item ">
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            data-dt-idx="3"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            4
-                          </Link>
-                        </li>
-                        <li className="paginate_button page-item ">
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            data-dt-idx="4"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            5
-                          </Link>
-                        </li>
-                        <li className="paginate_button page-item ">
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            data-dt-idx="5"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            6
-                          </Link>
-                        </li>
-                        <li
-                          className="paginate_button page-item next"
-                          id="datatable_next"
-                        >
-                          <Link
-                            to="#"
-                            aria-controls="datatable"
-                            data-dt-idx="next"
-                            tabIndex="0"
-                            className="page-link"
-                          >
-                            Next
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </Col>
-                </Row>
+                      1
+                    </Link>
+                  </li>
+                  <li className="paginate_button page-item ">
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      data-dt-idx="1"
+                      tabIndex="0"
+                      className="page-link"
+                    >
+                      2
+                    </Link>
+                  </li>
+                  <li className="paginate_button page-item ">
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      data-dt-idx="2"
+                      tabIndex="0"
+                      className="page-link"
+                    >
+                      3
+                    </Link>
+                  </li>
+                  <li className="paginate_button page-item ">
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      data-dt-idx="3"
+                      tabIndex="0"
+                      className="page-link"
+                    >
+                      4
+                    </Link>
+                  </li>
+                  <li className="paginate_button page-item ">
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      data-dt-idx="4"
+                      tabIndex="0"
+                      className="page-link"
+                    >
+                      5
+                    </Link>
+                  </li>
+                  <li className="paginate_button page-item ">
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      data-dt-idx="5"
+                      tabIndex="0"
+                      className="page-link"
+                    >
+                      6
+                    </Link>
+                  </li>
+                  <li
+                    className="paginate_button page-item next"
+                    id="datatable_next"
+                  >
+                    <Link
+                      to="#"
+                      aria-controls="datatable"
+                      data-dt-idx="next"
+                      tabIndex="0"
+                      className="page-link"
+                    >
+                      Next
+                    </Link>
+                  </li>
+                </ul>
               </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </>
+            </Col>
+          </Row>
+        </div>
+      </Card.Body>
+    </Card>
   );
 };
 
