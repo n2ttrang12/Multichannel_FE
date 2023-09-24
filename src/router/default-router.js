@@ -33,7 +33,7 @@ import Google from "../views/dashboard/maps/google";
 //TransitionGroup
 // import { TransitionGroup, CSSTransition } from "react-transition-group";
 //Special Pages
-import Billing from "../views/dashboard/special-pages/billing";
+import Billing from "../views/dashboard/special-pages/customer-management";
 import Kanban from "../views/dashboard/special-pages/kanban";
 import Pricing from "../views/dashboard/special-pages/pricing";
 import Timeline from "../views/dashboard/special-pages/timeline";
@@ -43,6 +43,9 @@ import RtlSupport from "../views/dashboard/special-pages/RtlSupport";
 //admin
 import Admin from "../views/dashboard/admin/admin";
 import Default from "../layouts/dashboard/default";
+import List from "../views/dashboard/order-management/list";
+import Bill from "../views/dashboard/order-management/bill";
+import CustomerManagement from "../views/dashboard/special-pages/customer-management";
 
 export const DefaultRouter = [
   {
@@ -52,6 +55,20 @@ export const DefaultRouter = [
       {
         path: "dashboard",
         element: <Index />,
+      },
+      // Order management
+      {
+        path: "/dashboard/order-management/list",
+        element: <List />,
+      },
+      {
+        path: "/dashboard/order-management/bills",
+        element: <Bill />,
+      },
+      // Customer management
+      {
+        path: "/dashboard/customer-management",
+        element: <CustomerManagement />,
       },
       {
         path: "dashboard/special-pages/billing",

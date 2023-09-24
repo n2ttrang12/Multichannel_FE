@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Row, Col, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Card from "../../../components/Card";
+import Swiper from "swiper";
+import { SwiperSlide } from "swiper/react";
+import Circularprogressbar from "../../../components/circularprogressbar";
 
 const Data_table = [
   {
@@ -100,6 +103,7 @@ const List = () => {
           <code>max-width: 100%;</code> and <code>height: auto;</code> are
           applied to the image so that it scales with the parent element.
         </p>
+
         <div className="border-bottom my-3">
           <Table
             responsive

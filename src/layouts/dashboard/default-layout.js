@@ -47,7 +47,7 @@ const Tour = () => {
   return <Fragment></Fragment>;
 };
 
-const OrderManagement = memo((props) => {
+const DefaultLayout = memo((props) => {
   const appName = useSelector(SettingSelector.app_name);
   useEffect(() => {});
 
@@ -71,5 +71,5 @@ const OrderManagement = memo((props) => {
   );
 });
 
-OrderManagement.displayName = "OrderManagement";
-export default OrderManagement;
+DefaultLayout.displayName = "DefaultLayout";
+export default DefaultLayout;

@@ -162,9 +162,8 @@ const Default = memo((props) => {
       <main className="main-content">
         <div className="position-relative">
           <Header />
-          <SubHeader />
         </div>
-        <div className="py-0 conatiner-fluid content-inner mt-n5">
+        <div className="conatiner-fluid content-inner">
           {/* <DefaultRouter /> */}
           <Outlet />
         </div>

@@ -14,7 +14,6 @@ import Index from "./views/index";
 import { IndexRouters } from "./router";
 import { SimpleRouter } from "./router/simple-router";
 import { DefaultRouter } from "./router/default-router";
-import { MineRouters } from "./router/mine";
 
 const router = createBrowserRouter(
   [
@@ -25,7 +24,6 @@ const router = createBrowserRouter(
     ...DefaultRouter,
     ...IndexRouters,
     ...SimpleRouter,
-    ...MineRouters,
   ],
   { basename: process.env.PUBLIC_URL }
 );
