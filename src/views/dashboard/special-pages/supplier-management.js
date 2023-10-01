@@ -4,113 +4,113 @@ import Card from "../../../components/Card";
 import { Link } from "react-router-dom";
 const Data_table = [
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
     status: "Đã phát hành",
     color: "bg-success",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
-    status: "Ngừng phát hành",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
+    status: "Ngưng hợp tác",
     color: "bg-danger",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
-    status: "Ngừng phát hành",
-    color: "bg-danger",
-  },
-  {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
-    phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
     status: "Đã phát hành",
     color: "bg-success",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
-    status: "Ngừng phát hành",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
+    status: "Ngưng hợp tác",
     color: "bg-danger",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
     status: "Đã phát hành",
     color: "bg-success",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
-    status: "Ngừng phát hành",
-    color: "bg-danger",
-  },
-  {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
-    phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
     status: "Đã phát hành",
     color: "bg-success",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
     status: "Đã phát hành",
     color: "bg-success",
   },
   {
-    customerId: "KH00001",
-    name: "Nguyễn Thu Trang",
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
     phone: "0987654322",
-    debt: "1.000.000",
-    totalSpend: "10.000.000",
-    totalProducts: "20",
-    status: "Ngừng phát hành",
-    color: "bg-danger",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
+    status: "Đã phát hành",
+    color: "bg-success",
+  },
+  {
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
+    phone: "0987654322",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
+    status: "Đã phát hành",
+    color: "bg-success",
+  },
+  {
+    supplierId: "KH00001",
+    name: "Công ty CP MSC",
+    phone: "0987654322",
+    email: "msccompany@gmail.com",
+    address: "216 Chu Văn An, phường 12, Q.Bình Thạnh, TP.HCM",
+    totalDebt: "10.000.000",
+    status: "Đã phát hành",
+    color: "bg-success",
   },
 ];
-const CustomerManagement = () => {
+const SupplierManagement = () => {
   return (
     <>
       <Card>
         <Card.Header className="d-flex justify-content-between">
           <div className="header-title">
-            <h4 className="card-title">Danh sách khách hàng</h4>
+            <h4 className="card-title">Danh sách NCC</h4>
           </div>
         </Card.Header>
         <Card.Body>
@@ -124,25 +124,25 @@ const CustomerManagement = () => {
             >
               <thead>
                 <tr>
-                  <th>Mã KH</th>
-                  <th>Tên khách hàng</th>
+                  <th>Mã NCC</th>
+                  <th>Tên nhà cung cấp</th>
                   <th>Số điện thoại</th>
+                  <th>Email</th>
+                  <th>Địa chỉ</th>
                   <th>Công nợ hiện tại</th>
-                  <th>Tổng chi tiêu</th>
-                  <th>Tổng số lượng hàng đã mua</th>
                   <th>Trạng thái ĐH</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
                 {Data_table.map((item) => (
-                  <tr key={item.customerId}>
-                    <td>{item.customerId}</td>
+                  <tr key={item.supplierId}>
+                    <td>{item.supplierId}</td>
                     <td>{item.name}</td>
                     <td>{item.phone}</td>
-                    <td>{item.debt}</td>
-                    <td>{item.totalSpend}</td>
-                    <td>{item.totalProducts}</td>
+                    <td>{item.email}</td>
+                    <td>{item.address}</td>
+                    <td>{item.totalDebt}</td>
                     <td>
                       <span className={`badge ${item.color}`}>
                         {item.status}
@@ -176,17 +176,14 @@ const CustomerManagement = () => {
                           title="Delete User"
                           to="#"
                         >
-                          <span className="btn-inner">
+                          <span className="btn-inner ">
                             <svg
-                              width="20"
                               xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              fill="red"
                               viewBox="0 0 448 512"
-                              fill="green"
                             >
-                              <path
-                                d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 
-                              64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
-                              />
+                              <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
                             </svg>
                           </span>
                         </Link>
@@ -320,4 +317,4 @@ const CustomerManagement = () => {
   );
 };
 
-export default CustomerManagement;
+export default SupplierManagement;

@@ -5,7 +5,7 @@ import {
   useAccordionButton,
   AccordionContext,
 } from "react-bootstrap";
-import Sizings from "../../../../views/uikit/sizing";
+// import Sizings from "../../../../views/uikit/sizing";
 
 function CustomToggle({ children, eventKey, onClick }) {
   const { activeEventKey } = useContext(AccordionContext);
@@ -458,16 +458,16 @@ const VerticalNav = memo((props) => {
             </ul>
           </Accordion.Collapse>
         </Accordion.Item>
-        <Accordion.Item
-          as="li"
-          className={`${activeMenu === "0" ? "active" : ""}`}
-          eventKey="sidebar-auth"
-          bsPrefix={`nav-item ${active === "auth" ? "active" : ""} `}
-          onClick={() => setActive("auth")}
-        >
-          <CustomToggle
-            eventKey="sidebar-auth"
-            onClick={(activeKey) => setActiveMenu(activeKey)}
+        <li className="nav-item">
+          <Link
+            className={`${
+              location.pathname === "/dashboard/supplier-management/"
+                ? "active"
+                : ""
+            } nav-link `}
+            aria-current="page"
+            to="/dashboard/supplier-management/"
+            onClick={() => {}}
           >
             <i className="icon">
               <svg
@@ -478,176 +478,18 @@ const VerticalNav = memo((props) => {
                 fill="none"
               >
                 <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   fill="currentColor"
-                  d="M36.8 192H603.2c20.3 0 36.8-16.5 36.8-36.8c0-7.3-2.2-14.4-6.2-20.4L558.2 21.4C549.3 8 534.4 0 518.3 0H121.7c-16 0-31 8-39.9 21.4L6.2 134.7c-4 6.1-6.2 13.2-6.2 20.4C0 175.5 16.5 192 36.8 192zM64 224V384v80c0 26.5 21.5 48 48 48H336c26.5 0 48-21.5 48-48V384 224H320V384H128V224H64zm448 0V480c0 17.7 14.3 32 32 32s32-14.3 32-32V224H512z"
+                  d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM609.3 512H471.4c5.4-9.4 8.6-20.3 8.6-32v-8c0-60.7-27.1-115.2-69.8-151.8c2.4-.1 4.7-.2 7.1-.2h61.4C567.8 320 640 392.2 640 481.3c0 17-13.8 30.7-30.7 30.7zM432 256c-31 0-59-12.6-79.3-32.9C372.4 196.5 384 163.6 384 128c0-26.8-6.6-52.1-18.3-74.3C384.3 40.1 407.2 32 432 32c61.9 0 112 50.1 112 112s-50.1 112-112 112z"
                 />
               </svg>
             </i>
             <span className="item-name" style={{ fontSize: 14 }}>
               Quản lý NCC
             </span>
-            <i className="right-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </i>
-          </CustomToggle>
-          <Accordion.Collapse eventKey="sidebar-auth">
-            <ul className="sub-nav">
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/auth/sign-in" ? "active" : ""
-                  } nav-link`}
-                  to="/auth/sign-in"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> L </i>
-                  <span className="item-name">Login</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/auth/sign-up" ? "active" : ""
-                  } nav-link`}
-                  to="/auth/sign-up"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> R </i>
-                  <span className="item-name">Register</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/auth/confirm-mail" ? "active" : ""
-                  } nav-link`}
-                  to="/auth/confirm-mail"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> C </i>
-                  <span className="item-name">Confirm Mail</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/auth/lock-screen" ? "active" : ""
-                  } nav-link`}
-                  to="/auth/lock-screen"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> L </i>
-                  <span className="item-name">Lock Screen</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/auth/recoverpw" ? "active" : ""
-                  } nav-link`}
-                  to="/auth/recoverpw"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> R </i>
-                  <span className="item-name">Recover password</span>
-                </Link>
-              </li>
-            </ul>
-          </Accordion.Collapse>
-        </Accordion.Item>
+          </Link>
+        </li>
         <Accordion.Item
           as="li"
           eventKey="sidebar-user"
@@ -697,11 +539,11 @@ const VerticalNav = memo((props) => {
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/dashboard/app/user-profile"
+                    location.pathname === "/dashboard/warehouse/inventory"
                       ? "active"
                       : ""
                   } nav-link`}
-                  to="/dashboard/app/user-profile"
+                  to="/dashboard/warehouse/inventory"
                 >
                   <i className="icon">
                     <svg
@@ -721,17 +563,18 @@ const VerticalNav = memo((props) => {
                     </svg>
                   </i>
                   <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">User Profile</span>
+                  <span className="item-name">Tồn kho</span>
                 </Link>
               </li>
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/dashboard/app/user-add"
+                    location.pathname ===
+                    "/dashboard/warehouse/inventory-receiving"
                       ? "active"
                       : ""
                   } nav-link`}
-                  to="/dashboard/app/user-add"
+                  to="/dashboard/warehouse/inventory-receiving"
                 >
                   <i className="icon">
                     <svg
@@ -751,17 +594,17 @@ const VerticalNav = memo((props) => {
                     </svg>
                   </i>
                   <i className="sidenav-mini-icon"> E </i>
-                  <span className="item-name">Add User</span>
+                  <span className="item-name">Đơn nhập hàng</span>
                 </Link>
               </li>
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/dashboard/app/user-list"
+                    location.pathname === "/dashboard/warehouse/import-goods"
                       ? "active"
                       : ""
                   } nav-link`}
-                  to="/dashboard/app/user-list"
+                  to="/dashboard/warehouse/import-goods"
                 >
                   <i className="icon">
                     <svg
@@ -781,7 +624,128 @@ const VerticalNav = memo((props) => {
                     </svg>
                   </i>
                   <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">User List</span>
+                  <span className="item-name">Nhập hàng</span>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className={`${
+                    location.pathname === "/dashboard/warehouse/shipping"
+                      ? "active"
+                      : ""
+                  } nav-link`}
+                  to="/dashboard/warehouse/shipping"
+                >
+                  <i className="icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <g>
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="8"
+                          fill="currentColor"
+                        ></circle>
+                      </g>
+                    </svg>
+                  </i>
+                  <i className="sidenav-mini-icon"> U </i>
+                  <span className="item-name">Chuyển hàng</span>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className={`${
+                    location.pathname === "/dashboard/warehouse/inventory-check"
+                      ? "active"
+                      : ""
+                  } nav-link`}
+                  to="/dashboard/warehouse/inventory-check"
+                >
+                  <i className="icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <g>
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="8"
+                          fill="currentColor"
+                        ></circle>
+                      </g>
+                    </svg>
+                  </i>
+                  <i className="sidenav-mini-icon"> U </i>
+                  <span className="item-name">Kiểm hàng</span>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className={`${
+                    location.pathname ===
+                    "/dashboard/warehouse/product-destruction"
+                      ? "active"
+                      : ""
+                  } nav-link`}
+                  to="/dashboard/warehouse/product-destruction"
+                >
+                  <i className="icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <g>
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="8"
+                          fill="currentColor"
+                        ></circle>
+                      </g>
+                    </svg>
+                  </i>
+                  <i className="sidenav-mini-icon"> U </i>
+                  <span className="item-name">Tiêu hủy</span>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className={`${
+                    location.pathname === "/dashboard/warehouse/product-return"
+                      ? "active"
+                      : ""
+                  } nav-link`}
+                  to="/dashboard/warehouse/product-return"
+                >
+                  <i className="icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <g>
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="8"
+                          fill="currentColor"
+                        ></circle>
+                      </g>
+                    </svg>
+                  </i>
+                  <i className="sidenav-mini-icon"> U </i>
+                  <span className="item-name">Trả hàng</span>
                 </Link>
               </li>
             </ul>
@@ -837,9 +801,11 @@ const VerticalNav = memo((props) => {
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/errors/error404" ? "active" : ""
+                    location.pathname === "/dashboard/debt-management/receipt"
+                      ? "active"
+                      : ""
                   } nav-link`}
-                  to="/errors/error404"
+                  to="/dashboard/debt-management/receipt"
                 >
                   <i className="icon">
                     <svg
@@ -858,15 +824,17 @@ const VerticalNav = memo((props) => {
                       </g>
                     </svg>
                   </i>
-                  <span className="item-name">Error 404</span>
+                  <span className="item-name">Phiếu thu</span>
                 </Link>
               </li>
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/errors/error500" ? "active" : ""
+                    location.pathname === "/dashboard/debt-management/payment"
+                      ? "active"
+                      : ""
                   } nav-link`}
-                  to="/errors/error500"
+                  to="/dashboard/debt-management/payment"
                 >
                   <i className="icon">
                     <svg
@@ -885,34 +853,7 @@ const VerticalNav = memo((props) => {
                       </g>
                     </svg>
                   </i>
-                  <span className="item-name">Error 500</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/errors/maintenance" ? "active" : ""
-                  } nav-link`}
-                  to="/errors/maintenance"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <span className="item-name">Maintenance</span>
+                  <span className="item-name">Phiếu chi</span>
                 </Link>
               </li>
             </ul>
