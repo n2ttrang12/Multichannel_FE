@@ -46,6 +46,7 @@ import Default from "../layouts/dashboard/default";
 import List from "../views/dashboard/order-management/list";
 import Bill from "../views/dashboard/order-management/bill";
 import CustomerManagement from "../views/dashboard/special-pages/customer-management";
+import SignUp from "../views/dashboard/auth/sign-up";
 
 export const DefaultRouter = [
   {
@@ -168,6 +169,10 @@ export const DefaultRouter = [
         element: <DualTone />,
       },
     ],
+  },
+  {
+    path: "sign-up",
+    element: <SignUp />,
   },
 ];
 // const DefaultRouter = () => {
