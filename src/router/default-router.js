@@ -48,6 +48,16 @@ import Bill from "../views/dashboard/order-management/bill";
 import CustomerManagement from "../views/dashboard/special-pages/customer-management";
 import SignUp from "../views/dashboard/auth/sign-up";
 import SignIn from "../views/dashboard/auth/sign-in";
+import SupplierManagement from "../views/dashboard/special-pages/supplier-management";
+import Inventory from "../views/dashboard/warehouse/inventory";
+import Inventoryreceiving from "../views/dashboard/warehouse/inventory-receiving";
+import ImportGoods from "../views/dashboard/warehouse/import-goods";
+import Shipping from "../views/dashboard/warehouse/ shipping";
+import InventoryCheck from "../views/dashboard/warehouse/inventory-check";
+import ProductDestruction from "../views/dashboard/warehouse/product-destruction";
+import ProductReturn from "../views/dashboard/warehouse/product-return";
+import Receipt from "../views/dashboard/debt-management/receipt";
+import Payment from "../views/dashboard/debt-management/payment";
 
 export const DefaultRouter = [
   {
@@ -71,6 +81,49 @@ export const DefaultRouter = [
       {
         path: "/dashboard/customer-management",
         element: <CustomerManagement />,
+      },
+      //NCC
+      {
+        path: "/dashboard/supplier-management",
+        element: <SupplierManagement />,
+      },
+      // Warehouse
+      {
+        path: "/dashboard/warehouse/inventory",
+        element: <Inventory />,
+      },
+      {
+        path: "/dashboard/warehouse/inventory-receiving",
+        element: <Inventoryreceiving />,
+      },
+      {
+        path: "/dashboard/warehouse/import-goods",
+        element: <ImportGoods />,
+      },
+      {
+        path: "/dashboard/warehouse/shipping",
+        element: <Shipping />,
+      },
+      {
+        path: "/dashboard/warehouse/inventory-check",
+        element: <InventoryCheck />,
+      },
+      {
+        path: "/dashboard/warehouse/product-destruction",
+        element: <ProductDestruction />,
+      },
+      {
+        path: "/dashboard/warehouse/product-return",
+        element: <ProductReturn />,
+      },
+      //Debt management
+      {
+        path: "/dashboard/debt-management/receipt",
+        element: <Receipt />,
+      },
+      {
+        path: "/dashboard/debt-management/payment",
+        element: <Payment />,
       },
       {
         path: "dashboard/special-pages/billing",
@@ -180,50 +233,3 @@ export const DefaultRouter = [
     element: <SignIn />,
   },
 ];
-// const DefaultRouter = () => {
-//     return (
-//         <TransitionGroup>
-//             <CSSTransition classNames="fadein" timeout={300}>
-//                 <Switch>
-//                     <Route path="/dashboard" exact component={Index} />
-//                     {/* user */}
-//                     <Route path="/dashboard/app/user-profile"     exact component={UserProfile} />
-//                     <Route path="/dashboard/app/user-add"         exact component={UserAdd}/>
-//                     <Route path="/dashboard/app/user-list"        exact component={UserList}/>
-//                     <Route path="/dashboard/app/user-privacy-setting" exact component={userProfileEdit}/>
-//                      {/* widget */}
-//                      <Route path="/dashboard/widget/widgetbasic"   exact component={Widgetbasic}/>
-//                      <Route path="/dashboard/widget/widgetcard"    exact component={Widgetcard}/>
-//                      <Route path="/dashboard/widget/widgetchart"   exact component={Widgetchart}/>
-//                      {/* icon */}
-//                      <Route path="/dashboard/icon/solid"           exact component={Solid}/>
-//                      <Route path="/dashboard/icon/outline"         exact component={Outline}/>
-//                      <Route path="/dashboard/icon/dual-tone"       exact component={DualTone}/>
-//                      {/* From */}
-//                      <Route path="/dashboard/form/form-element"    exact component={FormElement}/>
-//                      <Route path="/dashboard/form/form-validation" exact component={FormValidation}/>
-//                      <Route path="/dashboard/form/form-wizard"     exact component={FormWizard}/>
-//                      {/* table */}
-//                      <Route path="/dashboard/table/bootstrap-table" exact component={BootstrapTable}/>
-//                      <Route path="/dashboard/table/table-data"      exact component={TableData}/>
-//                      {/*special pages */}
-//                      <Route path="/dashboard/special-pages/billing" exact component={Billing}/>
-//                      <Route path="/dashboard/special-pages/kanban" exact component={Kanban}/>
-//                      <Route path="/dashboard/special-pages/pricing" exact component={Pricing}/>
-//                      <Route path="/dashboard/special-pages/timeline" exact component={Timeline}/>
-//                      <Route path="/dashboard/special-pages/calender" exact component={Calender}/>
-//                      {/* map */}
-//                      <Route path="/dashboard/map/vector" exact component={Vector}/>
-//                      <Route path="/dashboard/map/google" exact component={Google}/>
-//                      {/* extra */}
-//                      <Route path="/dashboard/extra/privacy-policy" exact component={PrivacyPolicy}/>
-//                      <Route path="/dashboard/extra/terms-of-service" exact component={TermsofService}/>
-//                      {/*admin*/}
-//                      <Route path="/dashboard/admin/admin" exact component={Admin}/>
-//                 </Switch>
-//             </CSSTransition>
-//         </TransitionGroup>
-//     )
-// }
-
-// export default DefaultRouter
