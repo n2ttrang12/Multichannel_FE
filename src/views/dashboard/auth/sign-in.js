@@ -22,7 +22,7 @@ const SignIn = () => {
       password,
     };
     axios
-      .post("http://localhost:8001/api/v1/sale/app-user/login", data)
+      .post("http://localhost:8001/api/v1/multi-chanel/app-user/login", data)
       .then((response) => {
         console.log(response.data);
         history.push("/dashboard");
