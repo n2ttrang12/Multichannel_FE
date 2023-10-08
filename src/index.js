@@ -14,6 +14,7 @@ import Index from "./views/index";
 import { IndexRouters } from "./router";
 import { SimpleRouter } from "./router/simple-router";
 import { DefaultRouter } from "./router/default-router";
+import UserProvider from "./contexts/userProvider";
 
 const router = createBrowserRouter(
   [
@@ -31,9 +32,11 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
-      <App>
-        <RouterProvider router={router}></RouterProvider>
-      </App>
+      <UserProvider>
+        <App>
+          <RouterProvider router={router}></RouterProvider>
+        </App>
+      </UserProvider>
     </Provider>
   </React.StrictMode>
 );

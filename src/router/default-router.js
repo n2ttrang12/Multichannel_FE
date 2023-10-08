@@ -58,14 +58,15 @@ import Receipt from "../views/dashboard/debt-management/receipt";
 import Payment from "../views/dashboard/debt-management/payment";
 import SignUp from "../views/dashboard/auth/sign-up";
 import SignIn from "../views/dashboard/auth/sign-in";
+import ProtectedRoute from "./protected-route";
 
 export const DefaultRouter = [
   {
-    path: "/",
+    path: "/dashboard",
     element: <Default />,
     children: [
       {
-        path: "dashboard",
+        path: "/dashboard",
         element: <Index />,
       },
       // Order management
@@ -97,11 +98,11 @@ export const DefaultRouter = [
         element: <Inventoryreceiving />,
       },
       {
-        path: "/dashboard/warehouse/import-goods",
+        path: "/dashboard/dashboard/warehouse/import-goods",
         element: <ImportGoods />,
       },
       {
-        path: "/dashboard/warehouse/shipping",
+        path: "/dashboard/dashboard/warehouse/shipping",
         element: <Shipping />,
       },
       {

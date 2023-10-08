@@ -29,10 +29,13 @@ import { useSelector } from "react-redux";
 
 // Import selectors & action from setting store
 import * as SettingSelector from "../../../../store/setting/selectors";
+import UserContext from "../../../../contexts/userContext";
 
 const Header = memo((props) => {
   const navbarHide = useSelector(SettingSelector.navbar_show); // array
   const headerNavbar = useSelector(SettingSelector.header_navbar);
+  const { logout, user } = React.useContext(UserContext);
+
   useEffect(() => {
     // navbarstylemode
     if (headerNavbar === "navs-sticky" || headerNavbar === "nav-glass") {
@@ -510,10 +513,8 @@ const Header = memo((props) => {
                     className="theme-color-pink-img img-fluid avatar avatar-50 avatar-rounded"
                   />
                   <div className="caption ms-3 d-none d-md-block ">
-                    <h6 className="mb-0 caption-title">Austin Robertson</h6>
-                    <p className="mb-0 caption-sub-title">
-                      Marketing Administrator
-                    </p>
+                    <h6 className="mb-0 caption-title"> {user.name}</h6>
+                    <p className="mb-0 caption-sub-title">{user.email}</p>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu
@@ -527,7 +528,12 @@ const Header = memo((props) => {
                     Privacy Setting
                   </Dropdown.Item>
                   <Dropdown.Divider />
-                  <Dropdown.Item href="https://templates.iqonic.design/hope-ui/react/build/auth/sign-in">
+                  <Dropdown.Item
+                    onClick={() => {
+                      console.log("logout");
+                      logout();
+                    }}
+                  >
                     Logout
                   </Dropdown.Item>
                 </Dropdown.Menu>

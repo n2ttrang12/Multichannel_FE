@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Image, Form, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Card from "../../../components/Card";
@@ -10,11 +10,22 @@ import axios from "axios";
 // import instagram from "../../../assets/images/brands/im.svg";
 // import linkedin from "../../../assets/images/brands/li.svg";
 import auth1 from "../../../assets/images/auth/01.png";
+import UserContext from "../../../contexts/userContext";
 
 const SignIn = () => {
   let history = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login, isLoggedIn } = React.useContext(UserContext);
+  const [showInvalidCredentialsError, setShowInvalidCredentialsError] =
+    useState(false);
+
+  useEffect(() => {
+    console.log(isLoggedIn, "sign in page");
+    if (isLoggedIn) {
+      history("/dashboard");
+    }
+  });
 
   const handleSignIn = () => {
     const data = {
@@ -25,7 +36,17 @@ const SignIn = () => {
       .post("http://localhost:8001/api/v1/multi-chanel/app-user/login", data)
       .then((response) => {
         console.log(response.data);
-        history("/dashboard");
+        if (response.data.statusCode == 200) {
+          setShowInvalidCredentialsError(false);
+          const { user, accessToken } = response.data.data;
+          login({
+            user,
+            accessToken,
+          });
+          history("/dashboard");
+        } else {
+          setShowInvalidCredentialsError(true);
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -135,6 +156,9 @@ const SignIn = () => {
                             />
                           </Form.Group>
                         </Col>
+                        {showInvalidCredentialsError && (
+                          <div className="text-danger">Invalid credentials</div>
+                        )}
                         <Col lg="12" className="d-flex justify-content-between">
                           <Form.Check className="form-check mb-3">
                             <Form.Check.Input

@@ -8,84 +8,38 @@ import Circularprogressbar from "../../../components/circularprogressbar";
 
 const Data_table = [
   {
-    name: "Airi Satou",
-    position: "Accountant",
-    office: "Tokyo",
-    age: "33",
-    startdate: "2008/11/28",
-    salary: "$162,700",
+    orderId: "DH00001",
+    createDate: "11/12/2022 12:00",
+    customer: "Nguyễn Như Lan",
+    phone: "0987654321",
+    channel: "Shoppe/11/28",
+    orderStatus: "Đặt hàng",
+    total: "100.000",
+    paymentMethod: "COD",
+    cod: "120.000",
+    shippingMethod: "Viettel post",
+    trackingNumber: "VD0001",
+    address: "216 Chu Văn An, p12 Q.Binh Thanh",
+    area: "TP HCM",
+    craetor: "Thanh Nguyễn",
+    color: "bg-success",
   },
   {
-    name: "Angelica Ramos",
-    position: "Chief Executive Officer (CEO)",
-    office: "London",
-    age: "47",
-    startdate: "2009/10/09",
-    salary: "$1,200,000",
-  },
-  {
-    name: "Ashton Cox",
-    position: "Junior Technical Author",
-    office: "San Francisco",
-    age: "66",
-    startdate: "2009/01/12",
-    salary: "$86,000",
-  },
-  {
-    name: "Bradley Greer",
-    position: "Software Engineer",
-    office: "London",
-    age: "41",
-    startdate: "2012/10/13",
-    salary: "$132,000",
-  },
-  {
-    name: "Brenden Wagner",
-    position: "Software Engineer",
-    office: "San Francisco",
-    age: "28",
-    startdate: "2011/06/07",
-    salary: "$206,850",
-  },
-  {
-    name: "Brielle Williamson",
-    position: "Integration Specialist",
-    office: "New York",
-    age: "61",
-    startdate: "2012/12/02",
-    salary: "$372,000",
-  },
-  {
-    name: "Bruno Nash",
-    position: "Software Engineer",
-    office: "London",
-    age: "38",
-    startdate: "2011/05/03",
-    salary: "$163,500",
-  },
-  {
-    name: "Caesar Vance",
-    position: "Pre-Sales Support",
-    office: "New York",
-    age: "21",
-    startdate: "2011/12/12",
-    salary: "$106,450",
-  },
-  {
-    name: "Cara Stevens",
-    position: "Sales Assistant",
-    office: "New York",
-    age: "46",
-    startdate: "2011/12/06",
-    salary: "$145,600",
-  },
-  {
-    name: "Cedric Kelly",
-    position: "Senior Javascript Developer",
-    office: "Edinburgh",
-    age: "22",
-    startdate: "2012/03/29",
-    salary: "$433,060",
+    orderId: "DH00001",
+    createDate: "11/12/2022 12:00",
+    customer: "Nguyễn Như Lan",
+    phone: "0987654321",
+    channel: "Shoppe/11/28",
+    orderStatus: "Đã hủy",
+    total: "100.000",
+    paymentMethod: "Tiền mặt",
+    cod: "",
+    shippingMethod: "Viettel post",
+    trackingNumber: "VD0001",
+    address: "216 Chu Văn An, p12 Q.Binh Thanh",
+    area: "TP HCM",
+    craetor: "Thanh Nguyễn",
+    color: "bg-danger",
   },
 ];
 
@@ -98,12 +52,6 @@ const List = () => {
         </div>
       </Card.Header>
       <Card.Body>
-        <p>
-          Images in Bootstrap are made responsive with <code>.img-fluid</code>.{" "}
-          <code>max-width: 100%;</code> and <code>height: auto;</code> are
-          applied to the image so that it scales with the parent element.
-        </p>
-
         <div className="border-bottom my-3">
           <Table
             responsive
@@ -114,36 +62,88 @@ const List = () => {
           >
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Mã ĐH</th>
+                <th>Ngày tạo đơn</th>
+                <th>Khách hàng</th>
+                <th>SĐT</th>
+                <th>Kênh</th>
+                <th>Trạng thái ĐH</th>
+                <th>Tổng tiền</th>
+                <th>Phương thức TT</th>
+                <th>COD</th>
+                <th>Hình thức GH</th>
+                <th>Mã vận đơn</th>
+                <th>Địa chỉ</th>
+                <th>Khu vực</th>
+                <th>Người tạo</th>
+                <th>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {Data_table.map((item) => (
-                <tr key={item.age}>
-                  <td>{item.name}</td>
-                  <td>{item.position}</td>
-                  <td>{item.office}</td>
-                  <td>{item.age}</td>
-                  <td>{item.startdate}</td>
-                  <td>{item.salary}</td>
+                <tr key={item.orderId}>
+                  <td>{item.orderId}</td>
+                  <td>{item.createDate}</td>
+                  <td>{item.customer}</td>
+                  <td>{item.phone}</td>
+                  <td>{item.channel}</td>
+                  <td>
+                    <span className={`badge ${item.color}`}>
+                      {item.orderStatus}
+                    </span>
+                  </td>
+                  <td>{item.total}</td>
+                  <td>{item.paymentMethod}</td>
+                  <td>{item.cod}</td>
+                  <td>{item.shippingMethod}</td>
+                  <td>{item.trackingNumber}</td>
+                  <td>{item.address}</td>
+                  <td>{item.area}</td>
+                  <td>{item.craetor}</td>
+                  <td>
+                    <div style={{ float: "right" }}>
+                      <Link
+                        className="btn btn-sm btn-icon text-primary flex-end"
+                        data-bs-toggle="tooltip"
+                        title="Edit User"
+                        to="#"
+                        onClick={() => {
+                          "";
+                        }}
+                      >
+                        <span className="btn-inner">
+                          <svg
+                            width="20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                            fill="blue"
+                          >
+                            <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z" />
+                          </svg>
+                        </span>
+                      </Link>
+                      <Link
+                        className="btn btn-sm btn-icon text-danger"
+                        data-bs-toggle="tooltip"
+                        title="Delete User"
+                        to="#"
+                      >
+                        <span className="btn-inner ">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            fill="red"
+                            viewBox="0 0 448 512"
+                          >
+                            <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
+                          </svg>
+                        </span>
+                      </Link>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot>
-              <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
-              </tr>
-            </tfoot>
           </Table>
           <Row className="align-items-center">
             <Col md="6">
