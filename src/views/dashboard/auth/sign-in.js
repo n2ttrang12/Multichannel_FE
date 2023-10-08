@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Image, Form, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Card from "../../../components/Card";
+import axios from "axios";
 
 // img
 // import facebook from "../../../assets/images/brands/fb.svg";
@@ -12,6 +13,32 @@ import auth1 from "../../../assets/images/auth/01.png";
 
 const SignIn = () => {
   let history = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignIn = () => {
+    const data = {
+      email,
+      password,
+    };
+    axios
+      .post("http://localhost:8001/api/v1/sale/app-user/login", data)
+      .then((response) => {
+        console.log(response.data);
+        history.push("/dashboard");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
   return (
     <>
       <section className="login-content">
@@ -86,6 +113,8 @@ const SignIn = () => {
                               id="email"
                               aria-describedby="email"
                               placeholder=" "
+                              value={email}
+                              onChange={handleEmailChange}
                             />
                           </Form.Group>
                         </Col>
@@ -100,6 +129,9 @@ const SignIn = () => {
                               id="password"
                               aria-describedby="password"
                               placeholder=" "
+                              value={password}
+                              onChange={handlePasswordChange}
+                              x
                             />
                           </Form.Group>
                         </Col>
@@ -118,7 +150,7 @@ const SignIn = () => {
                       </Row>
                       <div className="d-flex justify-content-center">
                         <Button
-                          onClick={() => history.push("/dashboard")}
+                          onClick={handleSignIn}
                           type="button"
                           variant="btn btn-primary"
                         >

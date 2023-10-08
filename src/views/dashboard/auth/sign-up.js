@@ -14,26 +14,23 @@ import auth5 from "../../../assets/images/auth/05.png";
 const SignUp = () => {
   let history = useNavigate();
 
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phonenumber, setPhonenumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordComfirm, setPasswordComfirm] = useState("");
+
   const handleSignUp = () => {
     const data = {
-      name: "Rakuten",
-      email: "rakuten@getnada.com",
-      phonenumber: "0586318127",
-      password: "headers",
-      passwordComfirm: "headers",
-      roleId: 1,
-    };
-
-    const headers = {
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdldG5hZGEuY29tIiwiaWF0IjoxNjk1NTQ5NTE2LCJleHAiOjE2OTU2MzU5MTZ9.SNkI4Ly1nUmgZHbZI5YdXmUJjkSpp2kwkx6E1-Ww7GY",
-      //  "Content-Type": "application/json", // Assuming you're sending JSON data
+      name: fullName,
+      email,
+      phonenumber,
+      password,
+      passwordComfirm,
     };
 
     axios
-      .post("http://localhost:8888/api/v1/sale/app-user/register", data, {
-        headers,
-      })
+      .post("http://localhost:8001/api/v1/sale/app-user/register", data)
       .then((response) => {
         console.log(response.data);
         history.push("/dashboard");
@@ -43,12 +40,6 @@ const SignUp = () => {
       });
     // history.push("/dashboard");
   };
-
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phonenumber, setPhonenumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordComfirm, setPasswordComfirm] = useState("");
 
   const handleFullNameChange = (e) => {
     setFullName(e.target.value);

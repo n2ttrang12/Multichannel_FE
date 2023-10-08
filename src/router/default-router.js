@@ -47,6 +47,7 @@ import List from "../views/dashboard/order-management/list";
 import Bill from "../views/dashboard/order-management/bill";
 import CustomerManagement from "../views/dashboard/special-pages/customer-management";
 import SignUp from "../views/dashboard/auth/sign-up";
+import SignIn from "../views/dashboard/auth/sign-in";
 
 export const DefaultRouter = [
   {
@@ -173,6 +174,10 @@ export const DefaultRouter = [
   {
     path: "sign-up",
     element: <SignUp />,
+  },
+  {
+    path: "sign-in",
+    element: <SignIn />,
   },
 ];
 // const DefaultRouter = () => {
