@@ -56,6 +56,8 @@ import ProductDestruction from "../views/dashboard/warehouse/product-destruction
 import ProductReturn from "../views/dashboard/warehouse/product-return";
 import Receipt from "../views/dashboard/debt-management/receipt";
 import Payment from "../views/dashboard/debt-management/payment";
+import SignUp from "../views/dashboard/auth/sign-up";
+import SignIn from "../views/dashboard/auth/sign-in";
 
 export const DefaultRouter = [
   {
@@ -221,5 +223,13 @@ export const DefaultRouter = [
         element: <DualTone />,
       },
     ],
+  },
+  {
+    path: "sign-up",
+    element: <SignUp />,
+  },
+  {
+    path: "sign-in",
+    element: <SignIn />,
   },
 ];
