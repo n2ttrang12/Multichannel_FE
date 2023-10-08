@@ -59,6 +59,7 @@ import Payment from "../views/dashboard/debt-management/payment";
 import SignUp from "../views/dashboard/auth/sign-up";
 import SignIn from "../views/dashboard/auth/sign-in";
 import ProtectedRoute from "./protected-route";
+import CategoryManagement from "../views/dashboard/product-management/category";
 
 export const DefaultRouter = [
   {
@@ -126,9 +127,10 @@ export const DefaultRouter = [
         path: "/dashboard/debt-management/payment",
         element: <Payment />,
       },
+      //Products management
       {
-        path: "dashboard/special-pages/billing",
-        element: <Billing />,
+        path: "/dashboard/product-management/category-management",
+        element: <CategoryManagement />,
       },
       {
         path: "dashboard/special-pages/calender",

@@ -1,8 +1,16 @@
 import React, { useEffect } from "react";
 import UserContext from "./userContext";
 
+const getUserFromLocalStorage = () => {
+  const storedUserJSON = localStorage.getItem("user");
+  const storedUser = JSON.parse(storedUserJSON);
+  console.log("parseUser", storedUser);
+  console.log("accessToken", localStorage.getItem("accessToken"));
+  return storedUser;
+};
+
 const UserProvider = ({ children }) => {
-  const [user, setUser] = React.useState(null);
+  const [user, setUser] = React.useState(() => getUserFromLocalStorage());
 
   //   const fetchUserDetails = async () => {
   //     const accessToken = localStorage.getItem("accessToken");
@@ -32,11 +40,7 @@ const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (!user) {
-      const storedUserJSON = localStorage.getItem("user");
-      const storedUser = JSON.parse(storedUserJSON);
-      console.log("parseUser", storedUser);
-      //todo: fetch user from server again when reloading page
-      setUser(storedUser);
+      //todo: fetch user from backend
     }
   }, []);
 

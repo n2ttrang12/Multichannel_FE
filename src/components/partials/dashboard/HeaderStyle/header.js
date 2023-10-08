@@ -513,8 +513,8 @@ const Header = memo((props) => {
                     className="theme-color-pink-img img-fluid avatar avatar-50 avatar-rounded"
                   />
                   <div className="caption ms-3 d-none d-md-block ">
-                    <h6 className="mb-0 caption-title"> {user.name}</h6>
-                    <p className="mb-0 caption-sub-title">{user.email}</p>
+                    <h6 className="mb-0 caption-title"> {user?.name}</h6>
+                    <p className="mb-0 caption-sub-title">{user?.email}</p>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu
