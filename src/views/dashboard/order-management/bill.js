@@ -224,7 +224,13 @@ const Bill = () => {
                 className="dataTables_paginate paging_simple_numbers"
                 id="datatable_paginate"
               >
-                <ul className="pagination">
+                <ul
+                  className="pagination"
+                  style={{
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                >
                   <li
                     className="paginate_button page-item previous disabled"
                     id="datatable_previous"

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import UserContext from "./userContext";
+import { useReducer } from "react";
 
 const getUserFromLocalStorage = () => {
   const storedUserJSON = localStorage.getItem("user");
@@ -9,8 +10,33 @@ const getUserFromLocalStorage = () => {
   return storedUser;
 };
 
+const initialState = {
+  user: getUserFromLocalStorage(),
+  accessToken: localStorage.getItem("accessToken"),
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "LOGIN":
+      return {
+        ...state,
+        user: action.payload.user,
+        accessToken: action.payload.accessToken,
+      };
+    case "LOGOUT":
+      return {
+        ...state,
+        user: null,
+        accessToken: null,
+      };
+    default:
+      return state;
+  }
+};
+
 const UserProvider = ({ children }) => {
-  const [user, setUser] = React.useState(() => getUserFromLocalStorage());
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { user, accessToken } = state;
 
   //   const fetchUserDetails = async () => {
   //     const accessToken = localStorage.getItem("accessToken");
@@ -50,18 +76,28 @@ const UserProvider = ({ children }) => {
 
     const userJSON = JSON.stringify(user);
     localStorage.setItem("user", userJSON);
-    setUser(user);
+    dispatch({
+      type: "LOGIN",
+      payload: {
+        user: user,
+        accessToken: accessToken,
+      },
+    });
   };
 
   const logout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
-    setUser(null);
+    dispatch({
+      type: "LOGOUT",
+      payload: {},
+    });
   };
 
   const value = {
     isLoggedIn: !!user,
     user,
+    accessToken,
     login,
     logout,
   };
