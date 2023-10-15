@@ -4496,6 +4496,8 @@
     background: #ffffff;
     color: #495057;
     transition: box-shadow 0.2s;
+    border-top: solid 1px #e5e7eb !important;
+    border-bottom: solid 1px #e5e7eb !important;
   }
   .p-treetable .p-treetable-tbody > tr > td {
     text-align: left;
