@@ -4,7 +4,6 @@ import { Column } from "primereact/column";
 import { Category } from "../../../models/category";
 
 import { Form, Button, Modal, Row, Col } from "react-bootstrap";
-import { Button as PrimeButton } from "primereact/button";
 import { Link } from "react-router-dom";
 import Card from "../../../components/Card";
 import "./theme.css";
@@ -322,6 +321,12 @@ const CategoryManagement = () => {
             variant="primary"
             onClick={() => {
               //handle send api
+              Category.deleteCategory(category.id)
+                .then((response) => fetchList(page, perPage)) // load lại page
+                .catch((error) => {
+                  alert(error);
+                })
+                .finally(() => setModal(null)); // đóng modal
             }}
           >
             Xác nhận

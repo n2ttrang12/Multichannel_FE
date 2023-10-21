@@ -1,10 +1,10 @@
 import axios from "axios";
 
-export const Category = {
+export const Product = {
   async getList({ page, perPage, search = undefined }) {
     //lấy data api
     // console.log("fetch list");
-    const baseUrl = "http://localhost:8001/api/v1/multi-chanel/category";
+    const baseUrl = "http://localhost:8001/api/v1/multi-chanel/product";
     const url = new URL(baseUrl);
     url.searchParams.append("page", page); // nososi vào url để khai báo page
     url.searchParams.append("perPage", perPage); // nối để lấy perpage

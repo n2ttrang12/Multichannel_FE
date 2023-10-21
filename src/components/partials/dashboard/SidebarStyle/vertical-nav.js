@@ -301,17 +301,20 @@ const VerticalNav = memo((props) => {
                       </g>
                     </svg>
                   </i>
-                  <span className="item-name">Loại sản phẩm</span>
+                  <span style={{ fontSize: 14 }} className="item-name">
+                    Loại sản phẩm
+                  </span>
                 </Link>
               </li>
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/dashboard/special-pages/calender"
+                    location.pathname ===
+                    "/dashboard/product-management/product-list"
                       ? "active"
                       : ""
                   } nav-link`}
-                  to="/dashboard/special-pages/calender"
+                  to="/dashboard/product-management/product-list"
                 >
                   <i className="icon">
                     <svg
@@ -334,127 +337,6 @@ const VerticalNav = memo((props) => {
                   <span style={{ fontSize: 14 }} className="item-name">
                     Danh sách sản phẩm
                   </span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/special-pages/kanban"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/special-pages/kanban"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> K </i>
-                  <span className="item-name">kanban</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/special-pages/pricing"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/special-pages/pricing"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> P </i>
-                  <span className="item-name">Pricing</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/special-pages/rtl-support"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/special-pages/rtl-support"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> RS </i>
-                  <span className="item-name">RTL Support</span>
-                </Link>
-              </li>
-
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/special-pages/timeline"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/special-pages/timeline"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> T </i>
-                  <span className="item-name">Timeline</span>
                 </Link>
               </li>
             </ul>
