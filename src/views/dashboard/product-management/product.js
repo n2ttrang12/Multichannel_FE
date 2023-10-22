@@ -3,18 +3,24 @@ import { Row, Col, Image, Modal, Form, Button, Table } from "react-bootstrap";
 import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
 import { Product as ProductModel } from "../../../models/product";
+import { useNavigate } from "react-router-dom";
 
 const Product = () => {
   //form validation
   const [validated, setValidated] = useState(false);
+  const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
   const [units, setUnits] = useState([]);
   useEffect(() => {
-    ProductModel.getUnits().then(({ data: { data: units } }) =>
-      setUnits(units)
-    );
+    ProductModel.getUnits().then(({ data: { data: units } }) => {
+      setUnits(units);
+      dispatchProduct({
+        type: "SET_UNIT",
+        payload: units[0].id,
+      });
+    });
   }, []);
 
   const [product, dispatchProduct] = useReducer(
@@ -425,7 +431,35 @@ const Product = () => {
           <div>
             <Button
               onClick={() => {
-                ProductModel.addProduct(product).catch((e) => console.log(e));
+                const _product = {
+                  ...product,
+                  priceList: product.priceList
+                    .filter((price) => {
+                      return price.price;
+                    })
+                    .map((price) => {
+                      const _price = {
+                        exportPrice: parseInt(price.price),
+                        quantity: parseInt(price.quantity),
+                      };
+
+                      if (price[variants[0]?.name] !== undefined) {
+                        _price.variantName = variants[0].name;
+                        _price.variantValue = price[variants[0].name];
+                      }
+                      if (price[variants[1]?.name] !== undefined) {
+                        _price.variantName2 = variants[1].name;
+                        _price.variantValue2 = price[variants[1].name];
+                      }
+                      return _price;
+                    }),
+                };
+
+                ProductModel.addProduct(_product)
+                  .then(() => {
+                    navigate("/dashboard/product-management/product-list");
+                  })
+                  .catch((e) => console.log(e));
               }}
               variant="btn btn-primary"
               type="submit"
