@@ -7309,4 +7309,18 @@
     height: 64px;
     border-radius: 8px;
   }
+
+  .card .btn-link span,
+  .card .btn-link i {
+    color: white;
+  }
+
+  .product .upload__image-wrapper .button-upload {
+    background-color: white !important;
+    color: black !important;
+    border-radius: "10px" !important;
+    border: 1px dashed var(--gray-400, #9ca3af) !important;
+    padding: 40px 0 !important;
+    width: 100%;
+  }
 }

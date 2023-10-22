@@ -60,8 +60,8 @@ import SignUp from "../views/dashboard/auth/sign-up";
 import SignIn from "../views/dashboard/auth/sign-in";
 import ProtectedRoute from "./protected-route";
 import CategoryManagement from "../views/dashboard/product-management/category";
+import ProductList from "../views/dashboard/product-management/product-list";
 import Product from "../views/dashboard/product-management/product";
-import ProductList from "../views/dashboard/product-management/product";
 
 export const DefaultRouter = [
   {
@@ -138,10 +138,10 @@ export const DefaultRouter = [
         path: "/dashboard/product-management/product-list",
         element: <ProductList />,
       },
-      // {
-      //   path: "dashboard/special-pages/kanban",
-      //   element: <Kanban />,
-      // },
+      {
+        path: "/dashboard/product-management/product-list/product",
+        element: <Product />,
+      },
       // {
       //   path: "dashboard/special-pages/pricing",
       //   element: <Pricing />,

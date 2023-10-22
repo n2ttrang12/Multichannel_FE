@@ -385,9 +385,15 @@ const CategoryManagement = () => {
             <Loading />
           ) : (
             <TreeTable value={nodes} tableStyle={{ minWidth: "50rem" }}>
-              <Column field="key" header="Số thứ tự"></Column>
+              <Column
+                style={{
+                  width: "120px",
+                }}
+                field="key"
+                header="Số thứ tự"
+              ></Column>
               <Column field="name" header="Tên danh mục" expander></Column>
-              <Column field="code" header="Code"></Column>
+              {/* <Column field="code" header="Code"></Column> */}
               <Column
                 body={actionTemplate}
                 headerClassName="w-10rem"
