@@ -1,106 +1,81 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import UserContext from "./userContext";
 import { useReducer } from "react";
-
-const getUserFromLocalStorage = () => {
-  const storedUserJSON = localStorage.getItem("user");
-  const storedUser = JSON.parse(storedUserJSON);
-  console.log("parseUser", storedUser);
-  console.log("accessToken", localStorage.getItem("accessToken"));
-  return storedUser;
-};
-
-const initialState = {
-  user: getUserFromLocalStorage(),
-  accessToken: localStorage.getItem("accessToken"),
-};
+import axiosInstance from "../models/axios";
+import { Loading } from "../components/common/loading";
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "LOGIN":
+    case "SET_CURRENT_USER":
       return {
         ...state,
         user: action.payload.user,
-        accessToken: action.payload.accessToken,
       };
-    case "LOGOUT":
-      return {
-        ...state,
-        user: null,
-        accessToken: null,
-      };
+
     default:
       return state;
   }
 };
 
 const UserProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const { user, accessToken } = state;
-
-  //   const fetchUserDetails = async () => {
-  //     const accessToken = localStorage.getItem("accessToken");
-  //     if (!accessToken) {
-  //       return;
-  //     }
-  //     try {
-  //       const response = await fetch(
-  //         "http://localhost:8001/api/v1/multi-chanel/app-user/my-infor",
-  //         {
-  //           method: "GET",
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //           },
-  //         }
-  //       );
-
-  //       if (response.ok) {
-  //         const userData = await response.json();
-  //         setUser(userData);
-  //       }
-  //     } catch (error) {
-  //       // Handle network errors or other issues
-  //       console.error("Error fetching user details:", error);
-  //     }
-  //   };
+  const [state, dispatch] = useReducer(reducer, {});
+  const { user } = state;
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      //todo: fetch user from backend
-    }
+    setIsLoading(true);
+    axiosInstance
+      //try to get current infor
+      .get("app-user/my-infor")
+      .then(({ data }) => {
+        dispatch({
+          type: "SET_CURRENT_USER",
+          payload: {
+            user: data,
+          },
+        });
+      })
+      .catch((e) => {
+        // redirect to login after not exist or expired both access and refresh token
+        if (!window.location.href.includes("sign-in")) {
+          window.location.href = "/sign-in";
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
-  const login = ({ user, accessToken }) => {
-    console.log("user", accessToken);
+  const login = ({ user, accessToken, refreshToken }) => {
     localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
 
     const userJSON = JSON.stringify(user);
     localStorage.setItem("user", userJSON);
     dispatch({
-      type: "LOGIN",
+      type: "SET_CURRENT_USER",
       payload: {
         user: user,
-        accessToken: accessToken,
       },
     });
   };
 
   const logout = () => {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    dispatch({
-      type: "LOGOUT",
-      payload: {},
-    });
+    localStorage.removeItem("refreshToken");
+    window.location.href = "/sign-in";
   };
 
   const value = {
     isLoggedIn: !!user,
     user,
-    accessToken,
     login,
     logout,
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

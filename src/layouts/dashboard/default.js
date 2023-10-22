@@ -52,16 +52,7 @@ const Tour = () => {
 const Default = memo((props) => {
   // let location = useLocation();
   // const pageLayout = useSelector(SettingSelector.page_layout);
-  const { isLoggedIn } = React.useContext(UserContext);
-  console.log(isLoggedIn, "isLogin");
-  let history = useNavigate();
-
   const appName = useSelector(SettingSelector.app_name);
-  useEffect(() => {
-    if (!isLoggedIn) {
-      history("/sign-in");
-    }
-  });
 
   return (
     <Fragment>

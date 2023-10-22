@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children, ...props }) => {
   const { isLoggedIn } = React.useContext(UserContext);
 
   if (!isLoggedIn) {
-    window.location.href = "/sign-in";
+    return null;
   }
 
   return <Route {...props}>{children}</Route>;

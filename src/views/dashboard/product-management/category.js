@@ -191,11 +191,12 @@ const CategoryManagement = () => {
       perPage, // limit,
       search,
     })
-      .then((data) => {
+      .then(({ data }) => {
         //console.log("getRootCategories", nodes);
         if (!data) {
           return;
         }
+        console.log(data);
         setResponse(data); // set data cho state respone
       })
       .finally(() => {

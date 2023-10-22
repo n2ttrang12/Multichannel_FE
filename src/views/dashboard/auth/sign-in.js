@@ -38,10 +38,11 @@ const SignIn = () => {
         console.log(response.data);
         if (response.data.statusCode == 200) {
           setShowInvalidCredentialsError(false);
-          const { user, accessToken } = response.data.data;
+          const { user, accessToken, refreshToken } = response.data.data;
           login({
             user,
             accessToken,
+            refreshToken,
           });
           history("/dashboard");
         } else {
