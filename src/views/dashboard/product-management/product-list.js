@@ -50,7 +50,11 @@ const ProductList = () => {
     //chạy khi page change khi set page/ text change/ filter
     fetchList(page, perPage, searchText);
   }, [page]);
-
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    setPage(1);
+    fetchList(1, perPage, searchText);
+  }, [searchText]);
   const DeleteProduct = ({ product }) => {
     const currentProduct = product?.data;
     return (

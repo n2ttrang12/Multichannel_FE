@@ -1,14 +1,44 @@
 import React, { useEffect, useReducer, useState } from "react";
-import { Row, Col, Image, Modal, Form, Button, Table } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Image,
+  Modal,
+  Form,
+  Button,
+  Table,
+  FormGroup,
+} from "react-bootstrap";
 import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
 import { Product as ProductModel } from "../../../models/product";
 import { useNavigate } from "react-router-dom";
 
+const SuccessModel = ({ handleCloseModal }) => {
+  return (
+    <Modal show={true} onHide={handleCloseModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Thông báo</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>{`Thêm sản phẩm mới thành công`}</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="danger" onClick={handleCloseModal}>
+          Đóng
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 const Product = () => {
   //form validation
-  const [validated, setValidated] = useState(false);
+  const [isInvalidName, setInvalidName] = useState(false);
+  const [isInvalidBarcode, setInvalidBarcode] = useState(false);
+  const [isInvalidDescription, setInvalidDescription] = useState(false);
   const navigate = useNavigate();
+  const [modal, setModal] = useState(null);
   const [images, setImages] = useState([]);
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
@@ -90,8 +120,8 @@ const Product = () => {
       photoList: [],
       priceList: [
         {
-          price: 0,
-          quantity: 0,
+          price: "",
+          quantity: "",
           sku: "",
         },
       ],
@@ -113,101 +143,119 @@ const Product = () => {
     unitId,
   } = product;
 
-  console.log(product);
-
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
     console.log(imageList, addUpdateIndex);
     setImages(imageList);
   };
 
-  const handleSubmit = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+  const validateName = () => {
+    if (!name || name.trim().length < 10) {
+      setInvalidName(true);
+      return false;
+    } else {
+      setInvalidName(false);
+      return true;
     }
-    setValidated(true);
   };
-  const [validated1, setValidated1] = useState(false);
-  const handleSubmit1 = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+  const validateBarcode = () => {
+    if (!barcode || barcode.trim().length <= 0) {
+      setInvalidBarcode(true);
+      return false;
+    } else {
+      setInvalidBarcode(false);
+      return true;
     }
-    setValidated1(true);
   };
+
+  const validateDescription = () => {
+    if (!description || description.trim().length <= 100) {
+      setInvalidDescription(true);
+      return false;
+    } else {
+      setInvalidDescription(false);
+      return true;
+    }
+  };
+
   return (
     <>
+      {modal}
       <div className="product">
-        <Row>
-          <Col sm="12" lg="8">
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h5 className="card-title"> Thông tin chung</h5>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                <Form>
-                  <Row>
-                    <Col md="6" className="mb-3">
-                      <Form.Label md="6" htmlFor="validationDefault01">
-                        Tên sản phẩm
-                        <span className="text-danger"> {" *"}</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={name}
-                        id="validationDefault01"
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_NAME",
-                            payload: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Col>
-                    <Col md="6" className="mb-3">
-                      <Form.Label htmlFor="validationDefault02">
-                        Trạng thái
-                      </Form.Label>
-                      <Form.Select
-                        value={status}
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_STATUS",
-                            payload: e.target.value,
-                          })
-                        }
-                        id="validationDefault04"
-                        required
-                      >
-                        <option value={"SALE"}>Đang bán</option>
-                        <option value={"STOP"}>Dừng bán</option>
-                      </Form.Select>
-                    </Col>
-                    <Col md="6" className="mb-3">
-                      <Form.Label md="6" htmlFor="validationDefault01">
-                        Mã sản phẩm
-                        {/* <span className="text-danger"> {" *"}</span> */}
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={code}
-                        id="validationDefault01"
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_CODE",
-                            payload: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                    </Col>
-                    {/* <Col md="6" className="mb-3">
+        <Card>
+          <Card.Header className="d-flex justify-content-between">
+            <div className="header-title">
+              <h5 className="card-title"> Thông tin chung</h5>
+            </div>
+          </Card.Header>
+          <Card.Body>
+            <Row>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label md="6" htmlFor="validationDefault01">
+                    Tên sản phẩm
+                    <span className="text-danger"> {" *"}</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={name}
+                    isInvalid={isInvalidName}
+                    id="validationDefault01"
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_NAME",
+                        payload: e.target.value,
+                      })
+                    }
+                    onBlur={() => validateName()}
+                  />
+                  <Form.Control.Feedback type={"invalid"} className="invalid">
+                    Vui lòng nhập ít nhất 10 ký tự.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label htmlFor="validationDefault02">
+                    Trạng thái
+                  </Form.Label>
+                  <Form.Select
+                    value={status}
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_STATUS",
+                        payload: e.target.value,
+                      })
+                    }
+                    id="validationDefault04"
+                    required
+                  >
+                    <option value={"SALE"}>Đang bán</option>
+                    <option value={"STOP"}>Dừng bán</option>
+                  </Form.Select>
+                </Form.Group>{" "}
+              </Col>
+            </Row>
+            <Row>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label md="6" htmlFor="validationDefault01">
+                    Mã sản phẩm
+                    {/* <span className="text-danger"> {" *"}</span> */}
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={code}
+                    id="validationDefault01"
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_CODE",
+                        payload: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                  {/* <Col md="6" className="mb-3">
                       <Form.Label htmlFor="validationDefault02">
                         Khối lượng
                       </Form.Label>
@@ -217,161 +265,57 @@ const Product = () => {
                         required
                       />
                     </Col> */}
-                    <Col md="6" className="mb-3">
-                      <Form.Label md="6" htmlFor="validationDefault01">
-                        Mã vạch (Barcode)
-                        {/* <span className="text-danger"> {" *"}</span> */}
-                      </Form.Label>
-                      <Form.Control
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_BARCODE",
-                            payload: e.target.value,
-                          })
-                        }
-                        value={barcode}
-                        type="text"
-                        id="validationDefault01"
-                        required
-                      />
-                    </Col>
-                    <Col md="6" className="mb-3">
-                      <Form.Label htmlFor="validationDefault02">
-                        Đơn vị tính
-                      </Form.Label>
-                      <Form.Select
-                        value={unitId}
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
-                            payload: e.target.value,
-                          })
-                        }
-                        id="validationDefault04"
-                        required
-                      >
-                        {units.map(({ id, name }) => {
-                          return <option value={id}>{name}</option>;
-                        })}
-                      </Form.Select>
-                    </Col>
-                  </Row>
-                </Form>
-              </Card.Body>
-            </Card>
-
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h5 className="card-title"> Hình ảnh</h5>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                <ImageUploading
-                  multiple
-                  value={images}
-                  onChange={onChange}
-                  maxNumber={maxNumber}
-                  dataURLKey="data_url"
-                >
-                  {({
-                    imageList,
-                    onImageUpload,
-                    onImageRemoveAll,
-                    onImageUpdate,
-                    onImageRemove,
-                    isDragging,
-                    dragProps,
-                  }) => (
-                    // write your building UI
-                    <div className="upload__image-wrapper">
-                      <div>
-                        <Button
-                          className="button-upload"
-                          style={isDragging ? { color: "red" } : undefined}
-                          onClick={onImageUpload}
-                          {...dragProps}
-                        >
-                          Click or Drop here
-                        </Button>
-                      </div>
-                      <div className="mt-3">
-                        {imageList.map((image, index) => (
-                          <div key={index} className="image-item">
-                            <img
-                              src={image["data_url"]}
-                              style={{ borderRadius: "8px" }}
-                              alt=""
-                              width="100"
-                            />
-                            <div className="image-item__btn-wrapper">
-                              <button onClick={() => onImageUpdate(index)}>
-                                Update
-                              </button>
-                              <button onClick={() => onImageRemove(index)}>
-                                Remove
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      {!!imageList.length && (
-                        <div className="mt-3">
-                          <Button
-                            style={{
-                              background: "white",
-                              color: "black",
-                            }}
-                            onClick={onImageRemoveAll}
-                          >
-                            Remove all images
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </ImageUploading>
-              </Card.Body>
-            </Card>
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h5 className="card-title"> Thuộc tính</h5>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                <Variants
-                  variants={variants}
-                  prices={priceList}
-                  onChangePrices={(prices) =>
-                    dispatchProduct({
-                      type: "SET_PRICES",
-                      payload: prices,
-                    })
-                  }
-                  onChange={(variants) => setVariants(variants)}
-                ></Variants>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col sm="12" lg="4">
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h5 className="card-title"> Thông tin khác</h5>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                {/* <Form className="was-validated" validated> */}
-                {/* <Form.Group>
-                    <Form.Label htmlFor="validationDefault02">
-                      Loại sản phẩm
-                    </Form.Label>
-                    <Form.Select id="validationDefault04" required>
-                      <option defaultValue>Choose...</option>
-                      <option>...</option>
-                    </Form.Select>
-                  </Form.Group> */}
+                </Form.Group>
+              </Col>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label md="6" htmlFor="validationDefault01">
+                    Mã vạch (Barcode)
+                    {/* <span className="text-danger"> {" *"}</span> */}
+                  </Form.Label>
+                  <Form.Control
+                    isInvalid={isInvalidBarcode}
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_BARCODE",
+                        payload: e.target.value,
+                      })
+                    }
+                    value={barcode}
+                    type="text"
+                    id="validationDefault01"
+                    onBlur={() => validateBarcode()}
+                  />
+                  <Form.Control.Feedback type={"invalid"} className="invalid">
+                    Vui lòng nhập Barcode.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label htmlFor="validationDefault02">
+                    Đơn vị tính
+                  </Form.Label>
+                  <Form.Select
+                    value={unitId}
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_UNIT",
+                        payload: e.target.value,
+                      })
+                    }
+                    id="validationDefault04"
+                    required
+                  >
+                    {units.map(({ id, name }) => {
+                      return <option value={id}>{name}</option>;
+                    })}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md="6">
                 <Form.Group className="form-group">
                   <Form.Label htmlFor="exampleFormControlSelect1">
                     Loại sản phẩm
@@ -391,6 +335,10 @@ const Product = () => {
                     <option>Above 60</option>
                   </select>
                 </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              {/* <Col md="6">
                 <Form.Group className="form-group">
                   <Form.Label htmlFor="exampleFormControlSelect1">
                     Nhã hiệu
@@ -407,67 +355,183 @@ const Product = () => {
                     <option>Above 60</option>
                   </select>
                 </Form.Group>
-                <Form.Group className="mb-3 form-group">
-                  <Form.Label htmlFor="exampleFormControlTextarea1">
-                    Mô tả
-                  </Form.Label>
-                  <Form.Control
-                    onChange={(e) => {
-                      dispatchProduct({
-                        type: "SET_DESCRIPTION",
-                        payload: e.target.value,
-                      });
-                    }}
-                    value={description}
-                    as="textarea"
-                    id="exampleFormControlTextarea1"
-                    rows="5"
-                  />
-                </Form.Group>
-                {/* </Form> */}
-              </Card.Body>
-            </Card>
-          </Col>
-          <div>
-            <Button
-              onClick={() => {
-                const _product = {
-                  ...product,
-                  priceList: product.priceList
-                    .filter((price) => {
-                      return price.price;
-                    })
-                    .map((price) => {
-                      const _price = {
-                        exportPrice: parseInt(price.price),
-                        quantity: parseInt(price.quantity),
-                      };
+              </Col> */}
+              {/* <Col md="6"> */}
+              <Form.Group className="mb-3 form-group">
+                <Form.Label htmlFor="exampleFormControlTextarea1">
+                  Mô tả
+                </Form.Label>
+                <Form.Control
+                  isInvalid={isInvalidDescription}
+                  onChange={(e) => {
+                    dispatchProduct({
+                      type: "SET_DESCRIPTION",
+                      payload: e.target.value,
+                    });
+                  }}
+                  value={description}
+                  as="textarea"
+                  id="exampleFormControlTextarea1"
+                  rows="5"
+                  onBlur={() => validateDescription()}
+                />
+                <Form.Control.Feedback type={"invalid"} className="invalid">
+                  Vui lòng nhập tối thiểu 100 ký tự.
+                </Form.Control.Feedback>
+              </Form.Group>
+              {/* </Col> */}
+            </Row>
+          </Card.Body>
+        </Card>
 
-                      if (price[variants[0]?.name] !== undefined) {
-                        _price.variantName = variants[0].name;
-                        _price.variantValue = price[variants[0].name];
-                      }
-                      if (price[variants[1]?.name] !== undefined) {
-                        _price.variantName2 = variants[1].name;
-                        _price.variantValue2 = price[variants[1].name];
-                      }
-                      return _price;
-                    }),
-                };
-
-                ProductModel.addProduct(_product)
-                  .then(() => {
-                    navigate("/dashboard/product-management/product-list");
-                  })
-                  .catch((e) => console.log(e));
-              }}
-              variant="btn btn-primary"
-              type="submit"
+        <Card>
+          <Card.Header className="d-flex justify-content-between">
+            <div className="header-title">
+              <h5 className="card-title"> Hình ảnh</h5>
+            </div>
+          </Card.Header>
+          <Card.Body>
+            <ImageUploading
+              multiple
+              value={images}
+              onChange={onChange}
+              maxNumber={maxNumber}
+              dataURLKey="data_url"
             >
-              Submit form
-            </Button>
-          </div>
-        </Row>
+              {({
+                imageList,
+                onImageUpload,
+                onImageRemoveAll,
+                onImageUpdate,
+                onImageRemove,
+                isDragging,
+                dragProps,
+              }) => (
+                // write your building UI
+                <div className="upload__image-wrapper">
+                  <div>
+                    <Button
+                      className="button-upload"
+                      style={isDragging ? { color: "red" } : undefined}
+                      onClick={onImageUpload}
+                      {...dragProps}
+                    >
+                      Click or Drop here
+                    </Button>
+                  </div>
+                  <div className="mt-3">
+                    {imageList.map((image, index) => (
+                      <div key={index} className="image-item">
+                        <img
+                          src={image["data_url"]}
+                          style={{ borderRadius: "8px" }}
+                          alt=""
+                          width="100"
+                        />
+                        <div className="image-item__btn-wrapper">
+                          <button onClick={() => onImageUpdate(index)}>
+                            Update
+                          </button>
+                          <button onClick={() => onImageRemove(index)}>
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {!!imageList.length && (
+                    <div className="mt-3">
+                      <Button
+                        style={{
+                          background: "white",
+                          color: "black",
+                        }}
+                        onClick={onImageRemoveAll}
+                      >
+                        Remove all images
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </ImageUploading>
+          </Card.Body>
+        </Card>
+        <Card>
+          <Card.Header className="d-flex justify-content-between">
+            <div className="header-title">
+              <h5 className="card-title"> Thuộc tính</h5>
+            </div>
+          </Card.Header>
+          <Card.Body>
+            <Variants
+              variants={variants}
+              prices={priceList}
+              onChangePrices={(prices) =>
+                dispatchProduct({
+                  type: "SET_PRICES",
+                  payload: prices,
+                })
+              }
+              onChange={(variants) => setVariants(variants)}
+            ></Variants>
+          </Card.Body>
+        </Card>
+
+        <div>
+          <Button
+            onClick={() => {
+              const isValidName = validateName();
+              const isValidBarcode = validateBarcode();
+              const isValidDescription = validateDescription();
+
+              if (!isValidName || !isValidBarcode || !isValidDescription) {
+                return;
+              }
+
+              const _product = {
+                ...product,
+                priceList: product.priceList
+                  .filter((price) => {
+                    return price.price;
+                  })
+                  .map((price) => {
+                    const _price = {
+                      exportPrice: parseInt(price.price),
+                      quantity: parseInt(price.quantity),
+                    };
+
+                    if (price[variants[0]?.name] !== undefined) {
+                      _price.variantName = variants[0].name;
+                      _price.variantValue = price[variants[0].name];
+                    }
+                    if (price[variants[1]?.name] !== undefined) {
+                      _price.variantName2 = variants[1].name;
+                      _price.variantValue2 = price[variants[1].name];
+                    }
+                    return _price;
+                  }),
+              };
+
+              ProductModel.addProduct(_product)
+                .then(() => {
+                  setModal(
+                    <SuccessModel
+                      handleCloseModal={() => {
+                        setModal(null);
+                        navigate("/dashboard/product-management/product-list");
+                      }}
+                    ></SuccessModel>
+                  );
+                })
+                .catch((e) => console.log(e));
+            }}
+            variant="btn btn-primary"
+            type="submit"
+          >
+            Submit form
+          </Button>
+        </div>
       </div>
     </>
   );
@@ -653,7 +717,7 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
                 <td>
                   <Form.Control
                     value={defaultPrice.price}
-                    type="text"
+                    type="number"
                     onChange={(e) => {
                       defaultPrice.price = e.target.value;
                       onChangePrices(handleBeforeSavingPrices([...prices]));
@@ -663,7 +727,7 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
                 <td>
                   <Form.Control
                     value={defaultPrice.quantity}
-                    type="text"
+                    type="number"
                     onChange={(e) => {
                       defaultPrice.quantity = e.target.value;
                       onChangePrices(handleBeforeSavingPrices([...prices]));
@@ -717,7 +781,7 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
                       <Form.Control
                         key={index}
                         value={priceObject.price}
-                        type="text"
+                        type="number"
                         onChange={(e) => {
                           priceObject.price = e.target.value;
                           onChangePrices(handleBeforeSavingPrices([...prices]));
@@ -728,7 +792,7 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
                       <Form.Control
                         key={index}
                         value={priceObject.quantity}
-                        type="text"
+                        type="number"
                         onChange={(e) => {
                           priceObject.quantity = e.target.value;
                           onChangePrices(handleBeforeSavingPrices([...prices]));

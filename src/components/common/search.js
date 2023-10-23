@@ -8,6 +8,7 @@ export const Search = ({ onEnter }) => {
     <div className="flex justify-content-end">
       <span className="p-input-icon-right">
         <InputText
+          className="pt-2 pb-2"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Tìm kiếm"
