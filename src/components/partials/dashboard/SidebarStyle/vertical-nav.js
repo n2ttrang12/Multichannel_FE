@@ -199,12 +199,10 @@ const VerticalNav = memo((props) => {
         <li className="nav-item">
           <Link
             className={`${
-              location.pathname === "/dashboard/customer-management/"
-                ? "active"
-                : ""
+              location.pathname === "/dashboard/customer-list/" ? "active" : ""
             } nav-link `}
             aria-current="page"
-            to="/dashboard/customer-management/"
+            to="/dashboard/customer-list/"
             onClick={() => {}}
           >
             <i className="icon">
@@ -345,12 +343,10 @@ const VerticalNav = memo((props) => {
         <li className="nav-item">
           <Link
             className={`${
-              location.pathname === "/dashboard/supplier-management/"
-                ? "active"
-                : ""
+              location.pathname === "/dashboard/supplier-list/" ? "active" : ""
             } nav-link `}
             aria-current="page"
-            to="/dashboard/supplier-management/"
+            to="/dashboard/supplier-list/"
             onClick={() => {}}
           >
             <i className="icon">

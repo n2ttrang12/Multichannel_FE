@@ -33,7 +33,6 @@ import Google from "../views/dashboard/maps/google";
 //TransitionGroup
 // import { TransitionGroup, CSSTransition } from "react-transition-group";
 //Special Pages
-import Billing from "../views/dashboard/special-pages/customer-management";
 import Kanban from "../views/dashboard/special-pages/kanban";
 import Pricing from "../views/dashboard/special-pages/pricing";
 import Timeline from "../views/dashboard/special-pages/timeline";
@@ -45,8 +44,7 @@ import Admin from "../views/dashboard/admin/admin";
 import Default from "../layouts/dashboard/default";
 import List from "../views/dashboard/order-management/list";
 import Bill from "../views/dashboard/order-management/bill";
-import CustomerManagement from "../views/dashboard/special-pages/customer-management";
-import SupplierManagement from "../views/dashboard/special-pages/supplier-management";
+import CustomerList from "../views/dashboard/customer-management/customer-list";
 import Inventory from "../views/dashboard/warehouse/inventory";
 import Inventoryreceiving from "../views/dashboard/warehouse/inventory-receiving";
 import ImportGoods from "../views/dashboard/warehouse/import-goods";
@@ -62,6 +60,9 @@ import ProtectedRoute from "./protected-route";
 import CategoryManagement from "../views/dashboard/product-management/category";
 import ProductList from "../views/dashboard/product-management/product-list";
 import Product from "../views/dashboard/product-management/product";
+import Customer from "../views/dashboard/customer-management/customer";
+import SupplierList from "../views/dashboard/supplier-management/supplier-list";
+import Supplier from "../views/dashboard/supplier-management/supplier";
 
 export const DefaultRouter = [
   {
@@ -83,13 +84,21 @@ export const DefaultRouter = [
       },
       // Customer management
       {
-        path: "/dashboard/customer-management",
-        element: <CustomerManagement />,
+        path: "/dashboard/customer-list",
+        element: <CustomerList />,
+      },
+      {
+        path: "/dashboard/customer-list/customer",
+        element: <Customer />,
       },
       //NCC
       {
-        path: "/dashboard/supplier-management",
-        element: <SupplierManagement />,
+        path: "/dashboard/supplier-list",
+        element: <SupplierList />,
+      },
+      {
+        path: "/dashboard/supplier-list",
+        element: <Supplier />,
       },
       // Warehouse
       {

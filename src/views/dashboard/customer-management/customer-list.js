@@ -1,7 +1,11 @@
-import React from "react";
-import { Row, Col, Table } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Table, Button } from "react-bootstrap";
 import Card from "../../../components/Card";
 import { Link } from "react-router-dom";
+import { Search } from "../../../components/common/search";
+import { Customer } from "../../../models/customer";
+import { createArrayFrom1ToN } from "../../../helper";
+
 const Data_table = [
   {
     customerId: "KH00001",
@@ -104,7 +108,43 @@ const Data_table = [
     color: "bg-danger",
   },
 ];
-const CustomerManagement = () => {
+const CustomerList = () => {
+  const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerpage] = useState(5);
+  const { data: products, pagination } = response;
+  const total = pagination?.total ?? 0;
+
+  const totalPage = Math.ceil(total / perPage); // dư 1 sp vân là 1 page
+  const fetchList = (page, perPage, search = undefined) => {
+    // lấy từ API
+    setIsLoading(true);
+    Customer.getList({
+      page, // Offset
+      perPage, // limit,
+      search,
+    })
+      .then(({ data }) => {
+        if (!data) {
+          return;
+        }
+        setResponse(data); // set data cho state respone
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    fetchList(page, perPage, searchText);
+  }, [page]);
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    setPage(1);
+    fetchList(1, perPage, searchText);
+  }, [searchText]);
   return (
     <>
       <Card>
@@ -112,8 +152,32 @@ const CustomerManagement = () => {
           <div className="header-title">
             <h4 className="card-title">Danh sách khách hàng</h4>
           </div>
+          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+            <Link to="/dashboard/customer-list/customer">
+              <i className="btn-inner">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </i>
+              <span>Thêm khách hàng</span>
+            </Link>
+          </Button>
         </Card.Header>
         <Card.Body>
+          <div>
+            <Search onEnter={(value) => setSearchText(value)}></Search>
+          </div>
           <div className="border-bottom my-3">
             <Table
               responsive
@@ -204,111 +268,42 @@ const CustomerManagement = () => {
                   role="status"
                   aria-live="polite"
                 >
-                  Showing 1 to 10 of 57 entries
+                  {total !== 0
+                    ? `Showing ${(page - 1) * perPage + 1} to ${
+                        page * perPage <= total ? page * perPage : total
+                      } of ${pagination?.total ?? 0} entries`
+                    : null}
                 </div>
               </Col>
-              <Col md="6">
+              <Col md="6" style={{ paddingTop: 16 }}>
                 <div
                   className="dataTables_paginate paging_simple_numbers"
                   id="datatable_paginate"
                 >
-                  <ul className="pagination">
-                    <li
-                      className="paginate_button page-item previous disabled"
-                      id="datatable_previous"
-                    >
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        aria-disabled="true"
-                        data-dt-idx="previous"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        Previous
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item active">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        aria-current="page"
-                        data-dt-idx="0"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        1
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="1"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        2
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="2"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        3
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="3"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        4
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="4"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        5
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="5"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        6
-                      </Link>
-                    </li>
-                    <li
-                      className="paginate_button page-item next"
-                      id="datatable_next"
-                    >
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="next"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        Next
-                      </Link>
-                    </li>
+                  <ul style={{ justifyContent: "end" }} className="pagination">
+                    {createArrayFrom1ToN(totalPage).map((pageIndex) => {
+                      return (
+                        <li
+                          className={
+                            "paginate_button page-item " +
+                            (page === pageIndex ? "active" : "")
+                          }
+                          id={pageIndex}
+                          onClick={() => setPage(pageIndex)}
+                        >
+                          <Link
+                            to="#"
+                            aria-controls="datatable"
+                            aria-disabled="true"
+                            data-dt-idx="previous"
+                            tabIndex="0"
+                            className="page-link"
+                          >
+                            {pageIndex}
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </Col>
@@ -320,4 +315,4 @@ const CustomerManagement = () => {
   );
 };
 
-export default CustomerManagement;
+export default CustomerList;

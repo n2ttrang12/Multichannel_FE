@@ -1,7 +1,9 @@
-import React from "react";
-import { Row, Col, Table } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Table, Button } from "react-bootstrap";
 import Card from "../../../components/Card";
 import { Link } from "react-router-dom";
+import { Supplier } from "../../../models/supplier";
+import { Search } from "../../../components/common/search";
 const Data_table = [
   {
     supplierId: "KH00001",
@@ -104,7 +106,43 @@ const Data_table = [
     color: "bg-success",
   },
 ];
-const SupplierManagement = () => {
+const SupplierList = () => {
+  const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerpage] = useState(5);
+  const { data: products, pagination } = response;
+  const total = pagination?.total ?? 0;
+
+  const totalPage = Math.ceil(total / perPage); // dư 1 sp vân là 1 page
+  const fetchList = (page, perPage, search = undefined) => {
+    // lấy từ API
+    setIsLoading(true);
+    Supplier.getList({
+      page, // Offset
+      perPage, // limit,
+      search,
+    })
+      .then(({ data }) => {
+        if (!data) {
+          return;
+        }
+        setResponse(data); // set data cho state respone
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    fetchList(page, perPage, searchText);
+  }, [page]);
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    setPage(1);
+    fetchList(1, perPage, searchText);
+  }, [searchText]);
   return (
     <>
       <Card>
@@ -112,8 +150,32 @@ const SupplierManagement = () => {
           <div className="header-title">
             <h4 className="card-title">Danh sách NCC</h4>
           </div>
+          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+            <Link to="/dashboard/customer-list/customer">
+              <i className="btn-inner">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </i>
+              <span>Thêm khách hàng</span>
+            </Link>
+          </Button>
         </Card.Header>
         <Card.Body>
+          <div>
+            <Search onEnter={(value) => setSearchText(value)}></Search>
+          </div>
           <div className="border-bottom my-3">
             <Table
               responsive
@@ -317,4 +379,4 @@ const SupplierManagement = () => {
   );
 };
 
-export default SupplierManagement;
+export default SupplierList;
