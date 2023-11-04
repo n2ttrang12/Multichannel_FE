@@ -13,6 +13,9 @@ import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
 import { Product as ProductModel } from "../../../models/product";
 import { useNavigate } from "react-router-dom";
+import HTMLEditor from "../../../components/common/html-editor";
+import { CategorySelector } from "./category-selector";
+import CategoryProvider from "../../../contexts/categoryProvider";
 
 const SuccessModel = ({ handleCloseModal }) => {
   return (
@@ -32,6 +35,39 @@ const SuccessModel = ({ handleCloseModal }) => {
   );
 };
 
+const CategoryModal = ({
+  handleCategoryChange,
+  handleCloseModal,
+  hideCategoryModel,
+}) => {
+  const [category, setCategory] = useState(null);
+
+  return (
+    <Modal size="xl" show={!hideCategoryModel} onHide={handleCloseModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Chọn danh mục</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <CategorySelector onChange={(category) => setCategory(category)} />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="primary"
+          disabled={!category?.id}
+          onClick={() => {
+            handleCategoryChange(category);
+          }}
+        >
+          Chọn
+        </Button>
+        <Button variant="danger" onClick={handleCloseModal}>
+          Đóng
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 const Product = () => {
   //form validation
   const [isInvalidName, setInvalidName] = useState(false);
@@ -39,6 +75,7 @@ const Product = () => {
   const [isInvalidDescription, setInvalidDescription] = useState(false);
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
+  const [hideCategoryModel, setHideCategoryModel] = useState(true);
   const [images, setImages] = useState([]);
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
@@ -98,7 +135,8 @@ const Product = () => {
         case "SET_CATEGORY":
           return {
             ...state,
-            categoryId: action.payload,
+            categoryId: action.payload.id,
+            categoryName: action.payload.name,
           };
 
         case "SET_UNIT":
@@ -126,7 +164,8 @@ const Product = () => {
         },
       ],
       //Thời Trang Nữ | Quần nữ | Quần jean nữ
-      categoryId: 6268,
+      categoryId: null,
+      categoryName: "",
       unitId: 0,
     }
   );
@@ -140,6 +179,7 @@ const Product = () => {
     photoList,
     priceList,
     categoryId,
+    categoryName,
     unitId,
   } = product;
 
@@ -181,6 +221,7 @@ const Product = () => {
   return (
     <>
       {modal}
+
       <div className="product">
         <Card>
           <Card.Header className="d-flex justify-content-between">
@@ -320,20 +361,14 @@ const Product = () => {
                   <Form.Label htmlFor="exampleFormControlSelect1">
                     Loại sản phẩm
                   </Form.Label>
-                  <select
-                    value={6268}
-                    className="form-select"
-                    id="exampleFormControlSelect1"
+                  <Button
+                    onClick={() => {
+                      setHideCategoryModel(false);
+                    }}
                   >
-                    <option>Chọn loại sản phẩm</option>
-                    <option value={6268}>
-                      Thời Trang Nữ | Quần nữ | Quần jean nữ
-                    </option>
-                    <option>18-26</option>
-                    <option>26-46</option>
-                    <option>46-60</option>
-                    <option>Above 60</option>
-                  </select>
+                    Chọn loại sản phẩm
+                  </Button>
+                  {categoryId ? <p>{categoryName}</p> : null}
                 </Form.Group>
               </Col>
             </Row>
@@ -357,28 +392,26 @@ const Product = () => {
                 </Form.Group>
               </Col> */}
               {/* <Col md="6"> */}
-              <Form.Group className="mb-3 form-group">
-                <Form.Label htmlFor="exampleFormControlTextarea1">
-                  Mô tả
-                </Form.Label>
-                <Form.Control
+
+              <div>
+                Mô tả
+                <HTMLEditor
                   isInvalid={isInvalidDescription}
-                  onChange={(e) => {
+                  onChange={(data) => {
                     dispatchProduct({
                       type: "SET_DESCRIPTION",
-                      payload: e.target.value,
+                      payload: data,
                     });
                   }}
-                  value={description}
-                  as="textarea"
-                  id="exampleFormControlTextarea1"
-                  rows="5"
+                  data={description}
                   onBlur={() => validateDescription()}
                 />
-                <Form.Control.Feedback type={"invalid"} className="invalid">
-                  Vui lòng nhập tối thiểu 100 ký tự.
-                </Form.Control.Feedback>
-              </Form.Group>
+                {isInvalidDescription ? (
+                  <p style={{ display: "block" }} className="invalid-feedback">
+                    Vui lòng nhập tối thiểu 100 ký tự.
+                  </p>
+                ) : null}
+              </div>
               {/* </Col> */}
             </Row>
           </Card.Body>
@@ -533,6 +566,20 @@ const Product = () => {
           </Button>
         </div>
       </div>
+      <CategoryProvider>
+        <CategoryModal
+          hideCategoryModel={hideCategoryModel}
+          handleCategoryChange={(category) => {
+            dispatchProduct({
+              type: "SET_CATEGORY",
+              payload: category,
+            });
+
+            setHideCategoryModel(true);
+          }}
+          handleCloseModal={() => setHideCategoryModel(true)}
+        ></CategoryModal>
+      </CategoryProvider>
     </>
   );
 };
@@ -635,7 +682,8 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
           return (
             <div
               style={{
-                border: "1px solid blue",
+                border: "1px solid",
+                borderRadius: "8px",
                 padding: "24px",
               }}
             >
