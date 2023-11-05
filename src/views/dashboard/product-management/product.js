@@ -478,26 +478,6 @@ const Product = () => {
               </Col>
             </Row>
             <Row>
-              {/* <Col md="6">
-                <Form.Group className="form-group">
-                  <Form.Label htmlFor="exampleFormControlSelect1">
-                    Nhã hiệu
-                  </Form.Label>
-                  <select
-                    className="form-select"
-                    id="exampleFormControlSelect1"
-                  >
-                    <option>Chọn nhãn hiệu</option>
-                    <option>0-18</option>
-                    <option>18-26</option>
-                    <option>26-46</option>
-                    <option>46-60</option>
-                    <option>Above 60</option>
-                  </select>
-                </Form.Group>
-              </Col> */}
-              {/* <Col md="6"> */}
-
               <div>
                 Mô tả
                 <span className="text-danger"> {" *"}</span>
@@ -563,16 +543,29 @@ const Product = () => {
                   </div>
                   <div className="mt-3">
                     {imageList.map((image, index) => (
-                      <div key={index} className="image-item">
+                      <div
+                        key={index}
+                        className="image-item"
+                        style={{
+                          position: "relative",
+                        }}
+                      >
                         <img
                           src={image["data_url"]}
                           style={{ borderRadius: "8px" }}
                           alt=""
                           width="200"
                         />
-                        <div className="image-item__btn-wrapper">
+                        <div
+                          className="image-item__btn-wrapper"
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            right: "4px",
+                          }}
+                        >
                           <Link
-                            className="btn btn-sm btn-icon edit-icon btn-primary"
+                            className="btn btn-sm btn-icon btn-primary"
                             data-bs-toggle="tooltip"
                             title="Edit "
                             to="#"
@@ -580,6 +573,7 @@ const Product = () => {
                             style={{
                               borderRadius: "70%",
                               alignItems: "center",
+                              marginRight: "8px",
                             }}
                           >
                             <svg
@@ -619,7 +613,7 @@ const Product = () => {
                             Update
                           </button> */}
                           <Link
-                            className="btn btn-sm btn-icon delete-icon btn-danger"
+                            className="btn btn-sm btn-icon btn-danger"
                             data-bs-toggle="tooltip"
                             title="Delete User"
                             to="#"
@@ -799,7 +793,7 @@ const Product = () => {
             variant="btn btn-primary"
             type="submit"
           >
-            Submit form
+            Submit
           </Button>
         </div>
       </div>
