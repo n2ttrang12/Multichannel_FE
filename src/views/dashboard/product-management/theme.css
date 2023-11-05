@@ -7323,4 +7323,20 @@
     padding: 40px 0 !important;
     width: 100%;
   }
+  .category .category-col {
+    border-right: 1px solid var(--gray-400, #9ca3af) !important;
+  }
+
+  .category .category-col .item-name:hover {
+    font-weight: 500 !important;
+    cursor: pointer !important;
+  }
+
+  .category .category-col .selected-item {
+    font-weight: 500 !important;
+    color: white;
+    background: var(--blue-500) !important;
+    border-radius: 8px !important;
+    border: 1px;
+  }
 }

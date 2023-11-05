@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Loading } from "../components/common/loading";
 import { Category } from "../models/category";
+
 export const CategoryContext = React.createContext();
 function removeVietnameseDiacritics(str) {
   // Chuyển đổi các ký tự tiếng Việt có dấu thành ký tự không dấu
@@ -77,9 +78,13 @@ const CategoryProvider = ({ children }) => {
     const isLeaf = !child || child.length === 0;
     return (
       <li
+        className={"item-name" + (selected === id ? " selected-item" : "")}
         style={{
-          backgroundColor: selected === id ? "yellow" : "blue",
-          margin: "8px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "12px",
+          fontSize: "14px",
         }}
         onClick={() => {
           if (isLeaf) {
@@ -89,8 +94,26 @@ const CategoryProvider = ({ children }) => {
         }}
         id={id}
       >
-        {name}
-        {!isLeaf && " >"}
+        <div>{name}</div>
+        <div>
+          {!isLeaf && (
+            <svg
+              class="icon-32"
+              width="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8.5 5L15.5 12L8.5 19"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>{" "}
+            </svg>
+          )}
+        </div>
       </li>
     );
   };

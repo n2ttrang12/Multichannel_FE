@@ -12,11 +12,12 @@ import {
 import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
 import { Product as ProductModel } from "../../../models/product";
-import { useNavigate } from "react-router-dom";
+import { Image as ImageModel } from "../../../models/image";
+import { Link, useNavigate } from "react-router-dom";
 import HTMLEditor from "../../../components/common/html-editor";
 import { CategorySelector } from "./category-selector";
 import CategoryProvider from "../../../contexts/categoryProvider";
-
+import "./theme.css";
 const SuccessModel = ({ handleCloseModal }) => {
   return (
     <Modal show={true} onHide={handleCloseModal}>
@@ -73,6 +74,9 @@ const Product = () => {
   const [isInvalidName, setInvalidName] = useState(false);
   const [isInvalidBarcode, setInvalidBarcode] = useState(false);
   const [isInvalidDescription, setInvalidDescription] = useState(false);
+  const [isInvalidCategory, setInvalidCategory] = useState(false);
+  const [isInvalidPhoto, setInvalidPhoto] = useState(false);
+  const [isInvalidPrice, setInvalidPrice] = useState(false);
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   const [hideCategoryModel, setHideCategoryModel] = useState(true);
@@ -80,6 +84,7 @@ const Product = () => {
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
   const [units, setUnits] = useState([]);
+
   useEffect(() => {
     ProductModel.getUnits().then(({ data: { data: units } }) => {
       setUnits(units);
@@ -92,7 +97,6 @@ const Product = () => {
 
   const [product, dispatchProduct] = useReducer(
     (state, action) => {
-      console.log(action);
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -170,6 +174,8 @@ const Product = () => {
     }
   );
 
+  console.log(product);
+
   const {
     name,
     status,
@@ -214,6 +220,38 @@ const Product = () => {
       return false;
     } else {
       setInvalidDescription(false);
+      return true;
+    }
+  };
+
+  const validateCategory = () => {
+    if (!categoryId) {
+      setInvalidCategory(true);
+      return false;
+    } else {
+      setInvalidCategory(false);
+      return true;
+    }
+  };
+  const validatePrice = () => {
+    const listHasPrice = priceList.filter((price) => {
+      return price.price && price.price > 0;
+    });
+    if (listHasPrice.length == 0) {
+      setInvalidPrice(true);
+      return false;
+    } else {
+      setInvalidPrice(false);
+      return true;
+    }
+  };
+
+  const validatePhoto = () => {
+    if (!images || images.length === 0) {
+      setInvalidPhoto(true);
+      return false;
+    } else {
+      setInvalidPhoto(false);
       return true;
     }
   };
@@ -358,17 +396,84 @@ const Product = () => {
               </Col>
               <Col md="6">
                 <Form.Group className="form-group">
-                  <Form.Label htmlFor="exampleFormControlSelect1">
-                    Loại sản phẩm
-                  </Form.Label>
-                  <Button
-                    onClick={() => {
-                      setHideCategoryModel(false);
+                  <div>
+                    <Form.Label htmlFor="exampleFormControlSelect1">
+                      Loại sản phẩm
+                      <span className="text-danger"> {" *"}</span>
+                    </Form.Label>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    Chọn loại sản phẩm
-                  </Button>
-                  {categoryId ? <p>{categoryName}</p> : null}
+                    {categoryId ? (
+                      <span
+                        className="text-primary"
+                        style={{ paddingRight: "8px" }}
+                      >
+                        {categoryName}
+                      </span>
+                    ) : null}
+                    <Link
+                      className="btn btn-sm btn-icon text-primary flex-end"
+                      data-bs-toggle="tooltip"
+                      title="Edit "
+                      to="#"
+                      onClick={() => {
+                        setHideCategoryModel(false);
+                      }}
+                    >
+                      <span>
+                        <svg
+                          class="icon-32"
+                          width="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M13.7476 20.4428H21.0002"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>{" "}
+                          <path
+                            fill-rule="evenodd"
+                            clip-rule="evenodd"
+                            d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>{" "}
+                          <path
+                            d="M11.021 6.00098L16.4732 10.1881"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>{" "}
+                        </svg>
+                      </span>
+                    </Link>
+                    {/* <Button
+                      
+                    >
+                      Chọn loại sản phẩm
+                    </Button> */}
+                  </div>
+                  {isInvalidCategory ? (
+                    <p
+                      style={{ display: "block" }}
+                      className="invalid-feedback"
+                    >
+                      Vui lòng loại sản phẩm
+                    </p>
+                  ) : null}
                 </Form.Group>
               </Col>
             </Row>
@@ -395,6 +500,7 @@ const Product = () => {
 
               <div>
                 Mô tả
+                <span className="text-danger"> {" *"}</span>
                 <HTMLEditor
                   isInvalid={isInvalidDescription}
                   onChange={(data) => {
@@ -420,7 +526,10 @@ const Product = () => {
         <Card>
           <Card.Header className="d-flex justify-content-between">
             <div className="header-title">
-              <h5 className="card-title"> Hình ảnh</h5>
+              <h5 className="card-title">
+                {" "}
+                Hình ảnh <span className="text-danger"> {" *"}</span>{" "}
+              </h5>
             </div>
           </Card.Header>
           <Card.Body>
@@ -459,15 +568,101 @@ const Product = () => {
                           src={image["data_url"]}
                           style={{ borderRadius: "8px" }}
                           alt=""
-                          width="100"
+                          width="200"
                         />
                         <div className="image-item__btn-wrapper">
-                          <button onClick={() => onImageUpdate(index)}>
+                          <Link
+                            className="btn btn-sm btn-icon edit-icon btn-primary"
+                            data-bs-toggle="tooltip"
+                            title="Edit "
+                            to="#"
+                            onClick={() => onImageUpdate(index)}
+                            style={{
+                              borderRadius: "70%",
+                              alignItems: "center",
+                            }}
+                          >
+                            <svg
+                              class="icon-32"
+                              width="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M13.7476 20.4428H21.0002"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></path>{" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></path>{" "}
+                              <path
+                                d="M11.021 6.00098L16.4732 10.1881"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></path>{" "}
+                            </svg>
+                          </Link>
+
+                          {/* <button onClick={() => onImageUpdate(index)}>
                             Update
-                          </button>
-                          <button onClick={() => onImageRemove(index)}>
+                          </button> */}
+                          <Link
+                            className="btn btn-sm btn-icon delete-icon btn-danger"
+                            data-bs-toggle="tooltip"
+                            title="Delete User"
+                            to="#"
+                            style={{
+                              borderRadius: "50%",
+                              alignItems: "center",
+                            }}
+                            onClick={() => onImageRemove(index)}
+                          >
+                            <svg
+                              class="icon-32"
+                              width="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></path>{" "}
+                              <path
+                                d="M20.708 6.23975H3.75"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></path>{" "}
+                              <path
+                                d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></path>{" "}
+                            </svg>
+                          </Link>
+                          {/* <button onClick={() => onImageRemove(index)}>
                             Remove
-                          </button>
+                          </button> */}
                         </div>
                       </div>
                     ))}
@@ -485,6 +680,15 @@ const Product = () => {
                       </Button>
                     </div>
                   )}
+
+                  {isInvalidPhoto && images.length == 0 ? (
+                    <p
+                      style={{ display: "block" }}
+                      className="invalid-feedback"
+                    >
+                      Vui lòng thêm ít nhất 1 hình
+                    </p>
+                  ) : null}
                 </div>
               )}
             </ImageUploading>
@@ -508,6 +712,14 @@ const Product = () => {
               }
               onChange={(variants) => setVariants(variants)}
             ></Variants>
+            {isInvalidPrice &&
+            priceList.filter((price) => {
+              return price.price && price.price > 0;
+            }).length === 0 ? (
+              <p style={{ display: "block" }} className="invalid-feedback">
+                Vui lòng thêm giá bán
+              </p>
+            ) : null}
           </Card.Body>
         </Card>
 
@@ -517,8 +729,18 @@ const Product = () => {
               const isValidName = validateName();
               const isValidBarcode = validateBarcode();
               const isValidDescription = validateDescription();
+              const isValidCategory = validateCategory();
+              const isValidPhoto = validatePhoto();
+              const isInvalidPrice = validatePrice();
 
-              if (!isValidName || !isValidBarcode || !isValidDescription) {
+              if (
+                !isValidName ||
+                !isValidBarcode ||
+                !isValidDescription ||
+                !isValidCategory ||
+                !isValidPhoto ||
+                !isInvalidPrice
+              ) {
                 return;
               }
 
@@ -526,7 +748,7 @@ const Product = () => {
                 ...product,
                 priceList: product.priceList
                   .filter((price) => {
-                    return price.price;
+                    return price.price && price.price > 0;
                   })
                   .map((price) => {
                     const _price = {
@@ -546,18 +768,33 @@ const Product = () => {
                   }),
               };
 
-              ProductModel.addProduct(_product)
-                .then(() => {
-                  setModal(
-                    <SuccessModel
-                      handleCloseModal={() => {
-                        setModal(null);
-                        navigate("/dashboard/product-management/product-list");
-                      }}
-                    ></SuccessModel>
-                  );
-                })
-                .catch((e) => console.log(e));
+              //push images
+              ImageModel.upload(images).then((res) => {
+                const { data } = res;
+
+                data.forEach((url, i) => {
+                  _product.photoList.push({
+                    url,
+                    isMain: i === 0,
+                  });
+                });
+
+                //push product
+                ProductModel.addProduct(_product)
+                  .then(() => {
+                    setModal(
+                      <SuccessModel
+                        handleCloseModal={() => {
+                          setModal(null);
+                          navigate(
+                            "/dashboard/product-management/product-list"
+                          );
+                        }}
+                      ></SuccessModel>
+                    );
+                  })
+                  .catch((e) => console.log(e));
+              });
             }}
             variant="btn btn-primary"
             type="submit"
@@ -570,6 +807,7 @@ const Product = () => {
         <CategoryModal
           hideCategoryModel={hideCategoryModel}
           handleCategoryChange={(category) => {
+            setInvalidCategory(false);
             dispatchProduct({
               type: "SET_CATEGORY",
               payload: category,
@@ -677,71 +915,79 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
   return (
     <div>
       <div>
-        {_variants.map(({ name, values }, index) => {
-          const _values = [...values, ""];
-          return (
-            <div
-              style={{
-                border: "1px solid",
-                borderRadius: "8px",
-                padding: "24px",
-              }}
-            >
-              <div>
-                <Form.Label htmlFor={index}>
-                  Nhóm phân loại {index + 1}
-                </Form.Label>
-
-                <Form.Control
-                  id={index}
-                  key={index}
-                  value={name}
-                  type="text"
-                  onChange={(e) => {
-                    _variants[index]["name"] = e.target.value;
-                    onChange(handleBeforeSavingVariants(_variants));
+        <Row style={{ display: "flex" }}>
+          {_variants.map(({ name, values }, index) => {
+            const _values = [...values, ""];
+            return (
+              <Col md="6">
+                <div
+                  style={{
+                    marginBottom: "16px",
+                    border: "1px solid lightgrey",
+                    borderRadius: "8px",
+                    padding: "16px",
                   }}
-                />
-              </div>
-              <div>
-                {_values.map((value, indexValue) => {
-                  return (
-                    <div
-                      className="mt-3"
-                      style={{ display: "flex", verticalAlign: "center" }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          marginRight: "16px",
-                        }}
-                      >
-                        <div>Phân loại {indexValue + 1}</div>
-                      </div>
-                      <div>
-                        <Form.Control
-                          key={indexValue}
-                          value={value}
-                          type="text"
-                          onChange={(e) => {
-                            _variants[index]["values"][indexValue] =
-                              e.target.value;
-                            onChange(handleBeforeSavingVariants(_variants));
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+                >
+                  <div>
+                    <Form.Label htmlFor={index}>
+                      Nhóm phân loại {index + 1}
+                    </Form.Label>
+
+                    <Form.Control
+                      id={index}
+                      key={index}
+                      value={name}
+                      type="text"
+                      onChange={(e) => {
+                        _variants[index]["name"] = e.target.value;
+                        onChange(handleBeforeSavingVariants(_variants));
+                      }}
+                    />
+                  </div>
+                  <div>
+                    {_values.map((value, indexValue) => {
+                      return (
+                        <div
+                          className="mt-3"
+                          style={{ display: "flex", verticalAlign: "center" }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginRight: "16px",
+                            }}
+                          >
+                            <div>Phân loại {indexValue + 1}</div>
+                          </div>
+                          <div>
+                            <Form.Control
+                              key={indexValue}
+                              value={value}
+                              type="text"
+                              onChange={(e) => {
+                                _variants[index]["values"][indexValue] =
+                                  e.target.value;
+                                onChange(handleBeforeSavingVariants(_variants));
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </Col>
+            );
+          })}
+        </Row>
       </div>
 
       <div className="mt-3">
-        <h5>Giá bán</h5>
+        <h5>
+          Giá bán
+          <span className="text-danger"> {" *"}</span>
+        </h5>
         <Table
           responsive
           striped
