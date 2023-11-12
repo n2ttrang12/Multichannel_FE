@@ -148,7 +148,7 @@ export const DefaultRouter = [
         element: <ProductList />,
       },
       {
-        path: "/dashboard/product-management/product-list/product",
+        path: "/dashboard/product-management/product-list/product/:id",
         element: <Product />,
       },
       // {

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import {
   Row,
   Col,
@@ -13,11 +13,15 @@ import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
 import { Product as ProductModel } from "../../../models/product";
 import { Image as ImageModel } from "../../../models/image";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import HTMLEditor from "../../../components/common/html-editor";
 import { CategorySelector } from "./category-selector";
-import CategoryProvider from "../../../contexts/categoryProvider";
+import CategoryProvider, {
+  CategoryContext,
+  getBreadcrumb,
+} from "../../../contexts/categoryProvider";
 import "./theme.css";
+import { Loading } from "../../../components/common/loading";
 const SuccessModel = ({ handleCloseModal }) => {
   return (
     <Modal show={true} onHide={handleCloseModal}>
@@ -40,8 +44,58 @@ const CategoryModal = ({
   handleCategoryChange,
   handleCloseModal,
   hideCategoryModel,
+  categoryId,
 }) => {
+  const categoryContext = useContext(CategoryContext);
+  const { setSelected, setSelectedLabel, categories, setL1, setL2, setL3 } =
+    categoryContext;
   const [category, setCategory] = useState(null);
+
+  useEffect(() => {
+    setSelected(categoryId);
+    for (let i = 0; i < categories?.length; i++) {
+      let layer1 = categories[i];
+      if (categoryId === layer1.id) {
+        setL1(layer1.id);
+        handleCategoryChange({
+          id: categoryId,
+          name: layer1?.name,
+        });
+        break;
+      }
+
+      if (layer1.child?.length > 0) {
+        for (let j = 0; j < layer1.child?.length; j++) {
+          let layer2 = layer1.child[j];
+          if (categoryId === layer2.id) {
+            setL1(layer1.id);
+            setL2(layer2.id);
+            handleCategoryChange({
+              id: categoryId,
+              name: layer1.name + " > " + layer2.name,
+            });
+            break;
+          }
+          if (layer2.child?.length > 0) {
+            for (let k = 0; k < layer2.child?.length; k++) {
+              let layer3 = layer2.child[k];
+              if (categoryId === layer3.id) {
+                setL1(layer1.id);
+                setL2(layer2.id);
+                setL3(layer3.id);
+                handleCategoryChange({
+                  id: categoryId,
+                  name:
+                    layer1?.name + " > " + layer2.name + " > " + layer3.name,
+                });
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }, [categoryId]);
 
   return (
     <Modal size="xl" show={!hideCategoryModel} onHide={handleCloseModal}>
@@ -52,6 +106,9 @@ const CategoryModal = ({
         <CategorySelector onChange={(category) => setCategory(category)} />
       </Modal.Body>
       <Modal.Footer>
+        <Button variant="danger" onClick={handleCloseModal}>
+          Đóng
+        </Button>
         <Button
           variant="primary"
           disabled={!category?.id}
@@ -61,15 +118,15 @@ const CategoryModal = ({
         >
           Chọn
         </Button>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
 const Product = () => {
+  let { id } = useParams();
+
+  const isNewMode = id === "new";
   //form validation
   const [isInvalidName, setInvalidName] = useState(false);
   const [isInvalidBarcode, setInvalidBarcode] = useState(false);
@@ -84,19 +141,58 @@ const Product = () => {
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
   const [units, setUnits] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const convertProductResponse = (resProduct) => {
+    return {
+      id: resProduct.id,
+      name: resProduct.name,
+      status: resProduct.status,
+      code: resProduct.status,
+      barcode: resProduct.barcode,
+      description: resProduct.description,
+      photoList: resProduct.productPhotos,
+      priceList: resProduct.productPrices.map((price) => ({
+        price: price.exportPrice,
+        quantity: price.quantity,
+        sku: "",
+      })),
+      //Thời Trang Nữ | Quần nữ | Quần jean nữ
+      categoryId: resProduct.category?.id,
+      categoryName: resProduct.category?.name,
+      unitId: resProduct.unit?.id,
+    };
+  };
 
   useEffect(() => {
     ProductModel.getUnits().then(({ data: { data: units } }) => {
       setUnits(units);
-      dispatchProduct({
-        type: "SET_UNIT",
-        payload: units[0].id,
-      });
+      if (isNewMode) {
+        dispatchProduct({
+          type: "SET_UNIT",
+          payload: units[0].id,
+        });
+      }
     });
+
+    if (!isNewMode) {
+      //mode edit => fetch sản phẩm về
+      setIsLoading(true);
+      ProductModel.get(id)
+        .then((res) => {
+          dispatchProduct({
+            type: "SET_PRODUCT",
+            payload: convertProductResponse(res?.data?.data),
+          });
+        })
+        .finally(() => setIsLoading(false));
+    }
   }, []);
 
   const [product, dispatchProduct] = useReducer(
     (state, action) => {
+      console.log(action);
+
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -148,6 +244,10 @@ const Product = () => {
             ...state,
             unitId: action.payload,
           };
+        case "SET_PRODUCT":
+          return {
+            ...action.payload,
+          };
 
         default:
           return state;
@@ -182,8 +282,8 @@ const Product = () => {
     code,
     barcode,
     description,
-    photoList,
-    priceList,
+    photoList = [],
+    priceList = [],
     categoryId,
     categoryName,
     unitId,
@@ -191,7 +291,6 @@ const Product = () => {
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
-    console.log(imageList, addUpdateIndex);
     setImages(imageList);
   };
 
@@ -259,7 +358,13 @@ const Product = () => {
   return (
     <>
       {modal}
-
+      <div
+        style={{
+          marginBottom: "16px",
+        }}
+      >
+        {isLoading && <Loading></Loading>}
+      </div>
       <div className="product">
         <Card>
           <Card.Header className="d-flex justify-content-between">
@@ -542,6 +647,84 @@ const Product = () => {
                     </Button>
                   </div>
                   <div className="mt-3">
+                    {
+                      //this is from edit
+                      photoList?.map((photo, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="image-item"
+                            style={{
+                              position: "relative",
+                            }}
+                          >
+                            <img
+                              src={photo.url}
+                              style={{ borderRadius: "8px" }}
+                              alt=""
+                              width="200"
+                            />
+                            <div
+                              className="image-item__btn-wrapper"
+                              style={{
+                                position: "absolute",
+                                top: "8px",
+                                right: "4px",
+                              }}
+                            >
+                              <Link
+                                className="btn btn-sm btn-icon btn-danger"
+                                data-bs-toggle="tooltip"
+                                title="Delete User"
+                                to="#"
+                                style={{
+                                  borderRadius: "50%",
+                                  alignItems: "center",
+                                }}
+                                onClick={() => {
+                                  photoList.splice(photoList.indexOf(photo), 1);
+                                  dispatchProduct({
+                                    type: "SET_PHOTOS",
+                                    payload: photoList,
+                                  });
+                                }}
+                              >
+                                <svg
+                                  class="icon-32"
+                                  width="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  {" "}
+                                  <path
+                                    d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>{" "}
+                                  <path
+                                    d="M20.708 6.23975H3.75"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>{" "}
+                                  <path
+                                    d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>{" "}
+                                </svg>
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })
+                    }
                     {imageList.map((image, index) => (
                       <div
                         key={index}
@@ -608,10 +791,6 @@ const Product = () => {
                               ></path>{" "}
                             </svg>
                           </Link>
-
-                          {/* <button onClick={() => onImageUpdate(index)}>
-                            Update
-                          </button> */}
                           <Link
                             className="btn btn-sm btn-icon btn-danger"
                             data-bs-toggle="tooltip"
@@ -654,9 +833,6 @@ const Product = () => {
                               ></path>{" "}
                             </svg>
                           </Link>
-                          {/* <button onClick={() => onImageRemove(index)}>
-                            Remove
-                          </button> */}
                         </div>
                       </div>
                     ))}
@@ -799,9 +975,11 @@ const Product = () => {
       </div>
       <CategoryProvider>
         <CategoryModal
+          categoryId={categoryId}
           hideCategoryModel={hideCategoryModel}
           handleCategoryChange={(category) => {
             setInvalidCategory(false);
+            console.log("dispatchProduct, category", category);
             dispatchProduct({
               type: "SET_CATEGORY",
               payload: category,

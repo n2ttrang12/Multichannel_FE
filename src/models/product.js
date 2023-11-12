@@ -29,13 +29,16 @@ export const Product = {
     );
   },
   async deleteProduct(id) {
-    return axiosInstance.delete(
-      axiosInstance.defaults.baseURL + `product/${id}`
+    return axiosInstance.post(
+      axiosInstance.defaults.baseURL + `product/deleted/${id}`
     );
   },
   async getUnits() {
     return axiosInstance.get(
       axiosInstance.defaults.baseURL + "product/mt/unit"
     );
+  },
+  async get(id) {
+    return axiosInstance.get(axiosInstance.defaults.baseURL + "product/" + id);
   },
 };

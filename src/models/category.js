@@ -13,7 +13,6 @@ export const Category = {
     // console.log("getList category", url.toString());
     return axiosInstance.get(url.toString());
   },
-
   async addCategory(name, parentId = null) {
     return axiosInstance.post(
       axiosInstance.defaults.baseURL + "category/create",
@@ -36,5 +35,21 @@ export const Category = {
     return axiosInstance.delete(
       axiosInstance.defaults.baseURL + `category/${id}`
     );
+  },
+  async getAll() {
+    const data = sessionStorage.getItem("category.all");
+    if (data) {
+      return JSON.parse(data);
+    } else {
+      //TODO: backend support get all and cached
+      const result = await Category.getList({
+        page: 1, // Offset
+        perPage: 100, // limit,
+        search: "",
+      });
+
+      sessionStorage.setItem("category.all", JSON.stringify(result));
+      return result;
+    }
   },
 };

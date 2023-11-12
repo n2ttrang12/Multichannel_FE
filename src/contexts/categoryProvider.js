@@ -26,11 +26,7 @@ const CategoryProvider = ({ children }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    Category.getList({
-      page: 1, // Offset
-      perPage: 100, // limit,
-      search: "",
-    })
+    Category.getAll()
       .then(({ data }) => {
         if (!data) {
           return;
