@@ -152,11 +152,23 @@ const Product = () => {
       barcode: resProduct.barcode,
       description: resProduct.description,
       photoList: resProduct.productPhotos,
-      priceList: resProduct.productPrices.map((price) => ({
-        price: price.exportPrice,
-        quantity: price.quantity,
-        sku: "",
-      })),
+      priceList: resProduct.productPrices.map((price) => {
+        const basicPriceInfo = {
+          price: price.exportPrice,
+          quantity: price.quantity,
+          sku: "",
+        };
+
+        if (price.variant) {
+          basicPriceInfo[price.variant.variant?.name] = price.variant.value;
+        }
+
+        if (price.variant2) {
+          basicPriceInfo[price.variant2.variant?.name] = price.variant2.value;
+        }
+
+        return basicPriceInfo;
+      }),
       //Thời Trang Nữ | Quần nữ | Quần jean nữ
       categoryId: resProduct.category?.id,
       categoryName: resProduct.category?.name,
@@ -180,6 +192,43 @@ const Product = () => {
       setIsLoading(true);
       ProductModel.get(id)
         .then((res) => {
+          const prices = res?.data?.data?.productPrices;
+
+          if (prices) {
+            const variants = [];
+            const handleVariant = (variant, variants) => {
+              const currentV = variants.find((v) => v.name === variant.name);
+              if (!currentV) {
+                variants.push({
+                  name: variant.name,
+                  values: [variant.value],
+                });
+              } else {
+                if (currentV.values.indexOf(variant.value) === -1) {
+                  currentV.values.push(variant.value);
+                }
+              }
+            };
+            prices.forEach((price) => {
+              handleVariant(
+                {
+                  name: price?.variant?.variant?.name,
+                  value: price?.variant?.value,
+                },
+                variants
+              );
+              handleVariant(
+                {
+                  name: price?.variant2?.variant?.name,
+                  value: price?.variant2?.value,
+                },
+                variants
+              );
+            });
+            console.log("variants", variants);
+            setVariants(variants);
+          }
+
           dispatchProduct({
             type: "SET_PRODUCT",
             payload: convertProductResponse(res?.data?.data),
@@ -274,6 +323,7 @@ const Product = () => {
     }
   );
 
+  console.log(variants);
   console.log(product);
 
   const {
