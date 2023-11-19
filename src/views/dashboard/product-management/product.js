@@ -711,7 +711,7 @@ const Product = () => {
                             <img
                               src={photo.url}
                               style={{ borderRadius: "8px" }}
-                              alt=""
+                              alt="Not found"
                               width="200"
                             />
                             <div
@@ -786,7 +786,7 @@ const Product = () => {
                         <img
                           src={image["data_url"]}
                           style={{ borderRadius: "8px" }}
-                          alt=""
+                          alt="Not found"
                           width="200"
                         />
                         <div
