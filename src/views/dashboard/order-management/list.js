@@ -6,6 +6,8 @@ import Swiper from "swiper";
 import { SwiperSlide } from "swiper/react";
 import Circularprogressbar from "../../../components/circularprogressbar";
 import { Order } from "../../../models/order";
+import { formatDate } from "@fullcalendar/react";
+import * as moment from "moment";
 
 const List = () => {
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
@@ -68,16 +70,11 @@ const List = () => {
                 <th>Khách hàng</th>
                 <th>SĐT</th>
                 <th>Kênh</th>
-                <th>Trạng thái ĐH</th>
                 <th>Tổng tiền</th>
-                <th>Phương thức TT</th>
+                <th>Trạng thái ĐH</th>
+                <th>Trạng thái vận chuyển</th>
                 <th>Trạng thái thanh toán</th>
-                <th>Hình thức GH</th>
-                <th>Mã vận đơn</th>
-                <th>Địa chỉ</th>
-                <th>Khu vực</th>
-                <th>Người tạo</th>
-                <th>Thao tác</th>
+                {/* <th>Thao tác</th> */}
               </tr>
             </thead>
             <tbody>
@@ -85,31 +82,32 @@ const List = () => {
                 const statusColor =
                   item.status === "PROCESSING"
                     ? "warning"
-                    : item.status === "DELIVERED"
+                    : item.status === "IN_CART"
                     ? "success"
+                    : item.status === "CANCELLED"
+                    ? "danger"
                     : "";
 
                 return (
                   <tr key={item.id}>
                     <td>{item.id}</td>
-                    <td>{item.createdAt}</td>
-                    <td>{item.customer}</td>
-                    <td>{item.phone}</td>
-                    <td>{item.type}</td>
                     <td>
-                      <span className={`badge ${statusColor}`}>
+                      {item.createdAt
+                        ? moment(item.createdAt).format("LLL")
+                        : null}
+                    </td>
+                    <td>{item.customer?.name}</td>
+                    <td>{item.customer?.phonenumber}</td>
+                    <td>{item.type}</td>
+                    <td>{item.subTotal}</td>
+                    <td>
+                      <span className={`badge bg-${statusColor}`}>
                         {item.status}
                       </span>
                     </td>
-                    <td>{item.total}</td>
-                    <td>{item.paymentMethod}</td>
-                    <td>{item.cod}</td>
-                    <td>{item.shippingMethod}</td>
-                    <td>{item.trackingNumber}</td>
-                    <td>{item.address}</td>
-                    <td>{item.area}</td>
-                    <td>{item.craetor}</td>
-                    <td>
+                    <td>{item.deliveryStatus}</td>
+                    <td>{item.paymentStatus}</td>
+                    {/* <td>
                       <div style={{ float: "right" }}>
                         <Link
                           className="btn btn-sm btn-icon text-primary flex-end"
@@ -149,7 +147,7 @@ const List = () => {
                           </span>
                         </Link>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 );
               })}
