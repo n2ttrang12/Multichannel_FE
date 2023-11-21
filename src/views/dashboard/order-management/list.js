@@ -8,6 +8,8 @@ import Circularprogressbar from "../../../components/circularprogressbar";
 import { Order } from "../../../models/order";
 import { formatDate } from "@fullcalendar/react";
 import * as moment from "moment";
+import { Loading } from "../../../components/common/loading";
+import { Search } from "../../../components/common/search";
 
 const List = () => {
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
@@ -55,59 +57,65 @@ const List = () => {
         </div>
       </Card.Header>
       <Card.Body>
-        <div className="border-bottom my-3">
-          <Table
-            responsive
-            striped
-            id="datatable"
-            className=""
-            data-toggle="data-table"
-          >
-            <thead>
-              <tr>
-                <th>Mã ĐH</th>
-                <th>Ngày tạo đơn</th>
-                <th>Khách hàng</th>
-                <th>SĐT</th>
-                <th>Kênh</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái ĐH</th>
-                <th>Trạng thái vận chuyển</th>
-                <th>Trạng thái thanh toán</th>
-                {/* <th>Thao tác</th> */}
-              </tr>
-            </thead>
-            <tbody>
-              {order?.map((item) => {
-                const statusColor =
-                  item.status === "PROCESSING"
-                    ? "warning"
-                    : item.status === "IN_CART"
-                    ? "success"
-                    : item.status === "CANCELLED"
-                    ? "danger"
-                    : "";
+        <div>
+          <Search onEnter={(value) => setSearchText(value)}></Search>
+        </div>
+        {isLoading ? (
+          <Loading></Loading>
+        ) : (
+          <div className="border-bottom my-3">
+            <Table
+              responsive
+              striped
+              id="datatable"
+              className=""
+              data-toggle="data-table"
+            >
+              <thead>
+                <tr>
+                  <th>Mã ĐH</th>
+                  <th>Ngày tạo đơn</th>
+                  <th>Khách hàng</th>
+                  <th>SĐT</th>
+                  <th>Kênh</th>
+                  <th>Tổng tiền</th>
+                  <th>Trạng thái ĐH</th>
+                  <th>Trạng thái vận chuyển</th>
+                  <th>Trạng thái thanh toán</th>
+                  {/* <th>Thao tác</th> */}
+                </tr>
+              </thead>
+              <tbody>
+                {order?.map((item) => {
+                  const statusColor =
+                    item.status === "PROCESSING"
+                      ? "warning"
+                      : item.status === "IN_CART"
+                      ? "success"
+                      : item.status === "CANCELLED"
+                      ? "danger"
+                      : "";
 
-                return (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>
-                      {item.createdAt
-                        ? moment(item.createdAt).format("LLL")
-                        : null}
-                    </td>
-                    <td>{item.customer?.name}</td>
-                    <td>{item.customer?.phonenumber}</td>
-                    <td>{item.type}</td>
-                    <td>{item.subTotal}</td>
-                    <td>
-                      <span className={`badge bg-${statusColor}`}>
-                        {item.status}
-                      </span>
-                    </td>
-                    <td>{item.deliveryStatus}</td>
-                    <td>{item.paymentStatus}</td>
-                    {/* <td>
+                  return (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td>
+                        {item.createdAt
+                          ? moment(item.createdAt).format("LLL")
+                          : null}
+                      </td>
+                      <td>{item.customer?.name}</td>
+                      <td>{item.customer?.phonenumber}</td>
+                      <td>{item.type}</td>
+                      <td>{item.subTotal}</td>
+                      <td>
+                        <span className={`badge bg-${statusColor}`}>
+                          {item.status}
+                        </span>
+                      </td>
+                      <td>{item.deliveryStatus}</td>
+                      <td>{item.paymentStatus}</td>
+                      {/* <td>
                       <div style={{ float: "right" }}>
                         <Link
                           className="btn btn-sm btn-icon text-primary flex-end"
@@ -148,129 +156,130 @@ const List = () => {
                         </Link>
                       </div>
                     </td> */}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-          <Row className="align-items-center">
-            <Col md="6">
-              <div
-                className="dataTables_info"
-                id="datatable_info"
-                role="status"
-                aria-live="polite"
-              >
-                Showing 1 to 10 of 57 entries
-              </div>
-            </Col>
-            <Col md="6">
-              <div
-                className="dataTables_paginate paging_simple_numbers"
-                id="datatable_paginate"
-              >
-                <ul className="pagination">
-                  <li
-                    className="paginate_button page-item previous disabled"
-                    id="datatable_previous"
-                  >
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      aria-disabled="true"
-                      data-dt-idx="previous"
-                      tabIndex="0"
-                      className="page-link"
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            <Row className="align-items-center">
+              <Col md="6">
+                <div
+                  className="dataTables_info"
+                  id="datatable_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Showing 1 to 10 of 57 entries
+                </div>
+              </Col>
+              <Col md="6">
+                <div
+                  className="dataTables_paginate paging_simple_numbers"
+                  id="datatable_paginate"
+                >
+                  <ul className="pagination">
+                    <li
+                      className="paginate_button page-item previous disabled"
+                      id="datatable_previous"
                     >
-                      Previous
-                    </Link>
-                  </li>
-                  <li className="paginate_button page-item active">
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      aria-current="page"
-                      data-dt-idx="0"
-                      tabIndex="0"
-                      className="page-link"
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        aria-disabled="true"
+                        data-dt-idx="previous"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        Previous
+                      </Link>
+                    </li>
+                    <li className="paginate_button page-item active">
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        aria-current="page"
+                        data-dt-idx="0"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        1
+                      </Link>
+                    </li>
+                    <li className="paginate_button page-item ">
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        data-dt-idx="1"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        2
+                      </Link>
+                    </li>
+                    <li className="paginate_button page-item ">
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        data-dt-idx="2"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        3
+                      </Link>
+                    </li>
+                    <li className="paginate_button page-item ">
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        data-dt-idx="3"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        4
+                      </Link>
+                    </li>
+                    <li className="paginate_button page-item ">
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        data-dt-idx="4"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        5
+                      </Link>
+                    </li>
+                    <li className="paginate_button page-item ">
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        data-dt-idx="5"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        6
+                      </Link>
+                    </li>
+                    <li
+                      className="paginate_button page-item next"
+                      id="datatable_next"
                     >
-                      1
-                    </Link>
-                  </li>
-                  <li className="paginate_button page-item ">
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      data-dt-idx="1"
-                      tabIndex="0"
-                      className="page-link"
-                    >
-                      2
-                    </Link>
-                  </li>
-                  <li className="paginate_button page-item ">
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      data-dt-idx="2"
-                      tabIndex="0"
-                      className="page-link"
-                    >
-                      3
-                    </Link>
-                  </li>
-                  <li className="paginate_button page-item ">
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      data-dt-idx="3"
-                      tabIndex="0"
-                      className="page-link"
-                    >
-                      4
-                    </Link>
-                  </li>
-                  <li className="paginate_button page-item ">
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      data-dt-idx="4"
-                      tabIndex="0"
-                      className="page-link"
-                    >
-                      5
-                    </Link>
-                  </li>
-                  <li className="paginate_button page-item ">
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      data-dt-idx="5"
-                      tabIndex="0"
-                      className="page-link"
-                    >
-                      6
-                    </Link>
-                  </li>
-                  <li
-                    className="paginate_button page-item next"
-                    id="datatable_next"
-                  >
-                    <Link
-                      to="#"
-                      aria-controls="datatable"
-                      data-dt-idx="next"
-                      tabIndex="0"
-                      className="page-link"
-                    >
-                      Next
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </Col>
-          </Row>
-        </div>
+                      <Link
+                        to="#"
+                        aria-controls="datatable"
+                        data-dt-idx="next"
+                        tabIndex="0"
+                        className="page-link"
+                      >
+                        Next
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </Col>
+            </Row>
+          </div>
+        )}
       </Card.Body>
     </Card>
   );

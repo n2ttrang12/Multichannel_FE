@@ -20,7 +20,7 @@ export const Product = {
       }
     );
   },
-  async updateProduct(product) {
+  async update(product) {
     return axiosInstance.post(
       axiosInstance.defaults.baseURL + `product/${product.id}`,
       {
@@ -37,6 +37,9 @@ export const Product = {
     return axiosInstance.get(
       axiosInstance.defaults.baseURL + "product/mt/unit"
     );
+  },
+  async getSupplier() {
+    return axiosInstance.get(axiosInstance.defaults.baseURL + "supplier");
   },
   async get(id) {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "product/" + id);

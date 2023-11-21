@@ -22,6 +22,8 @@ import CategoryProvider, {
 } from "../../../contexts/categoryProvider";
 import "./theme.css";
 import { Loading } from "../../../components/common/loading";
+import Supplier from "../supplier-management/supplier";
+import { SupplierModel } from "../../../models/supplier";
 const SuccessModel = ({ handleCloseModal }) => {
   return (
     <Modal show={true} onHide={handleCloseModal}>
@@ -141,6 +143,7 @@ const Product = () => {
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
   const [units, setUnits] = useState([]);
+  const [suppliers, setSupplier] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const convertProductResponse = (resProduct) => {
@@ -186,6 +189,12 @@ const Product = () => {
         });
       }
     });
+    SupplierModel.getList({
+      page: 1, // Offset
+      perPage: 100, // limit,
+    }).then(({ data: { data: suppliers } }) => {
+      setSupplier(suppliers);
+    });
 
     if (!isNewMode) {
       //mode edit => fetch sản phẩm về
@@ -225,7 +234,7 @@ const Product = () => {
                 variants
               );
             });
-            console.log("variants", variants);
+            // console.log("variants", variants);
             setVariants(variants);
           }
 
@@ -240,8 +249,6 @@ const Product = () => {
 
   const [product, dispatchProduct] = useReducer(
     (state, action) => {
-      console.log(action);
-
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -293,6 +300,11 @@ const Product = () => {
             ...state,
             unitId: action.payload,
           };
+        case "SET_SUPPLIER":
+          return {
+            ...state,
+            supplierId: action.payload,
+          };
         case "SET_PRODUCT":
           return {
             ...action.payload,
@@ -320,10 +332,11 @@ const Product = () => {
       categoryId: null,
       categoryName: "",
       unitId: 0,
+      supplierId: 0,
     }
   );
 
-  console.log(variants);
+  // console.log(variants);
   console.log(product);
 
   const {
@@ -337,6 +350,7 @@ const Product = () => {
     categoryId,
     categoryName,
     unitId,
+    supplierId,
   } = product;
 
   const onChange = (imageList, addUpdateIndex) => {
@@ -629,6 +643,31 @@ const Product = () => {
                       Vui lòng loại sản phẩm
                     </p>
                   ) : null}
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label htmlFor="validationDefault02">
+                    Nhà cung cấp
+                  </Form.Label>
+                  <Form.Select
+                    value={supplierId}
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_SUPPLIER",
+                        payload: e.target.value,
+                      })
+                    }
+                    id="validationDefault04"
+                    required
+                  >
+                    <option value={""}>{"Vui lòng chọn nhà cung cấp"}</option>;
+                    {suppliers.map(({ id, name }) => {
+                      return <option value={id}>{name}</option>;
+                    })}
+                  </Form.Select>
                 </Form.Group>
               </Col>
             </Row>
@@ -999,8 +1038,11 @@ const Product = () => {
                   });
                 });
 
-                //push product
-                ProductModel.addProduct(_product)
+                const promise = isNewMode
+                  ? ProductModel.addProduct(_product)
+                  : ProductModel.update(_product);
+
+                promise
                   .then(() => {
                     setModal(
                       <SuccessModel

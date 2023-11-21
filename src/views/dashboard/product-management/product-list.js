@@ -136,7 +136,7 @@ const ProductList = () => {
                   <th>Mã vạch</th>
                   <th>Loại sản phẩm</th>
 
-                  {/* <th>Mô tả</th> */}
+                  {/* <th>Nhà cung cấp</th> */}
                   <th>Giá bán</th>
                   {/* <th>Tồn kho</th> */}
                   {/* <th>Ngày tạo</th> */}

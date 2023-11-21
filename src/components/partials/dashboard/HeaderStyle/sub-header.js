@@ -12,13 +12,13 @@ import topHeader5 from "../../../../assets/images/dashboard/top-header5.png";
 const SubHeader = memo((props) => {
   return (
     <Fragment>
-      <div className="iq-navbar-header" style={{ height: "215px" }}>
+      <div className="iq-navbar-header">
         <Container fluid className=" iq-container">
           <Row>
             <Col md="12">
               <div className="d-flex justify-content-between flex-wrap">
                 <div>
-                  <h1>Hello Hi Chan Xinh Gái!</h1>
+                  <h2>Chào mừng bạn đến với MCS!</h2>
                   {/* <p>
                     We are on a mission to help developers like you build
                     successful projects for FREE.
@@ -51,7 +51,7 @@ const SubHeader = memo((props) => {
           </Row>
         </Container>
         {/* {{!-- rounded-bottom if not using animation --}} */}
-        <div className="iq-header-img">
+        <div className="iq-header-img" style={{ height: "160px" }}>
           <img
             src={topHeader}
             // alt="header"

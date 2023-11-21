@@ -11,8 +11,10 @@ import {
 } from "react-bootstrap";
 import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
-import { Product as ProductModel } from "../../../models/product";
-import { useNavigate } from "react-router-dom";
+import { SupplierModel } from "../../../models/supplier";
+import { Province as ProvinceModel } from "../../../models/province";
+
+import { useNavigate, useParams } from "react-router-dom";
 
 const SuccessModel = ({ handleCloseModal }) => {
   return (
@@ -33,27 +35,87 @@ const SuccessModel = ({ handleCloseModal }) => {
 };
 
 const Supplier = () => {
+  let { id } = useParams();
+
+  const isNewMode = id === "new";
   //form validation
   const [isInvalidName, setInvalidName] = useState(false);
-  const [isInvalidBarcode, setInvalidBarcode] = useState(false);
+  const [isInvalidEmail, setInvalidEmail] = useState(false);
+  const [isInvalidPhone, setInvalidPhone] = useState(false);
+  const [isInvalidAddress, setInvalidAddress] = useState(false);
   const [isInvalidDescription, setInvalidDescription] = useState(false);
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   const [images, setImages] = useState([]);
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
-  const [units, setUnits] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
-    ProductModel.getUnits().then(({ data: { data: units } }) => {
-      setUnits(units);
-      dispatchProduct({
-        type: "SET_UNIT",
-        payload: units[0].id,
+    ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
+      setProvinces(provinces);
+      dispatchSupplier({
+        type: "SET_PROVINCE",
+        payload: provinces,
       });
     });
+    if (!isNewMode) {
+      //mode edit => fetch sản phẩm về
+      setIsLoading(true);
+      SupplierModel.get(id)
+        .then((res) => {
+          const supplier = res?.data?.data;
+
+          if (supplier) {
+            if (supplier.address?.mtProvince) {
+              ProvinceModel.getDistricts(
+                supplier.address?.mtProvince?.code
+              ).then(({ data: { data: districts } }) => {
+                setDistricts(districts);
+              });
+            }
+            if (supplier.address?.mtDistrict) {
+              ProvinceModel.getWards(supplier.address?.mtDistrict?.code).then(
+                ({ data: { data: wards } }) => {
+                  setWards(wards);
+                }
+              );
+            }
+
+            dispatchSupplier({
+              type: "SET_SUPPLIER",
+              payload: {
+                id: supplier?.id,
+                name: supplier?.name,
+                phoneNumber: supplier?.phoneNumber,
+                email: supplier?.email,
+                address: {
+                  id: supplier?.address?.id,
+                  detail: supplier?.address?.detail,
+                  provinceId: supplier.address?.mtProvinceId
+                    ? supplier.address?.mtProvinceId + ""
+                    : "",
+                  districtId: supplier.address?.mtDistrictId
+                    ? supplier.address?.mtDistrictId + ""
+                    : "",
+                  wardId: supplier.address?.mtWardId
+                    ? supplier.address?.mtWardId + ""
+                    : "",
+                },
+                personalContactName: supplier?.personalContactName,
+                personalContactEmail: supplier?.personalContactEmail,
+                personalContactPhone: supplier?.personalContactPhone,
+              },
+            });
+          }
+        })
+        .finally(() => setIsLoading(false));
+    }
   }, []);
 
-  const [product, dispatchProduct] = useReducer(
+  const [supplier, dispatchSupplier] = useReducer(
     (state, action) => {
       console.log(action);
       switch (action.type) {
@@ -62,50 +124,79 @@ const Supplier = () => {
             ...state,
             name: action.payload,
           };
-        case "SET_STATUS":
+        case "SET_EMAIL":
           return {
             ...state,
-            status: action.payload,
+            email: action.payload,
           };
-        case "SET_CODE":
+        case "SET_PHONE_NUMBER":
           return {
             ...state,
-            code: action.payload,
+            phoneNumber: action.payload,
           };
-        case "SET_BARCODE":
+        case "SET_ADDRESS":
           return {
             ...state,
-            barcode: action.payload,
+            address: {
+              ...state.address,
+              detail: action.payload,
+            },
           };
-        case "SET_DESCRIPTION":
+        case "SET_PROVINCE":
           return {
             ...state,
-            description: action.payload,
-          };
-
-        case "SET_PHOTOS":
-          return {
-            ...state,
-            photoList: action.payload,
-          };
-
-        case "SET_PRICES":
-          return {
-            ...state,
-            priceList: action.payload,
+            address: {
+              ...state.address,
+              provinceId: action.payload,
+            },
           };
 
-        case "SET_CATEGORY":
+        case "SET_DISTRICT":
           return {
             ...state,
-            categoryId: action.payload,
+            address: {
+              ...state.address,
+              districtId: action.payload,
+            },
+          };
+        case "SET_WARD":
+          return {
+            ...state,
+            address: {
+              ...state.address,
+              wardId: action.payload,
+            },
+          };
+        case "SET_PERSONAL_CONTACT_NAME":
+          return {
+            ...state,
+            personalContactName: action.payload,
           };
 
-        case "SET_UNIT":
+        case "SET_PERSONAL_CONTACT_EMAIL":
           return {
             ...state,
-            unitId: action.payload,
+            personalContactEmail: action.payload,
           };
+
+        case "SET_PERSONAL_CONTACT_PHONE":
+          return {
+            ...state,
+            personalContactPhone: action.payload,
+          };
+        case "SET_SUPPLIER":
+          return action.payload;
+        // case "SET_FAX":
+        //   return {
+        //     ...state,
+        //     fax: action.payload,
+        //   };
+
+        // case "SET_CREATOR":
+        //   return {
+        //     ...state,
+        //     creator: action.payload,
+        //   };
 
         default:
           return state;
@@ -113,35 +204,65 @@ const Supplier = () => {
     },
     {
       name: "",
-      status: "SALE",
-      code: "",
-      barcode: "",
-      description: "",
-      photoList: [],
-      priceList: [
-        {
-          price: "",
-          quantity: "",
-          sku: "",
-        },
-      ],
-      //Thời Trang Nữ | Quần nữ | Quần jean nữ
-      categoryId: 6268,
-      unitId: 0,
+      phoneNumber: "",
+      email: "",
+      address: {
+        id: "",
+        detail: "",
+        provinceId: "",
+        districtId: "",
+        wardId: "",
+      },
+      personalContactName: "",
+      personalContactEmail: "",
+      personalContactPhone: "",
     }
   );
 
   const {
     name,
-    status,
-    code,
-    barcode,
-    description,
-    photoList,
-    priceList,
-    categoryId,
-    unitId,
-  } = product;
+    phoneNumber,
+    email,
+    address: { detail = "", provinceId = "", districtId = "", wardId = "" },
+    personalContactName,
+    personalContactEmail,
+    personalContactPhone,
+  } = supplier;
+  console.log(supplier);
+  useEffect(() => {
+    if (!provinceId) {
+      return;
+    }
+
+    const provinceCode = provinces?.find(({ id }) => id == provinceId)?.code;
+    // console.log("pppp", provinces, provinceId, provinceCode);
+
+    if (!provinceCode) {
+      return;
+    }
+
+    ProvinceModel.getDistricts(provinceCode).then(
+      ({ data: { data: districts } }) => {
+        setDistricts(districts);
+      }
+    );
+  }, [provinceId]);
+
+  useEffect(() => {
+    if (!districtId) {
+      return;
+    }
+
+    const districtCode = districts?.find(({ id }) => id == districtId)?.code;
+
+    if (!districtCode) {
+      return;
+    }
+
+    ProvinceModel.getWards(districtCode).then(({ data: { data: wards } }) => {
+      setWards(wards);
+    });
+  }, [districtId]);
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
@@ -150,7 +271,7 @@ const Supplier = () => {
   };
 
   const validateName = () => {
-    if (!name || name.trim().length < 10) {
+    if (!name || name.trim().length < 0) {
       setInvalidName(true);
       return false;
     } else {
@@ -158,22 +279,31 @@ const Supplier = () => {
       return true;
     }
   };
-  const validateBarcode = () => {
-    if (!barcode || barcode.trim().length <= 0) {
-      setInvalidBarcode(true);
+  const validateEmail = () => {
+    if (!email || email.trim().length <= 0) {
+      setInvalidEmail(true);
       return false;
     } else {
-      setInvalidBarcode(false);
+      setInvalidEmail(false);
+      return true;
+    }
+  };
+  const validatePhone = () => {
+    if (!phoneNumber || phoneNumber.trim().length <= 0) {
+      setInvalidPhone(true);
+      return false;
+    } else {
+      setInvalidPhone(false);
       return true;
     }
   };
 
-  const validateDescription = () => {
-    if (!description || description.trim().length <= 100) {
-      setInvalidDescription(true);
+  const validateAddress = () => {
+    if (!detail || detail.trim().length <= 0) {
+      setInvalidAddress(true);
       return false;
     } else {
-      setInvalidDescription(false);
+      setInvalidAddress(false);
       return true;
     }
   };
@@ -195,7 +325,7 @@ const Supplier = () => {
                   <Col>
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
-                        Tên khách hàng
+                        Tên nhà cung cấp
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
@@ -204,7 +334,7 @@ const Supplier = () => {
                         isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
+                          dispatchSupplier({
                             type: "SET_NAME",
                             payload: e.target.value,
                           })
@@ -215,7 +345,7 @@ const Supplier = () => {
                         type={"invalid"}
                         className="invalid"
                       >
-                        Vui lòng nhập ít nhất 10 ký tự.
+                        Vui lòng nhập tên nhà cung cấp
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
@@ -228,15 +358,17 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
+                        isInvalid={isInvalidPhone}
                         type="text"
-                        value={code}
+                        value={phoneNumber}
                         id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_CODE",
+                          dispatchSupplier({
+                            type: "SET_PHONE_NUMBER",
                             payload: e.target.value,
                           })
                         }
+                        onBlur={() => validatePhone()}
                       />
                       <Form.Control.Feedback
                         type={"invalid"}
@@ -253,17 +385,17 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
-                        isInvalid={isInvalidBarcode}
+                        isInvalid={isInvalidEmail}
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_BARCODE",
+                          dispatchSupplier({
+                            type: "SET_EMAIL",
                             payload: e.target.value,
                           })
                         }
-                        value={barcode}
+                        value={email}
                         type="text"
                         id="validationDefault01"
-                        onBlur={() => validateBarcode()}
+                        onBlur={() => validateEmail()}
                       />
                       <Form.Control.Feedback
                         type={"invalid"}
@@ -280,19 +412,30 @@ const Supplier = () => {
                     <Form.Group className="form-group">
                       <Form.Label htmlFor="validationDefault02">
                         Tỉnh/TP
+                        <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
-                        value={unitId}
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                        value={provinceId}
+                        onChange={(e) => {
+                          dispatchSupplier({
+                            type: "SET_PROVINCE",
                             payload: e.target.value,
-                          })
-                        }
+                          });
+                          dispatchSupplier({
+                            type: "SET_WARD",
+                            payload: "",
+                          });
+
+                          dispatchSupplier({
+                            type: "SET_DISTRICT",
+                            payload: "",
+                          });
+                        }}
                         id="validationDefault04"
                         required
                       >
-                        {units.map(({ id, name }) => {
+                        <option value={""}>Chọn tỉnh</option>
+                        {provinces.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
                         <Form.Control.Feedback
@@ -311,17 +454,22 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
-                        value={unitId}
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                        value={districtId}
+                        onChange={(e) => {
+                          dispatchSupplier({
+                            type: "SET_DISTRICT",
                             payload: e.target.value,
-                          })
-                        }
+                          });
+                          dispatchSupplier({
+                            type: "SET_WARD",
+                            payload: "",
+                          });
+                        }}
                         id="validationDefault04"
                         required
                       >
-                        {units.map(({ id, name }) => {
+                        <option value={""}>Chọn Quận/huyện</option>
+                        {districts.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
                         <Form.Control.Feedback
@@ -340,17 +488,18 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
-                        value={unitId}
+                        value={wardId}
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                          dispatchSupplier({
+                            type: "SET_WARD",
                             payload: e.target.value,
                           })
                         }
                         id="validationDefault04"
                         required
                       >
-                        {units.map(({ id, name }) => {
+                        <option value={""}>Chon xa</option>
+                        {wards.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
                         <Form.Control.Feedback
@@ -369,17 +518,17 @@ const Supplier = () => {
                     <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Control
-                    isInvalid={isInvalidBarcode}
+                    isInvalid={isInvalidAddress}
                     onChange={(e) =>
-                      dispatchProduct({
-                        type: "SET_BARCODE",
+                      dispatchSupplier({
+                        type: "SET_ADDRESS",
                         payload: e.target.value,
                       })
                     }
-                    value={barcode}
+                    value={detail}
                     type="text"
                     id="validationDefault01"
-                    onBlur={() => validateBarcode()}
+                    onBlur={() => validateAddress()}
                   />
                   <Form.Control.Feedback type={"invalid"} className="invalid">
                     Vui lòng nhập địa chỉ cụ thể.
@@ -398,40 +547,66 @@ const Supplier = () => {
                   <Col md="6">
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
-                        Ngày sinh
+                        Người đại diện
                       </Form.Label>
                       <Form.Control
-                        type="date"
-                        id="exampleInputdate"
-                        defaultValue="2019-12-18"
+                        type="text"
+                        value={personalContactName}
+                        isInvalid={isInvalidName}
+                        id="validationDefault01"
+                        onChange={(e) =>
+                          dispatchSupplier({
+                            type: "SET_PERSONAL_CONTACT_NAME",
+                            payload: e.target.value,
+                          })
+                        }
+                        onBlur={() => validateName()}
                       />
                     </Form.Group>
                   </Col>
                   <Col md="6">
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
-                        Giới tính
-                        <span className="text-danger"> {" *"}</span>
+                        Số điện thoại
                       </Form.Label>
-                      <Form.Select
-                        value={unitId}
+                      <Form.Control
+                        type="text"
+                        value={personalContactPhone}
+                        isInvalid={isInvalidName}
+                        id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                          dispatchSupplier({
+                            type: "SET_PERSONAL_CONTACT_PHONE",
                             payload: e.target.value,
                           })
                         }
-                        id="validationDefault04"
-                      >
-                        {units.map(({ id, name }) => {
-                          return <option value={id}>{name}</option>;
-                        })}
-                      </Form.Select>
+                        onBlur={() => validateName()}
+                      />
                     </Form.Group>
                   </Col>
                 </Row>
                 <Row>
                   <Col md="6">
+                    <Form.Group className="form-group">
+                      <Form.Label md="6" htmlFor="validationDefault01">
+                        Email
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={personalContactEmail}
+                        isInvalid={isInvalidName}
+                        id="validationDefault01"
+                        onChange={(e) =>
+                          dispatchSupplier({
+                            type: "SET_PERSONAL_CONTACT_EMAIL",
+                            payload: e.target.value,
+                          })
+                        }
+                        onBlur={() => validateName()}
+                      />
+                    </Form.Group>
+                  </Col>
+                  {/* <Col md="6">
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
                         Số fax
@@ -442,7 +617,7 @@ const Supplier = () => {
                         isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
+                          dispatchSupplier({
                             type: "SET_NAME",
                             payload: e.target.value,
                           })
@@ -450,7 +625,7 @@ const Supplier = () => {
                         onBlur={() => validateName()}
                       />
                     </Form.Group>
-                  </Col>
+                  </Col> */}
                 </Row>
               </Card.Body>
             </Card>
@@ -463,7 +638,7 @@ const Supplier = () => {
                 </div>
               </Card.Header>
               <Card.Body>
-                <Form.Group className="form-group">
+                {/* <Form.Group className="form-group">
                   <Form.Label md="6" htmlFor="validationDefault01">
                     Nhân viên tạo
                   </Form.Label>
@@ -473,22 +648,22 @@ const Supplier = () => {
                     isInvalid={isInvalidName}
                     id="validationDefault01"
                     onChange={(e) =>
-                      dispatchProduct({
+                      dispatchSupplier({
                         type: "SET_NAME",
                         payload: e.target.value,
                       })
                     }
                     onBlur={() => validateName()}
                   />
-                </Form.Group>
-                <Form.Group className="mb-3 form-group">
+                </Form.Group> */}
+                {/* <Form.Group className="mb-3 form-group">
                   <Form.Label htmlFor="exampleFormControlTextarea1">
                     Mô tả
                   </Form.Label>
                   <Form.Control
                     isInvalid={isInvalidDescription}
                     onChange={(e) => {
-                      dispatchProduct({
+                      dispatchSupplier({
                         type: "SET_DESCRIPTION",
                         payload: e.target.value,
                       });
@@ -507,7 +682,7 @@ const Supplier = () => {
                   <Form.Control
                     isInvalid={isInvalidDescription}
                     onChange={(e) => {
-                      dispatchProduct({
+                      dispatchSupplier({
                         type: "SET_DESCRIPTION",
                         payload: e.target.value,
                       });
@@ -518,7 +693,7 @@ const Supplier = () => {
                     rows="5"
                     onBlur={() => validateDescription()}
                   />
-                </Form.Group>
+                </Form.Group> */}
               </Card.Body>
             </Card>
           </Col>
@@ -527,44 +702,28 @@ const Supplier = () => {
           <Button
             onClick={() => {
               const isValidName = validateName();
-              const isValidBarcode = validateBarcode();
-              const isValidDescription = validateDescription();
-
-              if (!isValidName || !isValidBarcode || !isValidDescription) {
+              const isValidEmail = validateEmail();
+              const isValidPhone = validatePhone();
+              const isValidAddress = validateAddress();
+              if (
+                !isValidName ||
+                !isValidEmail ||
+                !isValidAddress ||
+                !isValidPhone
+              ) {
                 return;
               }
+              const promise = isNewMode
+                ? SupplierModel.addSupplier(supplier)
+                : SupplierModel.updateSupplier(supplier);
 
-              const _product = {
-                ...product,
-                priceList: product.priceList
-                  .filter((price) => {
-                    return price.price;
-                  })
-                  .map((price) => {
-                    const _price = {
-                      exportPrice: parseInt(price.price),
-                      quantity: parseInt(price.quantity),
-                    };
-
-                    if (price[variants[0]?.name] !== undefined) {
-                      _price.variantName = variants[0].name;
-                      _price.variantValue = price[variants[0].name];
-                    }
-                    if (price[variants[1]?.name] !== undefined) {
-                      _price.variantName2 = variants[1].name;
-                      _price.variantValue2 = price[variants[1].name];
-                    }
-                    return _price;
-                  }),
-              };
-
-              ProductModel.addProduct(_product)
+              promise
                 .then(() => {
                   setModal(
                     <SuccessModel
                       handleCloseModal={() => {
                         setModal(null);
-                        navigate("/dashboard/product-management/product-list");
+                        navigate("/dashboard/supplier-list");
                       }}
                     ></SuccessModel>
                   );

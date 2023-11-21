@@ -97,7 +97,7 @@ export const DefaultRouter = [
         element: <SupplierList />,
       },
       {
-        path: "/dashboard/supplier-list",
+        path: "/dashboard/supplier/:id",
         element: <Supplier />,
       },
       // Warehouse
