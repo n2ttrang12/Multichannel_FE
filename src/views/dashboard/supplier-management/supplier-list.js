@@ -55,6 +55,7 @@ const SupplierList = () => {
           <p>
             {`Bạn có chắc là muốn xóa nhà cung cấp (${supplier.name}) hay không?`}
           </p>
+          {/* <p>Nếu xóa nhà cung cấp thì sản phẩm của nhà cung cấp đó cũng sẽ bị xóa</p> */}
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -128,6 +129,7 @@ const SupplierList = () => {
                     <th>Mã NCC</th>
                     <th>Tên nhà cung cấp</th>
                     <th>Số điện thoại</th>
+                    <th>Email</th>
                     <th>Địa chỉ</th>
                     <th>Người đại diện</th>
                     <th>SDT</th>
@@ -143,12 +145,13 @@ const SupplierList = () => {
                         <td>{item.id}</td>
                         <td>{item.name}</td>
                         <td>{item.phoneNumber}</td>
+                        <td>{item.email}</td>
                         <td>
                           {item.address?.detail +
                             ", " +
-                            item.address?.mtDistrict?.name +
-                            ", " +
                             item.address?.mtWard?.name +
+                            ", " +
+                            item.address?.mtDistrict?.name +
                             ", " +
                             item.address?.mtProvince?.name}
                         </td>

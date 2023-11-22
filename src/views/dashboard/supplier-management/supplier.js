@@ -16,24 +16,6 @@ import { Province as ProvinceModel } from "../../../models/province";
 
 import { useNavigate, useParams } from "react-router-dom";
 
-const SuccessModel = ({ handleCloseModal }) => {
-  return (
-    <Modal show={true} onHide={handleCloseModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông báo</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>{`Thêm sản phẩm mới thành công`}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
 const Supplier = () => {
   let { id } = useParams();
 
@@ -43,7 +25,9 @@ const Supplier = () => {
   const [isInvalidEmail, setInvalidEmail] = useState(false);
   const [isInvalidPhone, setInvalidPhone] = useState(false);
   const [isInvalidAddress, setInvalidAddress] = useState(false);
-  const [isInvalidDescription, setInvalidDescription] = useState(false);
+  const [isInvalidProvince, setInvalidProvince] = useState(false);
+  const [isInvalidDistrict, setInvalidDistrict] = useState(false);
+  const [isInvalidWard, setInvalidWard] = useState(false);
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   const [images, setImages] = useState([]);
@@ -53,6 +37,27 @@ const Supplier = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const SuccessModel = ({ handleCloseModal }) => {
+    return (
+      <Modal show={true} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Thông báo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {isNewMode ? (
+            <p>{`Thêm nhà cung cấp thành công`}</p>
+          ) : (
+            <p>{`Chỉnh sửa nhà cung cấp thành công`}</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleCloseModal}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  };
   useEffect(() => {
     ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
       setProvinces(provinces);
@@ -307,13 +312,39 @@ const Supplier = () => {
       return true;
     }
   };
-
+  const validateProvince = () => {
+    if (!provinceId) {
+      setInvalidProvince(true);
+      return false;
+    } else {
+      setInvalidProvince(false);
+      return true;
+    }
+  };
+  const validateDistrict = () => {
+    if (!districtId) {
+      setInvalidDistrict(true);
+      return false;
+    } else {
+      setInvalidDistrict(false);
+      return true;
+    }
+  };
+  const validateWard = () => {
+    if (!wardId) {
+      setInvalidWard(true);
+      return false;
+    } else {
+      setInvalidWard(false);
+      return true;
+    }
+  };
   return (
     <>
       {modal}
       <div className="product">
         <Row>
-          <Col sm="12" lg="8">
+          <Col sm="12" lg="12">
             <Card>
               <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
@@ -438,13 +469,21 @@ const Supplier = () => {
                         {provinces.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
-                        <Form.Control.Feedback
+                        {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn tỉnh/TP.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidDistrict ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn Tỉnh/TP
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                   <Col md="4">
@@ -472,13 +511,21 @@ const Supplier = () => {
                         {districts.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
-                        <Form.Control.Feedback
+                        {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn Quận/huyện.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidDistrict ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn Quận/huyện
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                   <Col md="4">
@@ -498,17 +545,26 @@ const Supplier = () => {
                         id="validationDefault04"
                         required
                       >
-                        <option value={""}>Chon xa</option>
+                        <option value={""}>Chọn xã</option>
                         {wards.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
-                        <Form.Control.Feedback
+
+                        {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn phường/xã.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidWard ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn Phường/Xã
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                 </Row>
@@ -552,7 +608,7 @@ const Supplier = () => {
                       <Form.Control
                         type="text"
                         value={personalContactName}
-                        isInvalid={isInvalidName}
+                        // isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
                           dispatchSupplier({
@@ -560,7 +616,7 @@ const Supplier = () => {
                             payload: e.target.value,
                           })
                         }
-                        onBlur={() => validateName()}
+                        // onBlur={() => validateName()}
                       />
                     </Form.Group>
                   </Col>
@@ -572,7 +628,7 @@ const Supplier = () => {
                       <Form.Control
                         type="text"
                         value={personalContactPhone}
-                        isInvalid={isInvalidName}
+                        // isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
                           dispatchSupplier({
@@ -580,7 +636,7 @@ const Supplier = () => {
                             payload: e.target.value,
                           })
                         }
-                        onBlur={() => validateName()}
+                        // onBlur={() => validateName()}
                       />
                     </Form.Group>
                   </Col>
@@ -594,7 +650,7 @@ const Supplier = () => {
                       <Form.Control
                         type="text"
                         value={personalContactEmail}
-                        isInvalid={isInvalidName}
+                        // isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
                           dispatchSupplier({
@@ -602,7 +658,7 @@ const Supplier = () => {
                             payload: e.target.value,
                           })
                         }
-                        onBlur={() => validateName()}
+                        // onBlur={() => validateName()}
                       />
                     </Form.Group>
                   </Col>
@@ -630,7 +686,7 @@ const Supplier = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col sm="12" lg="4">
+          {/* <Col sm="12" lg="4">
             <Card>
               <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
@@ -638,7 +694,7 @@ const Supplier = () => {
                 </div>
               </Card.Header>
               <Card.Body>
-                {/* <Form.Group className="form-group">
+                <Form.Group className="form-group">
                   <Form.Label md="6" htmlFor="validationDefault01">
                     Nhân viên tạo
                   </Form.Label>
@@ -655,8 +711,8 @@ const Supplier = () => {
                     }
                     onBlur={() => validateName()}
                   />
-                </Form.Group> */}
-                {/* <Form.Group className="mb-3 form-group">
+                </Form.Group>
+                <Form.Group className="mb-3 form-group">
                   <Form.Label htmlFor="exampleFormControlTextarea1">
                     Mô tả
                   </Form.Label>
@@ -693,10 +749,10 @@ const Supplier = () => {
                     rows="5"
                     onBlur={() => validateDescription()}
                   />
-                </Form.Group> */}
+                </Form.Group>
               </Card.Body>
             </Card>
-          </Col>
+          </Col> */}
         </Row>
         <div>
           <Button
@@ -705,11 +761,17 @@ const Supplier = () => {
               const isValidEmail = validateEmail();
               const isValidPhone = validatePhone();
               const isValidAddress = validateAddress();
+              const isValidProvince = validateProvince();
+              const isValidDistrict = validateDistrict();
+              const isValidWard = validateWard();
               if (
                 !isValidName ||
                 !isValidEmail ||
                 !isValidAddress ||
-                !isValidPhone
+                !isValidPhone ||
+                !isValidProvince ||
+                !isValidDistrict ||
+                !isValidWard
               ) {
                 return;
               }
