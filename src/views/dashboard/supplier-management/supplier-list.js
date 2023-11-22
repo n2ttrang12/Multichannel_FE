@@ -12,7 +12,7 @@ const SupplierList = () => {
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [perPage, setPerpage] = useState(5);
+  const [perPage, setPerpage] = useState(10);
   const { data: supplier, pagination } = response;
   const total = pagination?.total ?? 0;
   const [modal, setModal] = useState(null);

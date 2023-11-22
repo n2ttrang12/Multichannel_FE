@@ -24,7 +24,7 @@ import "./theme.css";
 import { Loading } from "../../../components/common/loading";
 import Supplier from "../supplier-management/supplier";
 import { SupplierModel } from "../../../models/supplier";
-const SuccessModel = ({ handleCloseModal }) => {
+const SuccessModal = ({ handleCloseModal }) => {
   return (
     <Modal show={true} onHide={handleCloseModal}>
       <Modal.Header closeButton>
@@ -41,7 +41,40 @@ const SuccessModel = ({ handleCloseModal }) => {
     </Modal>
   );
 };
-
+const LoadingModal = ({}) => {
+  return (
+    <Modal show={true}>
+      {/* <Modal.Header closeButton>
+        <Modal.Title>Thông báo</Modal.Title>
+      </Modal.Header> */}
+      <Modal.Body>
+        <Loading></Loading>
+      </Modal.Body>
+      {/* <Modal.Footer>
+        <Button variant="danger" onClick={handleCloseModal}>
+          Đóng
+        </Button>
+      </Modal.Footer> */}
+    </Modal>
+  );
+};
+const ErrorModal = ({ handleCloseModal, errorMessage }) => {
+  return (
+    <Modal show={true} onHide={handleCloseModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Thông báo</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>{errorMessage}</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="danger" onClick={handleCloseModal}>
+          Đóng
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
 const CategoryModal = ({
   handleCategoryChange,
   handleCloseModal,
@@ -410,7 +443,8 @@ const Product = () => {
   };
 
   const validatePhoto = () => {
-    if (!images || images.length === 0) {
+    const allImages = [...images, ...photoList];
+    if (allImages.length === 0) {
       setInvalidPhoto(true);
       return false;
     } else {
@@ -1026,7 +1060,7 @@ const Product = () => {
                     return _price;
                   }),
               };
-
+              setModal(<LoadingModal></LoadingModal>);
               //push images
               ImageModel.upload(images).then((res) => {
                 const { data } = res;
@@ -1038,6 +1072,8 @@ const Product = () => {
                   });
                 });
 
+                setImages([]);
+
                 const promise = isNewMode
                   ? ProductModel.addProduct(_product)
                   : ProductModel.update(_product);
@@ -1045,17 +1081,28 @@ const Product = () => {
                 promise
                   .then(() => {
                     setModal(
-                      <SuccessModel
+                      <SuccessModal
                         handleCloseModal={() => {
                           setModal(null);
                           navigate(
                             "/dashboard/product-management/product-list"
                           );
                         }}
-                      ></SuccessModel>
+                      ></SuccessModal>
                     );
                   })
-                  .catch((e) => console.log(e));
+                  .catch((e) => {
+                    // setModal(null);
+                    setModal(
+                      <ErrorModal
+                        handleCloseModal={() => {
+                          setModal(null);
+                        }}
+                        errorMessage={"Thao tác không thành công"}
+                      ></ErrorModal>
+                    );
+                  })
+                  .finally(() => setIsLoading(false));
               });
             }}
             variant="btn btn-primary"

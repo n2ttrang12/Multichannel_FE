@@ -23,7 +23,7 @@ const ProductList = () => {
   const handleCloseModal = () => setModal(null);
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1); // lưu current page, set thì render lại
-  const [perPage, setPerpage] = useState(5); // Lưu perpage, đnag set cứng alf 5
+  const [perPage, setPerpage] = useState(10); // Lưu perpage, đnag set cứng alf 5
 
   const { data: products, pagination } = response; // products từ response
   const total = pagination?.total ?? 0;
