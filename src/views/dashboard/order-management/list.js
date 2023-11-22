@@ -8,6 +8,7 @@ import Circularprogressbar from "../../../components/circularprogressbar";
 import { Order } from "../../../models/order";
 import { formatDate } from "@fullcalendar/react";
 import * as moment from "moment";
+import "moment/locale/vi";
 import { Loading } from "../../../components/common/loading";
 import { Search } from "../../../components/common/search";
 import { createArrayFrom1ToN } from "../../../helper";
