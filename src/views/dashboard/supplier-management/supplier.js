@@ -15,6 +15,7 @@ import { SupplierModel } from "../../../models/supplier";
 import { Province as ProvinceModel } from "../../../models/province";
 
 import { useNavigate, useParams } from "react-router-dom";
+import { SuccessModal } from "../../../components/common/success-modal";
 
 const Supplier = () => {
   let { id } = useParams();
@@ -37,27 +38,7 @@ const Supplier = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const SuccessModel = ({ handleCloseModal }) => {
-    return (
-      <Modal show={true} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Thông báo</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {isNewMode ? (
-            <p>{`Thêm nhà cung cấp thành công`}</p>
-          ) : (
-            <p>{`Chỉnh sửa nhà cung cấp thành công`}</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="danger" onClick={handleCloseModal}>
-            Đóng
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  };
+
   useEffect(() => {
     ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
       setProvinces(provinces);
@@ -782,12 +763,17 @@ const Supplier = () => {
               promise
                 .then(() => {
                   setModal(
-                    <SuccessModel
+                    <SuccessModal
                       handleCloseModal={() => {
                         setModal(null);
                         navigate("/dashboard/supplier-list");
                       }}
-                    ></SuccessModel>
+                      message={
+                        isNewMode
+                          ? "Thêm mới nhà cung cấp thành công"
+                          : "Chỉnh sửa nhà cung cấp thành công"
+                      }
+                    ></SuccessModal>
                   );
                 })
                 .catch((e) => console.log(e));

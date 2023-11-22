@@ -32,6 +32,9 @@ export const Order = {
   async deleteorder(id) {
     return axiosInstance.delete(axiosInstance.defaults.baseURL + `order/${id}`);
   },
+  async getVendorOrders() {
+    return axiosInstance.post(axiosInstance.defaults.baseURL + "sendo/orders");
+  },
   async getUnits() {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "order/mt/unit");
   },

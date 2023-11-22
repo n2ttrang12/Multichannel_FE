@@ -24,57 +24,10 @@ import "./theme.css";
 import { Loading } from "../../../components/common/loading";
 import Supplier from "../supplier-management/supplier";
 import { SupplierModel } from "../../../models/supplier";
-const SuccessModal = ({ handleCloseModal }) => {
-  return (
-    <Modal show={true} onHide={handleCloseModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông báo</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>{`Thêm sản phẩm mới thành công`}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-const LoadingModal = ({}) => {
-  return (
-    <Modal show={true}>
-      {/* <Modal.Header closeButton>
-        <Modal.Title>Thông báo</Modal.Title>
-      </Modal.Header> */}
-      <Modal.Body>
-        <Loading></Loading>
-      </Modal.Body>
-      {/* <Modal.Footer>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
-      </Modal.Footer> */}
-    </Modal>
-  );
-};
-const ErrorModal = ({ handleCloseModal, errorMessage }) => {
-  return (
-    <Modal show={true} onHide={handleCloseModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông báo</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>{errorMessage}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
+import { SuccessModal } from "../../../components/common/success-modal";
+import { ErrorModal } from "../../../components/common/fail-modal";
+import { LoadingModal } from "../../../components/common/loading-modal";
+
 const CategoryModal = ({
   handleCategoryChange,
   handleCloseModal,
@@ -1088,6 +1041,11 @@ const Product = () => {
                             "/dashboard/product-management/product-list"
                           );
                         }}
+                        message={
+                          isNewMode
+                            ? "Thêm mới sản phẩm thành công"
+                            : "Chỉnh sửa sản phẩm thành công"
+                        }
                       ></SuccessModal>
                     );
                   })

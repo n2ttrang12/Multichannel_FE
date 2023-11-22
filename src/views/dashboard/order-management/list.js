@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Table } from "react-bootstrap";
+import { Row, Col, Table, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Card from "../../../components/Card";
 import Swiper from "swiper";
@@ -10,12 +10,16 @@ import { formatDate } from "@fullcalendar/react";
 import * as moment from "moment";
 import { Loading } from "../../../components/common/loading";
 import { Search } from "../../../components/common/search";
+import { createArrayFrom1ToN } from "../../../helper";
+import { SuccessModal } from "../../../components/common/success-modal";
+import { LoadingModal } from "../../../components/common/loading-modal";
 
 const List = () => {
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
+  const [modal, setModal] = useState(null);
   const [page, setPage] = useState(1);
-  const [perPage, setPerpage] = useState(5);
+  const [perPage, setPerpage] = useState(10);
   const { data: order, pagination } = response;
   const total = pagination?.total ?? 0;
 
@@ -51,10 +55,70 @@ const List = () => {
   }, [searchText]);
   return (
     <Card>
+      {modal}
       <Card.Header className="d-flex justify-content-between">
         <div className="header-title">
           <h4 className="card-title">Danh sách đơn hàng</h4>
         </div>
+        <Button className="btn btn-md btn-soft-primary me-2 mt-lg-0 mt-md-0 mt-3">
+          <Link
+            onClick={() => {
+              setModal(<LoadingModal></LoadingModal>);
+              Order.getVendorOrders({}).then(({ data }) => {
+                setModal(
+                  <SuccessModal
+                    handleCloseModal={() => {
+                      setModal(null);
+                      fetchList(page, perPage, searchText);
+                    }}
+                    message={`Lấy sản phẩm từ Sendo thành công`}
+                  ></SuccessModal>
+                );
+              });
+            }}
+          >
+            <i className="btn-inner">
+              <svg
+                class="icon-32"
+                width="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {" "}
+                <path
+                  d="M16.8397 20.1642V6.54639"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>{" "}
+                <path
+                  d="M20.9173 16.0681L16.8395 20.1648L12.7617 16.0681"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>{" "}
+                <path
+                  d="M6.91102 3.83276V17.4505"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>{" "}
+                <path
+                  d="M2.8335 7.92894L6.91127 3.83228L10.9891 7.92894"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>{" "}
+              </svg>
+            </i>
+            <span>Lấy đơn hàng</span>
+          </Link>
+        </Button>
       </Card.Header>
       <Card.Body>
         <div>
@@ -78,7 +142,7 @@ const List = () => {
                   <th>Khách hàng</th>
                   <th>SĐT</th>
                   <th>Kênh</th>
-                  <th>Tổng tiền</th>
+                  {/* <th>Tổng tiền</th> */}
                   <th>Trạng thái ĐH</th>
                   <th>Trạng thái vận chuyển</th>
                   <th>Trạng thái thanh toán</th>
@@ -88,14 +152,16 @@ const List = () => {
               <tbody>
                 {order?.map((item) => {
                   const statusColor =
-                    item.status === "PROCESSING"
-                      ? "warning"
-                      : item.status === "IN_CART"
+                    item.status === "NEW"
+                      ? "primary"
+                      : item.status === "COMPLETED"
                       ? "success"
+                      : item.status === "SHIPPING"
+                      ? "warning"
                       : item.status === "CANCELLED"
                       ? "danger"
-                      : "";
-
+                      : "secondary";
+                  moment.locale("vi");
                   return (
                     <tr key={item.id}>
                       <td>{item.id}</td>
@@ -107,7 +173,7 @@ const List = () => {
                       <td>{item.customer?.name}</td>
                       <td>{item.customer?.phonenumber}</td>
                       <td>{item.type}</td>
-                      <td>{item.subTotal}</td>
+                      {/* <td>{item.subTotal}</td> */}
                       <td>
                         <span className={`badge bg-${statusColor}`}>
                           {item.status}
@@ -169,111 +235,42 @@ const List = () => {
                   role="status"
                   aria-live="polite"
                 >
-                  Showing 1 to 10 of 57 entries
+                  {total !== 0
+                    ? `Showing ${(page - 1) * perPage + 1} to ${
+                        page * perPage <= total ? page * perPage : total
+                      } of ${pagination?.total ?? 0} entries`
+                    : null}
                 </div>
               </Col>
-              <Col md="6">
+              <Col md="6" style={{ paddingTop: 16 }}>
                 <div
                   className="dataTables_paginate paging_simple_numbers"
                   id="datatable_paginate"
                 >
-                  <ul className="pagination">
-                    <li
-                      className="paginate_button page-item previous disabled"
-                      id="datatable_previous"
-                    >
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        aria-disabled="true"
-                        data-dt-idx="previous"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        Previous
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item active">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        aria-current="page"
-                        data-dt-idx="0"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        1
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="1"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        2
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="2"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        3
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="3"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        4
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="4"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        5
-                      </Link>
-                    </li>
-                    <li className="paginate_button page-item ">
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="5"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        6
-                      </Link>
-                    </li>
-                    <li
-                      className="paginate_button page-item next"
-                      id="datatable_next"
-                    >
-                      <Link
-                        to="#"
-                        aria-controls="datatable"
-                        data-dt-idx="next"
-                        tabIndex="0"
-                        className="page-link"
-                      >
-                        Next
-                      </Link>
-                    </li>
+                  <ul style={{ justifyContent: "end" }} className="pagination">
+                    {createArrayFrom1ToN(totalPage).map((pageIndex) => {
+                      return (
+                        <li
+                          className={
+                            "paginate_button page-item " +
+                            (page === pageIndex ? "active" : "")
+                          }
+                          id={pageIndex}
+                          onClick={() => setPage(pageIndex)}
+                        >
+                          <Link
+                            to="#"
+                            aria-controls="datatable"
+                            aria-disabled="true"
+                            data-dt-idx="previous"
+                            tabIndex="0"
+                            className="page-link"
+                          >
+                            {pageIndex}
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </Col>

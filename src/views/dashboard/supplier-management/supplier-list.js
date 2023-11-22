@@ -143,7 +143,16 @@ const SupplierList = () => {
                     return (
                       <tr key={item.id}>
                         <td>{item.id}</td>
-                        <td>{item.name}</td>
+                        <td
+                          onClick={() => {
+                            navigate("/dashboard/supplier/" + item.id);
+                          }}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                        >
+                          {item.name}
+                        </td>
                         <td>{item.phoneNumber}</td>
                         <td>{item.email}</td>
                         <td>
