@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Table, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "../../../components/Card";
 import Swiper from "swiper";
 import { SwiperSlide } from "swiper/react";
@@ -16,6 +16,7 @@ import { SuccessModal } from "../../../components/common/success-modal";
 import { LoadingModal } from "../../../components/common/loading-modal";
 
 const List = () => {
+  const navigate = useNavigate();
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState(null);
@@ -165,10 +166,22 @@ const List = () => {
                   moment.locale("vi");
                   return (
                     <tr key={item.id}>
-                      <td>{item.id}</td>
+                      <td
+                        onClick={() => {
+                          navigate(
+                            "/dashboard/order-management/list/order-detail/" +
+                              item.id
+                          );
+                        }}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                      >
+                        {"DH" + item.id}
+                      </td>
                       <td>
                         {item.createdAt
-                          ? moment(item.createdAt).format("LLL")
+                          ? moment(item.createdAt).format("L")
                           : null}
                       </td>
                       <td>{item.customer?.name}</td>

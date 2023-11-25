@@ -177,7 +177,7 @@ const ProductList = () => {
                           cursor: "pointer",
                         }}
                       >
-                        {item.name}
+                        <a>{item.name}</a>
                       </td>
                       <td>{item.barcode}</td>
                       <td>{item.category.name}</td>

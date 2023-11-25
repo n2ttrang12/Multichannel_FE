@@ -63,6 +63,7 @@ import Product from "../views/dashboard/product-management/product";
 import Customer from "../views/dashboard/customer-management/customer";
 import SupplierList from "../views/dashboard/supplier-management/supplier-list";
 import Supplier from "../views/dashboard/supplier-management/supplier";
+import OrderDetail from "../views/dashboard/order-management/order-detail";
 
 export const DefaultRouter = [
   {
@@ -81,6 +82,10 @@ export const DefaultRouter = [
       {
         path: "/dashboard/order-management/bills",
         element: <Bill />,
+      },
+      {
+        path: "/dashboard/order-management/list/order-detail/:id",
+        element: <OrderDetail />,
       },
       // Customer management
       {

@@ -13,29 +13,24 @@ export const Order = {
 
     return axiosInstance.get(url.toString());
   },
-  async addorder(order) {
-    return axiosInstance.post(
-      axiosInstance.defaults.baseURL + "order/create-cart",
-      {
-        ...order,
-      }
-    );
-  },
-  async updateorder(order) {
-    return axiosInstance.post(
-      axiosInstance.defaults.baseURL + `order/${order.id}`,
-      {
-        ...order,
-      }
-    );
-  },
-  async deleteorder(id) {
-    return axiosInstance.delete(axiosInstance.defaults.baseURL + `order/${id}`);
-  },
   async getVendorOrders() {
     return axiosInstance.post(axiosInstance.defaults.baseURL + "sendo/orders");
   },
   async getUnits() {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "order/mt/unit");
+  },
+  async get(id) {
+    return axiosInstance.get(axiosInstance.defaults.baseURL + "order/" + id);
+  },
+  async getAllOrderStatus(id) {
+    return axiosInstance.get(
+      axiosInstance.defaults.baseURL + "order/allstatus"
+    );
+  },
+  async updateStatusOrder(id, status) {
+    return axiosInstance.post(
+      axiosInstance.defaults.baseURL + "order/status/" + id,
+      { status }
+    );
   },
 };
