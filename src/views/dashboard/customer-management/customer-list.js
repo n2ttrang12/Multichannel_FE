@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Table, Button } from "react-bootstrap";
 import Card from "../../../components/Card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search } from "../../../components/common/search";
 import { Customer } from "../../../models/customer";
 import { createArrayFrom1ToN } from "../../../helper";
 import { Loading } from "../../../components/common/loading";
 
 const CustomerList = () => {
+  const navigate = useNavigate();
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -107,7 +108,19 @@ const CustomerList = () => {
                     return (
                       <tr key={item.id}>
                         <td>{item.id}</td>
-                        <td>{item.name}</td>
+                        <td
+                          onClick={() => {
+                            navigate(
+                              "/dashboard/customer-list/customer-detail/" +
+                                item.id
+                            );
+                          }}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                        >
+                          {item.name}
+                        </td>
                         <td>{item.phonenumber}</td>
                         <td>{item.address}</td>
                         <td>{item.orders.length}</td>

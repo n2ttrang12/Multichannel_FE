@@ -232,13 +232,23 @@ const OrderDetail = () => {
               </Card.Header>
               <Card.Body>
                 <Row>
-                  <Col md="6">
+                  {/* <Col md="4">
                     <Row>
                       <Col md="6">
                         <p>Mã khách hàng </p>
                       </Col>
                       <Col md="6">
                         <p>{": " + customerId} </p>
+                      </Col>
+                    </Row>
+                  </Col> */}
+                  <Col md="6">
+                    <Row>
+                      <Col md="6">
+                        <p>Tên khách hàng </p>
+                      </Col>
+                      <Col md="6">
+                        <p> {": " + customerName}</p>
                       </Col>
                     </Row>
                   </Col>
@@ -264,6 +274,9 @@ const OrderDetail = () => {
                       </Col>
                     </Row>
                   </Col>
+                </Row>
+                <Row>
+                  <Col md="12"></Col>
                 </Row>
               </Card.Body>
             </Card>
