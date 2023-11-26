@@ -160,9 +160,11 @@ const List = () => {
                       ? "success"
                       : item.status === "SHIPPING"
                       ? "warning"
+                      : item.status === "PROCESSING"
+                      ? "info"
                       : item.status === "CANCELLED"
                       ? "danger"
-                      : "secondary";
+                      : "dark";
                   moment.locale("vi");
                   return (
                     <tr key={item.id}>
