@@ -48,7 +48,7 @@ import CustomerList from "../views/dashboard/customer-management/customer-list";
 import Inventory from "../views/dashboard/warehouse/inventory";
 import Inventoryreceiving from "../views/dashboard/warehouse/inventory-receiving";
 import ImportGoods from "../views/dashboard/warehouse/import-goods";
-import Shipping from "../views/dashboard/warehouse/ shipping";
+import Shipping from "../views/dashboard/warehouse/ warehouse";
 import InventoryCheck from "../views/dashboard/warehouse/inventory-check";
 import ProductDestruction from "../views/dashboard/warehouse/product-destruction";
 import ProductReturn from "../views/dashboard/warehouse/product-return";
@@ -66,6 +66,7 @@ import Supplier from "../views/dashboard/supplier-management/supplier";
 import OrderDetail from "../views/dashboard/order-management/order-detail";
 import CustomerDetail from "../views/dashboard/customer-management/customer-detail";
 import VoucherList from "../views/dashboard/voucher-management/voucher-list";
+import Warehouse from "../views/dashboard/warehouse/ warehouse";
 
 export const DefaultRouter = [
   {
@@ -113,33 +114,14 @@ export const DefaultRouter = [
       },
       // Warehouse
       {
-        path: "/dashboard/warehouse/inventory",
-        element: <Inventory />,
+        path: "/dashboard/warehouse/wasehouse",
+        element: <Warehouse />,
       },
       {
-        path: "/dashboard/warehouse/inventory-receiving",
-        element: <Inventoryreceiving />,
-      },
-      {
-        path: "/dashboard/dashboard/warehouse/import-goods",
+        path: "/dashboard/warehouse/import-goods",
         element: <ImportGoods />,
       },
-      {
-        path: "/dashboard/dashboard/warehouse/shipping",
-        element: <Shipping />,
-      },
-      {
-        path: "/dashboard/warehouse/inventory-check",
-        element: <InventoryCheck />,
-      },
-      {
-        path: "/dashboard/warehouse/product-destruction",
-        element: <ProductDestruction />,
-      },
-      {
-        path: "/dashboard/warehouse/product-return",
-        element: <ProductReturn />,
-      },
+
       // Voucher
       {
         path: "/dashboard/voucher-list",
@@ -167,91 +149,6 @@ export const DefaultRouter = [
         path: "/dashboard/product-management/product-list/product/:id",
         element: <Product />,
       },
-      // {
-      //   path: "dashboard/special-pages/pricing",
-      //   element: <Pricing />,
-      // },
-      // {
-      //   path: "dashboard/special-pages/timeline",
-      //   element: <Timeline />,
-      // },
-      // {
-      //   path: "dashboard/special-pages/rtl-support",
-      //   element: <RtlSupport />,
-      // },
-      // {
-      //   path: "dashboard/app/user-profile",
-      //   element: <UserProfile />,
-      // },
-      // {
-      //   path: "dashboard/app/user-add",
-      //   element: <UserAdd />,
-      // },
-      // {
-      //   path: "dashboard/app/user-list",
-      //   element: <UserList />,
-      // },
-      // {
-      //   path: "dashboard/admin/admin",
-      //   element: <Admin />,
-      // },
-      // // Widget
-      // {
-      //   path: "dashboard/widget/widgetbasic",
-      //   element: <Widgetbasic />,
-      // },
-      // {
-      //   path: "dashboard/widget/widgetchart",
-      //   element: <Widgetchart />,
-      // },
-      // {
-      //   path: "dashboard/widget/widgetcard",
-      //   element: <Widgetcard />,
-      // },
-      // // Map
-      // {
-      //   path: "dashboard/map/google",
-      //   element: <Google />,
-      // },
-      // {
-      //   path: "dashboard/map/vector",
-      //   element: <Vector />,
-      // },
-      // // Form
-      // {
-      //   path: "dashboard/form/form-element",
-      //   element: <FormElement />,
-      // },
-      // {
-      //   path: "dashboard/form/form-wizard",
-      //   element: <FormWizard />,
-      // },
-      // {
-      //   path: "dashboard/form/form-validation",
-      //   element: <FormValidation />,
-      // },
-      // // Table
-      // {
-      //   path: "dashboard/table/bootstrap-table",
-      //   element: <BootstrapTable />,
-      // },
-      // {
-      //   path: "dashboard/table/table-data",
-      //   element: <TableData />,
-      // },
-      // // Icon
-      // {
-      //   path: "dashboard/icon/solid",
-      //   element: <Solid />,
-      // },
-      // {
-      //   path: "dashboard/icon/outline",
-      //   element: <Outline />,
-      // },
-      // {
-      //   path: "dashboard/icon/dual-tone",
-      //   element: <DualTone />,
-      // },
     ],
   },
   {

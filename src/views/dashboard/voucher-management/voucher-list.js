@@ -15,9 +15,9 @@ import "react-clock/dist/Clock.css";
 
 const VoucherList = () => {
   const navigate = useNavigate();
+
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
-  const [isDiscount, setIsDiscount] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerpage] = useState(10);
   const { data: voucher, pagination } = response;
@@ -55,9 +55,16 @@ const VoucherList = () => {
   const handleCloseModal = () => setModal(null);
 
   moment.locale("vi");
-  const AddVoucherModel = ({ id, handleCloseModal }) => {
+  const AddVoucherModel = ({ id }) => {
     const [isPercentage, setIsPercentage] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isInvalidCode, setInvalidCode] = useState(false);
+    const [isInvalidToDate, setInvalidToDate] = useState(false);
+    const [isInvalidDateRage, setInvalidDateRage] = useState(false);
+    const [isInvalidFromDate, setInvalidFromDate] = useState(false);
+    const [isInvalidAvailable, setInvalidAvailable] = useState(false);
+    const [isInvalidDiscount, setInvalidDiscount] = useState(false);
+    const [isInvalidPercent, setInvalidPercent] = useState(false);
 
     const [voucher, dispatch] = useReducer(
       (state, action) => {
@@ -110,23 +117,31 @@ const VoucherList = () => {
 
     const { code, available, fromDate, toDate, percent, discount } = voucher;
     useEffect(() => {
-      dispatch({
-        type: "SET_PERCENT",
-        payload: 0,
-      });
-      dispatch({
-        type: "SET_DISCOUNT",
-        payload: 0,
-      });
+      if (isPercentage) {
+        validateDiscount();
+        dispatch({
+          type: "SET_DISCOUNT",
+          payload: 0,
+        });
+      } else {
+        validatePercent();
+        dispatch({
+          type: "SET_PERCENT",
+          payload: 0,
+        });
+      }
     }, [isPercentage]);
 
     useEffect(() => {
+      console.log("rerender");
       if (id) {
         //mode edit => fetch sản phẩm về
         setIsLoading(true);
         VoucherModel.get(id)
           .then((res) => {
             const voucher = res?.data?.data;
+
+            setIsPercentage(voucher.percent ? true : false);
             dispatch({
               type: "SET_VOUCHER",
               payload: voucher,
@@ -135,6 +150,68 @@ const VoucherList = () => {
           .finally(() => setIsLoading(false));
       }
     }, []);
+    const validateCode = () => {
+      if (!code || code.trim().length <= 0) {
+        setInvalidCode(true);
+        return false;
+      } else {
+        setInvalidCode(false);
+        return true;
+      }
+    };
+    const validateFromDate = () => {
+      console.log(fromDate);
+      if (!fromDate || fromDate.trim().length <= 0) {
+        setInvalidFromDate(true);
+        return false;
+      } else {
+        setInvalidFromDate(false);
+        return true;
+      }
+    };
+    const validateToDate = () => {
+      console.log(toDate);
+      if (!toDate || toDate.trim().length <= 0) {
+        setInvalidToDate(true);
+        return false;
+      } else {
+        if (fromDate >= toDate) {
+          setInvalidDateRage(true);
+          return false;
+        }
+
+        setInvalidDateRage(false);
+        setInvalidToDate(false);
+        return true;
+      }
+    };
+    const validateAvailable = () => {
+      if (!available || available <= 0) {
+        setInvalidAvailable(true);
+        return false;
+      } else {
+        setInvalidAvailable(false);
+        return true;
+      }
+    };
+    const validateDiscount = () => {
+      if (!isPercentage && (!discount || discount <= 0)) {
+        setInvalidDiscount(true);
+        return false;
+      } else {
+        setInvalidDiscount(false);
+        return true;
+      }
+    };
+    const validatePercent = () => {
+      if (isPercentage && (!percent || percent <= 0)) {
+        setInvalidPercent(true);
+        return false;
+      } else {
+        setInvalidPercent(false);
+        return true;
+      }
+    };
 
     return (
       <Modal size="lg" show={true} onHide={handleCloseModal}>
@@ -152,6 +229,7 @@ const VoucherList = () => {
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                   <Form.Label>Mã voucher</Form.Label>
                   <Form.Control
+                    isInvalid={isInvalidCode}
                     type="text"
                     value={code}
                     onChange={(e) =>
@@ -161,6 +239,9 @@ const VoucherList = () => {
                       })
                     }
                   />
+                  <Form.Control.Feedback type={"invalid"} className="invalid">
+                    Vui lòng nhập mã voucher
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Row>
               <Row>
@@ -168,30 +249,55 @@ const VoucherList = () => {
                   <Form.Group controlId="startDate">
                     <Form.Label>Bắt đầu </Form.Label>
                     <DateTimePicker
+                      disableClock
                       format="dd/MM/y h:mm:ss a"
                       value={fromDate}
                       onChange={(date) => {
                         dispatch({
                           type: "SET_FROM_DATE",
-                          payload: date,
+                          payload: date?.toISOString() ?? "",
                         });
                       }}
                     />
+                    {isInvalidFromDate ? (
+                      <p
+                        style={{ display: "block" }}
+                        className="invalid-feedback"
+                      >
+                        Vui lòng chọn ngày bắt đầu.
+                      </p>
+                    ) : null}
                   </Form.Group>
                 </Col>
                 <Col>
                   <Form.Group controlId="endDate">
                     <Form.Label>Kết thúc </Form.Label>
                     <DateTimePicker
+                      disableClock
                       format="dd/MM/y h:mm:ss a"
                       value={toDate}
                       onChange={(date) => {
                         dispatch({
                           type: "SET_TO_DATE",
-                          payload: date,
+                          payload: date?.toISOString() ?? "",
                         });
                       }}
                     />
+                    {isInvalidToDate ? (
+                      <p
+                        style={{ display: "block" }}
+                        className="invalid-feedback"
+                      >
+                        Vui lòng chọn ngày kết thúc.
+                      </p>
+                    ) : isInvalidDateRage ? (
+                      <p
+                        style={{ display: "block" }}
+                        className="invalid-feedback"
+                      >
+                        Ngày kết thúc lớn hơn ngày bắt đầu
+                      </p>
+                    ) : null}
                   </Form.Group>
                 </Col>
               </Row>
@@ -199,6 +305,7 @@ const VoucherList = () => {
                 <Col md="6">
                   <Form.Check>
                     <Form.Check.Input
+                      isInvalid={isInvalidDiscount}
                       type="radio"
                       name="customRadio0"
                       id="automatically"
@@ -212,6 +319,7 @@ const VoucherList = () => {
                   <Form.Group className="mb-3" controlId="formBasicPassword">
                     {/* <Form.Label>Giảm tiền</Form.Label> */}
                     <Form.Control
+                      isInvalid={isInvalidDiscount}
                       disabled={isPercentage}
                       type="number"
                       value={discount}
@@ -222,6 +330,9 @@ const VoucherList = () => {
                         })
                       }
                     />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Số tiền giảm giá phải lớn hơn 0
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
                 <Col md="6">
@@ -240,6 +351,7 @@ const VoucherList = () => {
                   <Form.Group className="mb-3" controlId="formBasicPassword">
                     {/* <Form.Label>Giảm phần trăm</Form.Label> */}
                     <Form.Control
+                      isInvalid={isInvalidPercent}
                       disabled={!isPercentage}
                       type="number"
                       value={percent}
@@ -250,6 +362,9 @@ const VoucherList = () => {
                         })
                       }
                     />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Phần trăm giảm phải lớn hơn 0
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>
@@ -258,6 +373,7 @@ const VoucherList = () => {
                   <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>Số lượng</Form.Label>
                     <Form.Control
+                      isInvalid={isInvalidAvailable}
                       type="number"
                       value={available}
                       onChange={(e) =>
@@ -267,6 +383,9 @@ const VoucherList = () => {
                         })
                       }
                     />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Số lượng voucher phải lớn hơn 0
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>
@@ -277,13 +396,29 @@ const VoucherList = () => {
           <Button
             variant="primary"
             onClick={() => {
+              const isValidCode = validateCode();
+              const isValidToDate = validateToDate();
+              const isValidFromDate = validateFromDate();
+              const isValidAvailable = validateAvailable();
+              const isValidDiscount = validateDiscount();
+              const isValidPercent = validatePercent();
+              if (
+                !isValidCode ||
+                !isValidFromDate ||
+                !isValidToDate ||
+                !isValidAvailable ||
+                !isValidDiscount ||
+                !isValidPercent
+              ) {
+                return;
+              }
               let promise = null;
               if (id) {
-                delete voucher.id;
                 promise = VoucherModel.updateVoucher(id, voucher);
               } else {
                 promise = VoucherModel.addVoucher(voucher);
               }
+
               promise
                 .then((response) => fetchList(page, perPage))
                 .catch((error) => {

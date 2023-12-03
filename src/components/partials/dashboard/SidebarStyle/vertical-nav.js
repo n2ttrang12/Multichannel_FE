@@ -449,11 +449,11 @@ const VerticalNav = memo((props) => {
               <li className="nav-item">
                 <Link
                   className={`${
-                    location.pathname === "/dashboard/warehouse/inventory"
+                    location.pathname === "/dashboard/warehouse/warehouse"
                       ? "active"
                       : ""
                   } nav-link`}
-                  to="/dashboard/warehouse/inventory"
+                  to="/dashboard/warehouse/warehouse"
                 >
                   <i className="icon">
                     <svg
@@ -473,38 +473,7 @@ const VerticalNav = memo((props) => {
                     </svg>
                   </i>
                   <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">Tồn kho</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname ===
-                    "/dashboard/warehouse/inventory-receiving"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/warehouse/inventory-receiving"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> E </i>
-                  <span className="item-name">Đơn nhập hàng</span>
+                  <span className="item-name">Danh sách kho</span>
                 </Link>
               </li>
               <li className="nav-item">
@@ -535,127 +504,6 @@ const VerticalNav = memo((props) => {
                   </i>
                   <i className="sidenav-mini-icon"> U </i>
                   <span className="item-name">Nhập hàng</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/warehouse/shipping"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/warehouse/shipping"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">Chuyển hàng</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/warehouse/inventory-check"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/warehouse/inventory-check"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">Kiểm hàng</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname ===
-                    "/dashboard/warehouse/product-destruction"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/warehouse/product-destruction"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">Tiêu hủy</span>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link
-                  className={`${
-                    location.pathname === "/dashboard/warehouse/product-return"
-                      ? "active"
-                      : ""
-                  } nav-link`}
-                  to="/dashboard/warehouse/product-return"
-                >
-                  <i className="icon">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <g>
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="8"
-                          fill="currentColor"
-                        ></circle>
-                      </g>
-                    </svg>
-                  </i>
-                  <i className="sidenav-mini-icon"> U </i>
-                  <span className="item-name">Trả hàng</span>
                 </Link>
               </li>
             </ul>
