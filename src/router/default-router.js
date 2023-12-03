@@ -65,6 +65,7 @@ import SupplierList from "../views/dashboard/supplier-management/supplier-list";
 import Supplier from "../views/dashboard/supplier-management/supplier";
 import OrderDetail from "../views/dashboard/order-management/order-detail";
 import CustomerDetail from "../views/dashboard/customer-management/customer-detail";
+import VoucherList from "../views/dashboard/voucher-management/voucher-list";
 
 export const DefaultRouter = [
   {
@@ -138,6 +139,11 @@ export const DefaultRouter = [
       {
         path: "/dashboard/warehouse/product-return",
         element: <ProductReturn />,
+      },
+      // Voucher
+      {
+        path: "/dashboard/voucher-list",
+        element: <VoucherList />,
       },
       //Debt management
       {

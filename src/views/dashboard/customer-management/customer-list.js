@@ -122,7 +122,15 @@ const CustomerList = () => {
                           {item.name}
                         </td>
                         <td>{item.phonenumber}</td>
-                        <td>{item.address}</td>
+                        <td>
+                          {item.address?.detail +
+                            ", " +
+                            item.address?.mtWard?.name +
+                            ", " +
+                            item.address?.mtWard?.name +
+                            ", " +
+                            item.address?.mtDistrict?.name}
+                        </td>
                         <td>{item.orders.length}</td>
                         <td>
                           {
