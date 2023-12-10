@@ -509,7 +509,7 @@ const VerticalNav = memo((props) => {
             </ul>
           </Accordion.Collapse>
         </Accordion.Item>
-        <Accordion.Item
+        {/* <Accordion.Item
           as="li"
           eventKey="utilities-error"
           bsPrefix={`nav-item ${active === "error" ? "active" : ""} `}
@@ -616,7 +616,7 @@ const VerticalNav = memo((props) => {
               </li>
             </ul>
           </Accordion.Collapse>
-        </Accordion.Item>
+        </Accordion.Item> */}
       </Accordion>
     </Fragment>
   );
