@@ -92,7 +92,17 @@ const CustomerDetail = () => {
                         <p>Địa chỉ </p>
                       </Col>
                       <Col>
-                        <p> {": " + address}</p>
+                        <p>
+                          {" "}
+                          {": " +
+                            address?.detail +
+                            ", " +
+                            address?.mtDistrict?.name +
+                            ", " +
+                            address?.mtProvince?.name +
+                            ", " +
+                            address?.mtWard?.name}
+                        </p>
                       </Col>
                     </Row>
                   </Col>
@@ -157,7 +167,9 @@ const CustomerDetail = () => {
                           </td>
                           <td>
                             {item.createdAt
-                              ? moment(item.createdAt).format("L")
+                              ? moment(item.createdAt).format(
+                                  "DD/MM/YYYY HH:mm:ss"
+                                )
                               : null}
                           </td>
                           <td>{item.type}</td>

@@ -519,15 +519,21 @@ const VoucherList = () => {
                         <td>{item.percent}</td>
                         <td>
                           {item.fromDate
-                            ? moment(item.fromDate).format("L")
+                            ? moment(item.fromDate).format(
+                                "DD/MM/YYYY HH:mm:ss"
+                              )
                             : null}
                         </td>
                         <td>
-                          {item.toDate ? moment(item.toDate).format("L") : null}
+                          {item.toDate
+                            ? moment(item.toDate).format("DD/MM/YYYY HH:mm:ss")
+                            : null}
                         </td>
                         <td>
                           {item.createdAt
-                            ? moment(item.createdAt).format("L")
+                            ? moment(item.createdAt).format(
+                                "DD/MM/YYYY HH:mm:ss"
+                              )
                             : null}
                         </td>
 

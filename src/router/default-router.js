@@ -67,6 +67,7 @@ import OrderDetail from "../views/dashboard/order-management/order-detail";
 import CustomerDetail from "../views/dashboard/customer-management/customer-detail";
 import VoucherList from "../views/dashboard/voucher-management/voucher-list";
 import Warehouse from "../views/dashboard/warehouse/ warehouse";
+import HistoryImportPerProduct from "../views/dashboard/warehouse/history-import-per-product";
 
 export const DefaultRouter = [
   {
@@ -114,8 +115,12 @@ export const DefaultRouter = [
       },
       // Warehouse
       {
-        path: "/dashboard/warehouse/wasehouse",
+        path: "/dashboard/warehouse/list-products",
         element: <Warehouse />,
+      },
+      {
+        path: "/dashboard/warehouse/list-products/details/:id",
+        element: <HistoryImportPerProduct />,
       },
       {
         path: "/dashboard/warehouse/import-goods",
