@@ -39,4 +39,11 @@ export const SupplierModel = {
   async get(id) {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "supplier/" + id);
   },
+  async getAll() {
+    return SupplierModel.getList({
+      page: 0, // Offset
+      perPage: 0, // limit,
+      search: "",
+    });
+  },
 };

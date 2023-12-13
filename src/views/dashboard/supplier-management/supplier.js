@@ -93,6 +93,7 @@ const Supplier = () => {
                 personalContactName: supplier?.personalContactName,
                 personalContactEmail: supplier?.personalContactEmail,
                 personalContactPhone: supplier?.personalContactPhone,
+                products: supplier?.products,
               },
             });
           }
@@ -213,6 +214,7 @@ const Supplier = () => {
     personalContactName,
     personalContactEmail,
     personalContactPhone,
+    products,
   } = supplier;
   console.log(supplier);
   useEffect(() => {
@@ -666,74 +668,107 @@ const Supplier = () => {
                 </Row>
               </Card.Body>
             </Card>
+            {!isNewMode ? (
+              <Card>
+                <Card.Header className="d-flex justify-content-between">
+                  <div className="header-title">
+                    <h5 className="card-title">Danh sách sản phẩm</h5>
+                  </div>
+                </Card.Header>
+                <Card.Body>
+                  <Table
+                    responsive
+                    striped
+                    id="datatable"
+                    className=""
+                    data-toggle="data-table"
+                  >
+                    <thead>
+                      <tr>
+                        {/* <th>Ảnh</th> */}
+                        <th>Tên sản phẩm</th>
+                        <th>Mã vạch</th>
+                        <th>Loại sản phẩm</th>
+
+                        {/* <th>Nhà cung cấp</th> */}
+                        <th>Giá bán</th>
+                        {/* <th>Tồn kho</th> */}
+                        {/* <th>Ngày tạo</th> */}
+                        {/* <th>Trạng thái</th> */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products?.map((item) => {
+                        // const item = orderItem.product;
+                        // const listPrices =
+                        //   item.productPrices?.map((price) =>
+                        //     parseInt(price.exportPrice)
+                        //   ) ?? [];
+
+                        // const minPrice = Math.min(...listPrices);
+                        // const maxPrice = Math.max(...listPrices);
+
+                        return (
+                          <tr key={item.id}>
+                            <td
+                              onClick={() => {
+                                navigate(
+                                  "/dashboard/product-management/product-list/product/" +
+                                    item.id
+                                );
+                              }}
+                              style={{
+                                cursor: "pointer",
+                              }}
+                            >
+                              {/* {item.productPhotos
+                              ?.slice(0, 1)
+                              .map((productPhoto) => {
+                                return (
+                                  <img
+                                    style={{
+                                      width: "80px",
+                                    }}
+                                    src={productPhoto.url}
+                                  ></img>
+                                );
+                              })} */}
+                              <a>{item.name}</a>
+                            </td>
+                            <td>{item.barcode}</td>
+                            <td>{item.category?.name}</td>
+                            {/* <td>{item.label}</td> */}
+                            {/* <td
+                  dangerouslySetInnerHTML={{ __html: item.description }}
+                ></td> */}
+                            {/* <td>
+                            
+                            {minPrice && maxPrice ? (
+                              minPrice === maxPrice ? (
+                                <span>{maxPrice}</span>
+                              ) : (
+                                <span>
+                                  {minPrice} - {maxPrice}
+                                </span>
+                              )
+                            ) : null}
+                          </td> */}
+                            {/* <td>{item.stock}</td> */}
+                            {/* <td>{item.status}</td> */}
+                            {/* <td>
+                  <span className={`badge ${item.color}`}>{item.status}</span>
+                </td> */}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </Table>
+                </Card.Body>
+              </Card>
+            ) : (
+              ""
+            )}
           </Col>
-          {/* <Col sm="12" lg="4">
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h5 className="card-title"> Thông tin khác</h5>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                <Form.Group className="form-group">
-                  <Form.Label md="6" htmlFor="validationDefault01">
-                    Nhân viên tạo
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={name}
-                    isInvalid={isInvalidName}
-                    id="validationDefault01"
-                    onChange={(e) =>
-                      dispatchSupplier({
-                        type: "SET_NAME",
-                        payload: e.target.value,
-                      })
-                    }
-                    onBlur={() => validateName()}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3 form-group">
-                  <Form.Label htmlFor="exampleFormControlTextarea1">
-                    Mô tả
-                  </Form.Label>
-                  <Form.Control
-                    isInvalid={isInvalidDescription}
-                    onChange={(e) => {
-                      dispatchSupplier({
-                        type: "SET_DESCRIPTION",
-                        payload: e.target.value,
-                      });
-                    }}
-                    value={description}
-                    as="textarea"
-                    id="exampleFormControlTextarea1"
-                    rows="5"
-                    onBlur={() => validateDescription()}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3 form-group">
-                  <Form.Label htmlFor="exampleFormControlTextarea1">
-                    Ghi chú
-                  </Form.Label>
-                  <Form.Control
-                    isInvalid={isInvalidDescription}
-                    onChange={(e) => {
-                      dispatchSupplier({
-                        type: "SET_DESCRIPTION",
-                        payload: e.target.value,
-                      });
-                    }}
-                    value={description}
-                    as="textarea"
-                    id="exampleFormControlTextarea1"
-                    rows="5"
-                    onBlur={() => validateDescription()}
-                  />
-                </Form.Group>
-              </Card.Body>
-            </Card>
-          </Col> */}
         </Row>
         <div>
           <Button
@@ -756,9 +791,10 @@ const Supplier = () => {
               ) {
                 return;
               }
+              const _supplier = { ...supplier, products: undefined };
               const promise = isNewMode
-                ? SupplierModel.addSupplier(supplier)
-                : SupplierModel.updateSupplier(supplier);
+                ? SupplierModel.addSupplier(_supplier)
+                : SupplierModel.updateSupplier(_supplier);
 
               promise
                 .then(() => {

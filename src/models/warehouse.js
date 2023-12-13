@@ -25,25 +25,31 @@ export const WarehouseModal = {
 
     return axiosInstance.get(url.toString());
   },
-  async addWarehouse(warehouse) {
+  async getSupplierList({ page, perPage, search = undefined }) {
+    //lấy data api
+    // console.log("fetch list");
+
+    const url = new URL(axiosInstance.defaults.baseURL + "supplier");
+    url.searchParams.append("page", page); // nososi vào url để khai báo page
+    url.searchParams.append("perPage", perPage); // nối để lấy perpage
+    if (search) url.searchParams.append("fullTextSearch", search); // nối để lấy perpage
+
+    return axiosInstance.get(url.toString());
+  },
+  async addImport(importProduct) {
     return axiosInstance.post(
-      axiosInstance.defaults.baseURL + "warehouse/create",
+      axiosInstance.defaults.baseURL + "warehouse/import-product",
       {
-        ...warehouse,
+        ...importProduct,
       }
     );
   },
-  async update(warehouse) {
+  async updateImport(warehouse) {
     return axiosInstance.post(
       axiosInstance.defaults.baseURL + `warehouse/${warehouse.id}`,
       {
         ...warehouse,
       }
-    );
-  },
-  async deleteWarehouse(id) {
-    return axiosInstance.delete(
-      axiosInstance.defaults.baseURL + `warehouse/${id}`
     );
   },
 

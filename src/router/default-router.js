@@ -49,7 +49,7 @@ import Inventory from "../views/dashboard/warehouse/inventory";
 import Inventoryreceiving from "../views/dashboard/warehouse/inventory-receiving";
 import ImportGoods from "../views/dashboard/warehouse/import-goods";
 import Shipping from "../views/dashboard/warehouse/ warehouse";
-import InventoryCheck from "../views/dashboard/warehouse/inventory-check";
+import InventoryCheck from "../views/dashboard/warehouse/import-goods-details";
 import ProductDestruction from "../views/dashboard/warehouse/product-destruction";
 import ProductReturn from "../views/dashboard/warehouse/product-return";
 import Receipt from "../views/dashboard/debt-management/receipt";
@@ -68,6 +68,7 @@ import CustomerDetail from "../views/dashboard/customer-management/customer-deta
 import VoucherList from "../views/dashboard/voucher-management/voucher-list";
 import Warehouse from "../views/dashboard/warehouse/ warehouse";
 import HistoryImportPerProduct from "../views/dashboard/warehouse/history-import-per-product";
+import ImportGoodsDetails from "../views/dashboard/warehouse/import-goods-details";
 
 export const DefaultRouter = [
   {
@@ -126,7 +127,10 @@ export const DefaultRouter = [
         path: "/dashboard/warehouse/import-goods",
         element: <ImportGoods />,
       },
-
+      {
+        path: "/dashboard/warehouse/import-goods/addnew",
+        element: <ImportGoodsDetails />,
+      },
       // Voucher
       {
         path: "/dashboard/voucher-list",

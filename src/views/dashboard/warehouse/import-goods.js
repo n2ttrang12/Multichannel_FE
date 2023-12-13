@@ -6,7 +6,8 @@ import { Search } from "../../../components/common/search";
 import { createArrayFrom1ToN } from "../../../helper";
 import { Loading } from "../../../components/common/loading";
 import { WarehouseModal } from "../../../models/warehouse";
-
+import * as moment from "moment";
+import "moment/locale/vi";
 const ImportGoods = () => {
   const navigate = useNavigate();
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
@@ -88,7 +89,7 @@ const ImportGoods = () => {
             <h4 className="card-title">Danh sách nhập kho</h4>
           </div>
           <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-            <Link to="/dashboard/supplier/new">
+            <Link to="/dashboard/warehouse/import-goods/addnew">
               <i className="btn-inner">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -126,23 +127,18 @@ const ImportGoods = () => {
               >
                 <thead>
                   <tr>
-                    <th>Mã NCC</th>
+                    <th>Ngày tạo</th>
+                    <th>Nhân viên tạo</th>
                     <th>Tên nhà cung cấp</th>
-                    <th>Số điện thoại</th>
-                    <th>Email</th>
-                    <th>Địa chỉ</th>
                     <th>Người đại diện</th>
-                    <th>SDT</th>
-                    <th>Email</th>
-                    <th>Thao tác</th>
+                    <th>Số lượng sản phẩm</th>
+                    {/* <th>Trạng thái</th> */}
                   </tr>
                 </thead>
                 <tbody>
                   {supplier?.map((item) => {
-                    console.log(item.address);
                     return (
                       <tr key={item.id}>
-                        <td>{item.id}</td>
                         <td
                           onClick={() => {
                             navigate("/dashboard/supplier/" + item.id);
@@ -151,77 +147,20 @@ const ImportGoods = () => {
                             cursor: "pointer",
                           }}
                         >
-                          {item.name}
+                          {item.createdAt
+                            ? moment(item.createdAt).format(
+                                "DD/MM/YYYY HH:mm:ss"
+                              )
+                            : null}
                         </td>
-                        <td>{item.phoneNumber}</td>
-                        <td>{item.email}</td>
-                        <td>
-                          {item.address?.detail +
-                            ", " +
-                            item.address?.mtWard?.name +
-                            ", " +
-                            item.address?.mtDistrict?.name +
-                            ", " +
-                            item.address?.mtProvince?.name}
-                        </td>
-                        <td>{item.personalContactName}</td>
-                        <td>{item.personalContactPhone}</td>
-                        <td>{item.personalContactEmail}</td>
+                        <td>{item.creator}</td>
+                        <td>{item.supplier?.name}</td>
+                        <td>{item.supplier?.personalContactName}</td>
+                        <td>{item.warehouseHistory?.length}</td>
 
                         {/* <td>
-                        <span className={`badge ${item.color}`}>
                           {item.status}
-                        </span>
-                      </td> */}
-                        <td>
-                          <div style={{ float: "right" }}>
-                            <Link
-                              className="btn btn-sm btn-icon text-primary flex-end"
-                              data-bs-toggle="tooltip"
-                              title="Edit User"
-                              to="#"
-                              onClick={() => {
-                                navigate("/dashboard/supplier/" + item.id);
-                              }}
-                            >
-                              <span className="btn-inner">
-                                <svg
-                                  width="20"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 512 512"
-                                  fill="blue"
-                                >
-                                  <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z" />
-                                </svg>
-                              </span>
-                            </Link>
-                            <Link
-                              className="btn btn-sm btn-icon text-danger"
-                              data-bs-toggle="tooltip"
-                              title="Delete User"
-                              to="#"
-                              onClick={() =>
-                                setModal(
-                                  <DeleteSupplierModel
-                                    supplier={item}
-                                    handleCloseModal={() => setModal(null)}
-                                  />
-                                )
-                              }
-                            >
-                              <span className="btn-inner ">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="20"
-                                  fill="red"
-                                  viewBox="0 0 448 512"
-                                >
-                                  <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
-                                </svg>
-                              </span>
-                            </Link>
-                          </div>
-                        </td>
+                        </td> */}
                       </tr>
                     );
                   })}
