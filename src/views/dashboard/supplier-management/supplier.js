@@ -459,7 +459,7 @@ const Supplier = () => {
                           Vui lòng chọn tỉnh/TP.
                         </Form.Control.Feedback> */}
                       </Form.Select>
-                      {isInvalidDistrict ? (
+                      {isInvalidProvince ? (
                         <p
                           style={{ display: "block" }}
                           className="invalid-feedback"

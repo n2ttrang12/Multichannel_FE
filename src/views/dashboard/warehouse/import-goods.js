@@ -46,40 +46,7 @@ const ImportGoods = () => {
     setPage(1);
     fetchList(1, perPage, searchText);
   }, [searchText]);
-  const DeleteSupplierModel = ({ supplier, handleCloseModal }) => {
-    return (
-      <Modal show={true} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Xóa nhà cung cấp</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            {`Bạn có chắc là muốn xóa nhà cung cấp (${supplier.name}) hay không?`}
-          </p>
-          {/* <p>Nếu xóa nhà cung cấp thì sản phẩm của nhà cung cấp đó cũng sẽ bị xóa</p> */}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="primary"
-            // onClick={() => {
-            //   //handle send api
-            //   SupplierModel.deleteSupplier(supplier.id)
-            //     .then((response) => fetchList(page, perPage)) // load lại page
-            //     .catch((error) => {
-            //       alert(error);
-            //     })
-            //     .finally(() => setModal(null)); // đóng modal
-            // }}
-          >
-            Xác nhận
-          </Button>{" "}
-          <Button variant="danger" onClick={handleCloseModal}>
-            Hủy bỏ
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  };
+
   return (
     <>
       <Card>
@@ -89,7 +56,7 @@ const ImportGoods = () => {
             <h4 className="card-title">Danh sách nhập kho</h4>
           </div>
           <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-            <Link to="/dashboard/warehouse/import-goods/addnew">
+            <Link to="/dashboard/warehouse/import-goods/new">
               <i className="btn-inner">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -141,7 +108,9 @@ const ImportGoods = () => {
                       <tr key={item.id}>
                         <td
                           onClick={() => {
-                            navigate("/dashboard/supplier/" + item.id);
+                            navigate(
+                              "/dashboard/warehouse/import-goods/" + item.id
+                            );
                           }}
                           style={{
                             cursor: "pointer",

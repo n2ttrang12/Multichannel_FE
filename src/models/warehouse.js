@@ -58,4 +58,9 @@ export const WarehouseModal = {
       axiosInstance.defaults.baseURL + "warehouse/" + id
     );
   },
+  async getImport(id) {
+    return axiosInstance.get(
+      axiosInstance.defaults.baseURL + "warehouse/import-product/" + id
+    );
+  },
 };

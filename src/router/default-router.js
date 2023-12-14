@@ -69,6 +69,7 @@ import VoucherList from "../views/dashboard/voucher-management/voucher-list";
 import Warehouse from "../views/dashboard/warehouse/ warehouse";
 import HistoryImportPerProduct from "../views/dashboard/warehouse/history-import-per-product";
 import ImportGoodsDetails from "../views/dashboard/warehouse/import-goods-details";
+import UnitList from "../views/dashboard/unit-management/unit-list";
 
 export const DefaultRouter = [
   {
@@ -128,13 +129,18 @@ export const DefaultRouter = [
         element: <ImportGoods />,
       },
       {
-        path: "/dashboard/warehouse/import-goods/addnew",
+        path: "/dashboard/warehouse/import-goods/:id",
         element: <ImportGoodsDetails />,
       },
       // Voucher
       {
         path: "/dashboard/voucher-list",
         element: <VoucherList />,
+      },
+      // Voucher
+      {
+        path: "/dashboard/unit-management",
+        element: <UnitList />,
       },
       //Debt management
       {

@@ -31,15 +31,53 @@ const ImportGoodsDetails = () => {
   const [selectedSupplierId, setSelectedSupplierId] = useState(null);
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [importGoods, setImportGoods] = useState([]);
   const [selectedProductVariants, setSelectedProductVariants] = useState([]);
   const [supplierDetail, setSupplierDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInvalidSupplier, setInvalidSupplier] = useState(false);
+  const [isInvalidProduct, setInvalidProduct] = useState(false);
 
   useEffect(() => {
     SupplierModel.getAll().then(({ data: { data: suppliers } }) => {
       setSuppliers(suppliers);
     });
+    if (!isNewMode) {
+      WarehouseModal.getImport(id)
+        .then(({ data: { data: importGood } }) => {
+          setImportGoods(importGood);
+        })
+        .finally(() => setIsLoading(false));
+    }
   }, []);
+
+  const {
+    id: importId,
+    type: importType,
+    supplierId,
+    updatedAt,
+    createdAt: importCreateAt,
+    supplier: {
+      id: supplierImportId,
+      name,
+      phonenumber,
+      email,
+      addressId,
+      personalContactName,
+      personalContactEmail,
+      personalContactPhone,
+      status,
+      createdAt: customerCreatedAt,
+    } = {},
+    warehouseHistory,
+    dicounts,
+    type,
+    createdAt,
+    orderItems,
+  } = importGoods;
+
+  console.log("importG", importGoods);
+
   useEffect(() => {
     if (!selectedSupplierId) return;
     SupplierModel.get(selectedSupplierId).then(
@@ -86,7 +124,25 @@ const ImportGoodsDetails = () => {
 
     return name;
   };
-  console.log(supplierDetail);
+  // console.log(supplierDetail);
+  const validateSupplier = () => {
+    if (!selectedSupplierId) {
+      setInvalidSupplier(true);
+      return false;
+    } else {
+      setInvalidSupplier(false);
+      return true;
+    }
+  };
+  const validateProduct = () => {
+    if (selectedProductVariants.length <= 0) {
+      setInvalidProduct(true);
+      return false;
+    } else {
+      setInvalidProduct(false);
+      return true;
+    }
+  };
   return (
     <>
       {modal}
@@ -114,11 +170,19 @@ const ImportGoodsDetails = () => {
                         }}
                         id="validationDefault04"
                         required
+                        disabled={!isNewMode}
                       >
-                        <option value={""}>Chọn nhà cung cấp</option>
-                        {suppliers.map(({ id, name }) => {
-                          return <option value={id}>{name}</option>;
-                        })}
+                        {isNewMode ? (
+                          <>
+                            <option value={""}>Chọn nhà cung cấp</option>
+
+                            {suppliers.map(({ id, name }) => {
+                              return <option value={id}>{name}</option>;
+                            })}
+                          </>
+                        ) : (
+                          <option value={supplierImportId}>{name}</option>
+                        )}
                         {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
@@ -126,6 +190,14 @@ const ImportGoodsDetails = () => {
                           Vui lòng chọn tỉnh/TP.
                         </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidSupplier ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn nhà cung cấp
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                 </Row>
@@ -202,13 +274,15 @@ const ImportGoodsDetails = () => {
                               );
                             }
                           )}
-                          {/* <Form.Control.Feedback
-                          type={"invalid"}
-                          className="invalid"
-                        >
-                          Vui lòng chọn tỉnh/TP.
-                        </Form.Control.Feedback> */}
                         </Form.Select>
+                        {isInvalidProduct ? (
+                          <p
+                            style={{ display: "block" }}
+                            className="invalid-feedback"
+                          >
+                            Vui lòng thêm sản phẩm
+                          </p>
+                        ) : null}
                       </Form.Group>
                     </Col>
                   </Row>
@@ -248,141 +322,153 @@ const ImportGoodsDetails = () => {
                 >
                   <thead>
                     <tr>
-                      <th>Ten san pham</th>
-                      <th>So luong</th>
-                      <th>Thao tác</th>
+                      <th>Tên sản phẩm</th>
+                      <th>Số lượng</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {selectedProductVariants.map(
-                      ({
-                        productId,
-                        productName,
-                        productPriceId,
-                        quantity = 0,
-                      }) => {
-                        return (
-                          <tr key={productId + productPriceId}>
-                            <td>{productName}</td>
-                            <td>
-                              <Form.Group
-                                className="mb-3"
-                                controlId="formBasicPassword"
-                              >
-                                <Form.Label>Số lượng</Form.Label>
-                                <Form.Control
-                                  type="number"
-                                  value={quantity}
-                                  onChange={(e) => {
-                                    const variant =
-                                      selectedProductVariants.find(
-                                        (productVariant) =>
-                                          productPriceId ==
-                                            productVariant.productPriceId &&
-                                          productId == productVariant.productId
-                                      );
-                                    variant.quantity = e.target.value;
-                                    setSelectedProductVariants([
-                                      ...selectedProductVariants,
-                                    ]);
-                                  }}
-                                />
-                              </Form.Group>
-                            </td>
-                            <td>
-                              <div style={{ float: "right" }}>
-                                <Link
-                                  className="btn btn-sm btn-icon text-danger"
-                                  data-bs-toggle="tooltip"
-                                  title="Xóa"
-                                  to="#"
-                                  onClick={() => {
-                                    const variants =
-                                      selectedProductVariants.filter(
-                                        (productVariant) =>
-                                          productPriceId !=
-                                            productVariant.productPriceId &&
-                                          productId != productVariant.productId
-                                      );
-
-                                    setSelectedProductVariants(variants);
-                                  }}
+                  {isNewMode ? (
+                    <tbody>
+                      {selectedProductVariants.map(
+                        ({
+                          productId,
+                          productName,
+                          productPriceId,
+                          quantity = 0,
+                        }) => {
+                          return (
+                            <tr key={productId + productPriceId}>
+                              <td>{productName}</td>
+                              <td>
+                                <Form.Group
+                                  className="mb-3"
+                                  controlId="formBasicPassword"
                                 >
-                                  <span className="btn-inner ">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="20"
-                                      fill="red"
-                                      viewBox="0 0 448 512"
-                                    >
-                                      <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
-                                    </svg>
-                                  </span>
-                                </Link>
-                              </div>
+                                  <Form.Label>Số lượng</Form.Label>
+                                  <Form.Control
+                                    type="number"
+                                    value={quantity}
+                                    onChange={(e) => {
+                                      const variant =
+                                        selectedProductVariants.find(
+                                          (productVariant) =>
+                                            productPriceId ==
+                                              productVariant.productPriceId &&
+                                            productId ==
+                                              productVariant.productId
+                                        );
+                                      variant.quantity = e.target.value;
+                                      setSelectedProductVariants([
+                                        ...selectedProductVariants,
+                                      ]);
+                                    }}
+                                  />
+                                </Form.Group>
+                              </td>
+                              <td>
+                                <div style={{ float: "right" }}>
+                                  <Link
+                                    className="btn btn-sm btn-icon text-danger"
+                                    data-bs-toggle="tooltip"
+                                    title="Xóa"
+                                    to="#"
+                                    onClick={() => {
+                                      const variants =
+                                        selectedProductVariants.filter(
+                                          (productVariant) =>
+                                            productPriceId !=
+                                              productVariant.productPriceId &&
+                                            productId !=
+                                              productVariant.productId
+                                        );
+
+                                      setSelectedProductVariants(variants);
+                                    }}
+                                  >
+                                    <span className="btn-inner ">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        fill="red"
+                                        viewBox="0 0 448 512"
+                                      >
+                                        <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        }
+                      )}
+                    </tbody>
+                  ) : (
+                    <tbody>
+                      {warehouseHistory?.map((item) => {
+                        return (
+                          <tr key={item.id}>
+                            <td>
+                              <a>
+                                {getProductVariantName(
+                                  item.warehouse?.productPrices?.product,
+                                  item.warehouse?.productPrices
+                                )}
+                              </a>
                             </td>
+                            <td>{item.quantity}</td>
                           </tr>
                         );
-                      }
-                    )}
-                  </tbody>
+                      })}
+                    </tbody>
+                  )}
                 </Table>
               </Card.Body>
             </Card>
           </Col>
         </Row>
-        <div>
-          <Button
-            onClick={() => {
-              // const isValidName = validateName();
-              // const isValidEmail = validateEmail();
-              // const isValidPhone = validatePhone();
-              // const isValidAddress = validateAddress();
-              // const isValidProvince = validateProvince();
-              // const isValidDistrict = validateDistrict();
-              // const isValidWard = validateWard();
-              // if (
-              //   !isValidName ||
-              //   !isValidEmail ||
-              //   !isValidAddress ||
-              //   !isValidPhone ||
-              //   !isValidProvince ||
-              //   !isValidDistrict ||
-              //   !isValidWard
-              // ) {
-              //   return;
-              // }
-              const importProduct = {
-                supplierId: selectedSupplierId,
-                productDto: selectedProductVariants.map((variant) => {
-                  return {
-                    productId: variant.productId,
-                    productPriceId: variant.productPriceId,
-                    quantity: parseInt(variant.quantity),
-                  };
-                }),
-              };
+        {isNewMode ? (
+          <div>
+            <Button
+              onClick={() => {
+                const isValidSupplier = validateSupplier();
+                const isValidProduct = validateProduct();
+                if (!isValidSupplier || !isValidProduct) {
+                  return;
+                }
+                const importProduct = {
+                  supplierId: selectedSupplierId,
+                  productDto: selectedProductVariants.map((variant) => {
+                    return {
+                      productId: variant.productId,
+                      productPriceId: variant.productPriceId,
+                      quantity: parseInt(variant.quantity),
+                    };
+                  }),
+                };
 
-              WarehouseModal.addImport(importProduct)
-                .then(() => {
-                  setModal(
-                    <SuccessModal
-                      handleCloseModal={() => {
-                        setModal(null);
-                        navigate("/dashboard/warehouse/import-goods");
-                      }}
-                      message={"Nhập hàng thành công"}
-                    ></SuccessModal>
-                  );
-                })
-                .catch((e) => console.log(e));
-            }}
-            variant="btn btn-primary"
-            type="submit"
-          >
-            Submit form
-          </Button>
-        </div>
+                WarehouseModal.addImport(importProduct)
+                  .then(() => {
+                    setModal(
+                      <SuccessModal
+                        handleCloseModal={() => {
+                          setModal(null);
+                          navigate("/dashboard/warehouse/import-goods");
+                        }}
+                        message={"Nhập hàng thành công"}
+                      ></SuccessModal>
+                    );
+                  })
+                  .catch((e) => console.log(e));
+              }}
+              variant="btn btn-primary"
+              type="submit"
+            >
+              Submit
+            </Button>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );
