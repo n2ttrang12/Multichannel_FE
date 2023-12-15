@@ -1,4 +1,4 @@
-import React, { useEffect, memo, Fragment } from "react";
+import React, { useEffect, memo, Fragment, useState } from "react";
 import { Row, Col, Dropdown, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -38,13 +38,57 @@ import { useSelector } from "react-redux";
 // Import selectors & action from setting store
 import * as SettingSelector from "../../store/setting/selectors";
 import SubHeader from "../../components/partials/dashboard/HeaderStyle/sub-header.js";
+import { StatisticModel } from "../../models/dashboard.js";
 
 // install Swiper modules
 SwiperCore.use([Navigation]);
 
 const Index = memo((props) => {
   useSelector(SettingSelector.theme_color);
-
+  const [response, setResponse] = useState({});
+  const [total, setTotal] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: revenue, pagination } = response;
+  const [page, setPage] = useState(1);
+  const [perPage, setPerpage] = useState(10);
+  const totalPage = Math.ceil(total / perPage); // dư 1 sp vân là 1 page
+  useEffect(() => {
+    setIsLoading(true);
+    StatisticModel.getTotal()
+      .then(({ data: { data: total } }) => {
+        setTotal(total);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+  const fetchList = (page, perPage, search = undefined) => {
+    // lấy từ API
+    // console.log("aaaa", customer);
+    setIsLoading(true);
+    StatisticModel.getRevenue({
+      page, // Offset
+      perPage, // limit,
+      search,
+    })
+      .then(({ data }) => {
+        if (!data) {
+          return;
+        }
+        setResponse(data); // set data cho state respone
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    fetchList(page, perPage, searchText);
+  }, [page]);
+  useEffect(() => {
+    //chạy khi page change khi set page/ text change/ filter
+    setPage(1);
+    fetchList(1, perPage, searchText);
+  }, [searchText]);
   const getVariableColor = () => {
     let prefix =
       getComputedStyle(document.body).getPropertyValue("--prefix") || "bs-";
@@ -63,11 +107,19 @@ const Index = memo((props) => {
     const color4 = getComputedStyle(document.body).getPropertyValue(
       `--${prefix}warning`
     );
+    const color5 = getComputedStyle(document.body).getPropertyValue(
+      `--${prefix}danger`
+    );
+    const color6 = getComputedStyle(document.body).getPropertyValue(
+      `--${prefix}success`
+    );
     return {
       primary: color1.trim(),
       info: color2.trim(),
       warning: color4.trim(),
       primary_light: color3.trim(),
+      danger: color5.trim(),
+      success: color6.trim(),
     };
   };
   const variableColors = getVariableColor();
@@ -267,6 +319,14 @@ const Index = memo((props) => {
       },
     ],
   };
+  const {
+    totalCancel,
+    totalSuccess,
+    totalOrder,
+    totalOff,
+    totalWeb,
+    totalSendo,
+  } = total;
   return (
     <Fragment>
       <div className="position-relative">
@@ -300,6 +360,89 @@ const Index = memo((props) => {
                     2440: { slidesPerView: 8 },
                   }}
                 >
+                  <SwiperSlide className=" card card-slide">
+                    <div className="card-body">
+                      <div className="progress-widget">
+                        <Circularprogressbar
+                          stroke={variableColors.success}
+                          width="60px"
+                          height="60px"
+                          trailstroke="#ddd"
+                          strokewidth="4px"
+                          Linecap="rounded"
+                          style={{ width: 60, height: 60 }}
+                          value={50}
+                          id="circle-progress-05"
+                        >
+                          <svg
+                            class="icon-32"
+                            width="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            {" "}
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                              fill={variableColors.success}
+                            ></path>{" "}
+                          </svg>
+                        </Circularprogressbar>
+                        <div className="progress-detail">
+                          <p className="mb-2">Success Orders</p>
+                          <h4 className="counter">
+                            <CountUp
+                              start={0}
+                              end={totalSuccess}
+                              duration={3}
+                            />
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                  <SwiperSlide className=" card card-slide">
+                    <div className="card-body">
+                      <div className="progress-widget">
+                        <Circularprogressbar
+                          stroke={variableColors.danger}
+                          width="60px"
+                          height="60px"
+                          trailstroke="#ddd"
+                          Linecap="rounded"
+                          strokewidth="4px"
+                          value={(totalCancel / totalOrder) * 100}
+                          style={{ width: 60, height: 60 }}
+                          id="circle-progress-06"
+                        >
+                          <svg
+                            class="icon-32"
+                            width="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            {" "}
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                              fill={variableColors.danger}
+                            ></path>{" "}
+                          </svg>
+                        </Circularprogressbar>
+                        <div className="progress-detail">
+                          <p className="mb-2">Cancel Order</p>
+                          <h4 className="counter">
+                            <CountUp start={0} end={totalCancel} duration={3} />
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+
                   <SwiperSlide className="card card-slide">
                     <div className="card-body">
                       <div className="progress-widget">
@@ -311,25 +454,29 @@ const Index = memo((props) => {
                           trailstroke="#ddd"
                           strokewidth="4px"
                           style={{ width: 60, height: 60 }}
-                          value={90}
+                          value={100}
                           id="circle-progress-01"
                         >
                           <svg
-                            className=""
+                            class="icon-32"
                             width="24"
-                            height="24px"
                             viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
+                            {" "}
                             <path
-                              fill="currentColor"
-                              d="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z"
-                            />
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                              fill={variableColors.primary}
+                            ></path>{" "}
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Total Sales</p>
+                          <p className="mb-2">Total Orders</p>
                           <h4 className="counter">
-                            $<CountUp start={120} end={560} duration={3} />K
+                            <CountUp start={0} end={totalOrder} duration={3} />
                           </h4>
                         </div>
                       </div>
@@ -346,25 +493,29 @@ const Index = memo((props) => {
                           strokewidth="4px"
                           Linecap="rounded"
                           style={{ width: 60, height: 60 }}
-                          value={60}
+                          value={(totalOff / totalOrder) * 100}
                           id="circle-progress-02"
                         >
                           <svg
-                            className=""
+                            class="icon-32"
                             width="24"
-                            height="24"
                             viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
+                            {" "}
                             <path
-                              fill="currentColor"
-                              d="M19,6.41L17.59,5L7,15.59V9H5V19H15V17H8.41L19,6.41Z"
-                            />
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                              fill={variableColors.info}
+                            ></path>{" "}
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Total Profit</p>
+                          <p className="mb-2">Offline Orders</p>
                           <h4 className="counter">
-                            $<CountUp start={20} end={158} duration={3} />K
+                            <CountUp start={0} end={totalOff} duration={3} />
                           </h4>
                         </div>
                       </div>
@@ -374,27 +525,36 @@ const Index = memo((props) => {
                     <div className="card-body">
                       <div className="progress-widget">
                         <Circularprogressbar
-                          stroke={variableColors.primary}
+                          stroke={variableColors.primary_light}
                           width="60px"
                           height="60px"
                           trailstroke="#ddd"
                           strokewidth="4px"
                           Linecap="rounded"
                           style={{ width: 60, height: 60 }}
-                          value={70}
+                          value={(totalWeb / totalOrder) * 100}
                           id="circle-progress-03"
                         >
-                          <svg className="" width="24" viewBox="0 0 24 24">
+                          <svg
+                            class="icon-32"
+                            width="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            {" "}
                             <path
-                              fill="currentColor"
-                              d="M19,6.41L17.59,5L7,15.59V9H5V19H15V17H8.41L19,6.41Z"
-                            />
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                              fill={variableColors.primary_light}
+                            ></path>{" "}
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Total Cost</p>
+                          <p className="mb-2">Website Orders</p>
                           <h4 className="counter">
-                            $<CountUp start={120} end={378} duration={3} />K
+                            <CountUp start={0} end={totalWeb} duration={3} />
                           </h4>
                         </div>
                       </div>
@@ -404,157 +564,51 @@ const Index = memo((props) => {
                     <div className="card-body">
                       <div className="progress-widget">
                         <Circularprogressbar
-                          stroke={variableColors.info}
+                          stroke={variableColors.warning}
                           width="60px"
                           height="60px"
                           trailstroke="#ddd"
                           strokewidth="4px"
                           Linecap="rounded"
                           style={{ width: 60, height: 60 }}
-                          value={60}
+                          value={(totalSendo / totalOrder) * 100}
                           id="circle-progress-04"
                         >
                           <svg
-                            className=""
-                            width="24px"
-                            height="24px"
+                            class="icon-32"
+                            width="24"
                             viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
+                            {" "}
                             <path
-                              fill="currentColor"
-                              d="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z"
-                            />
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                              fill={variableColors.warning}
+                            ></path>{" "}
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Revenue</p>
+                          <p className="mb-2">Sendo Orders</p>
                           <h4 className="counter">
-                            $<CountUp start={212} end={742} duration={3} />K
+                            <CountUp start={0} end={totalSendo} duration={3} />
                           </h4>
                         </div>
                       </div>
                     </div>
                   </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.primary}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          Linecap="rounded"
-                          style={{ width: 60, height: 60 }}
-                          value={50}
-                          id="circle-progress-05"
-                        >
-                          <svg
-                            className=""
-                            width="24px"
-                            height="24px"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z"
-                            />
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Net Income</p>
-                          <h4 className="counter">
-                            $<CountUp start={35} end={150} duration={3} />K
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.info}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          Linecap="rounded"
-                          strokewidth="4px"
-                          value={40}
-                          style={{ width: 60, height: 60 }}
-                          id="circle-progress-06"
-                        >
-                          <svg
-                            className=""
-                            width="24px"
-                            height="24px"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z"
-                            />
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Today</p>
-                          <h4 className="counter">
-                            $<CountUp start={652} end={4600} duration={3} />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={colors}
-                          Linecap="rounded"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          width="60px"
-                          height="60px"
-                          value={30}
-                          style={{ width: 60, height: 60 }}
-                          id="circle-progress-07"
-                        >
-                          <svg
-                            className=""
-                            width="24px"
-                            height="24px"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M5,17.59L15.59,7H9V5H19V15H17V8.41L6.41,19L5,17.59Z"
-                            />
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Members</p>
-                          <h4 className="counter">
-                            <CountUp
-                              start={2}
-                              end={11.2}
-                              duration={3}
-                              decimals={1}
-                            />
-                            M
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
+
                   <div className="swiper-button swiper-button-next"></div>
                   <div className="swiper-button swiper-button-prev"></div>
                 </Swiper>
               </div>
             </Row>
           </Col>
-          <Col md="12" lg="8">
+          <Col md="12">
             <Row>
-              <Col md="12">
+              <Col md="8">
                 <div className="card" data-aos="fade-up" data-aos-delay="800">
                   <div className="flex-wrap card-header d-flex justify-content-between">
                     <div className="header-title">
@@ -629,443 +683,65 @@ const Index = memo((props) => {
                   </div>
                 </div>
               </Col>
-              <Col md="12" xl="6">
-                <div className="card" data-aos="fade-up" data-aos-delay="900">
-                  <div className="flex-wrap card-header d-flex justify-content-between">
-                    <div className="header-title">
-                      <h4 className="card-title">Earnings</h4>
-                    </div>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        as={Button}
-                        variant="text-gray"
-                        type="button"
-                        id="dropdownMenuButtonSM"
-                      >
-                        This Week
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#">This Week</Dropdown.Item>
-                        <Dropdown.Item href="#">This Month</Dropdown.Item>
-                        <Dropdown.Item href="#">This Year</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="card-body">
-                    <div className="flex-wrap d-flex align-items-center justify-content-between">
-                      <Chart
-                        className="col-md-8 col-lg-8"
-                        options={chart2.options}
-                        series={chart2.series}
-                        type="radialBar"
-                        height="250"
-                      />
-                      <div className="d-grid gap col-md-4 col-lg-4">
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill="#3a57e8"
-                          >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
-                                fill="#3a57e8"
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Fashion</span>
-                            <h6>251K</h6>
+              <Col md="4">
+                <Row>
+                  <Col md="12" lg="12">
+                    <div
+                      className="card credit-card-widget"
+                      data-aos="fade-up"
+                      data-aos-delay="700"
+                    >
+                      <div className="pb-3 border card-header">
+                        <div className="p-4 border border-white rounded primary-gradient-card">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <h5 className="font-weight-bold">VISA </h5>
+                              <p className="mb-0">PREMIUM ACCOUNT</p>
+                            </div>
+                            <div className="master-card-content">
+                              <svg
+                                className="master-card-1"
+                                width="60"
+                                height="60"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fill="#ffffff"
+                                  d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                                />
+                              </svg>
+                              <svg
+                                className="master-card-2"
+                                width="60"
+                                height="60"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fill="#ffffff"
+                                  d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                                />
+                              </svg>
+                            </div>
                           </div>
-                        </div>
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill="#4bc7d2"
-                          >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
-                                fill="#4bc7d2"
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Accessories</span>
-                            <h6>176K</h6>
+                          <div className="my-4">
+                            <div className="card-number">
+                              <span className="fs-5 me-2">5789</span>
+                              <span className="fs-5 me-2">****</span>
+                              <span className="fs-5 me-2">****</span>
+                              <span className="fs-5">2847</span>
+                            </div>
+                          </div>
+                          <div className="mb-2 d-flex align-items-center justify-content-between">
+                            <p className="mb-0">Card holder</p>
+                            <p className="mb-0">Expire Date</p>
+                          </div>
+                          <div className="d-flex align-items-center justify-content-between">
+                            <h6>Mike Smith</h6>
+                            <h6 className="ms-5">06/11</h6>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-              <Col md="12" xl="6">
-                <div className="card" data-aos="fade-up" data-aos-delay="1000">
-                  <div className="flex-wrap card-header d-flex justify-content-between">
-                    <div className="header-title">
-                      <h4 className="card-title">Conversions</h4>
-                    </div>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        as={Button}
-                        variant="text-gray"
-                        type="button"
-                        id="dropdownMenuButtonSM"
-                      >
-                        This Week
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#">This Week</Dropdown.Item>
-                        <Dropdown.Item href="#">This Month</Dropdown.Item>
-                        <Dropdown.Item href="#">This Year</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="card-body">
-                    <Chart
-                      className="d-activity"
-                      options={chart3.options}
-                      series={chart3.series}
-                      type="bar"
-                      height="230"
-                    />
-                  </div>
-                </div>
-              </Col>
-              <Col md="12" lg="12">
-                <div
-                  className="overflow-hidden card"
-                  data-aos="fade-up"
-                  data-aos-delay="600"
-                >
-                  <div className="flex-wrap card-header d-flex justify-content-between">
-                    <div className="header-title">
-                      <h4 className="mb-2 card-title">Enterprise Clients</h4>
-                      <p className="mb-0">
-                        <svg
-                          className="me-2"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill="#3a57e8"
-                            d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
-                          />
-                        </svg>
-                        15 new acquired this month
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-0 card-body">
-                    <div className="mt-4 table-responsive">
-                      <table
-                        id="basic-table"
-                        className="table mb-0 table-striped"
-                        role="grid"
-                      >
-                        <thead>
-                          <tr>
-                            <th>COMPANIES</th>
-                            <th>CONTACTS</th>
-                            <th>ORDER</th>
-                            <th>COMPLETION</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <img
-                                  className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                  src={shapes1}
-                                  alt="profile"
-                                />
-                                <h6>Addidis Sportwear</h6>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="iq-media-group iq-media-group-1">
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    SP
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    PP
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    MM
-                                  </div>
-                                </Link>
-                              </div>
-                            </td>
-                            <td>$14,000</td>
-                            <td>
-                              <div className="mb-2 d-flex align-items-center">
-                                <h6>60%</h6>
-                              </div>
-                              <Progress
-                                softcolors="primary"
-                                color="primary"
-                                className="shadow-none w-100"
-                                value={60}
-                                minvalue={0}
-                                maxvalue={100}
-                                style={{ height: "4px" }}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <img
-                                  className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                  src={shapes5}
-                                  alt="profile"
-                                />
-                                <h6>Netflixer Platforms</h6>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="iq-media-group iq-media-group-1">
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    SP
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    PP
-                                  </div>
-                                </Link>
-                              </div>
-                            </td>
-                            <td>$30,000</td>
-                            <td>
-                              <div className="mb-2 d-flex align-items-center">
-                                <h6>25%</h6>
-                              </div>
-                              <Progress
-                                softcolors="primary"
-                                color="primary"
-                                className="shadow-none w-100"
-                                value={25}
-                                minvalue={0}
-                                maxvalue={100}
-                                style={{ height: "4px" }}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <img
-                                  className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                  src={shapes2}
-                                  alt="profile"
-                                />
-                                <h6>Shopifi Stores</h6>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="iq-media-group iq-media-group-1">
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    PP
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    TP
-                                  </div>
-                                </Link>
-                              </div>
-                            </td>
-                            <td>$8,500</td>
-                            <td>
-                              <div className="mb-2 d-flex align-items-center">
-                                <h6>100%</h6>
-                              </div>
-                              <Progress
-                                softcolors="success"
-                                color="success"
-                                className="shadow-none w-100"
-                                value={100}
-                                minvalue={0}
-                                maxvalue={100}
-                                style={{ height: "4px" }}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <img
-                                  className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                  src={shapes3}
-                                  alt="profile"
-                                />
-                                <h6>Bootstrap Technologies</h6>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="iq-media-group iq-media-group-1">
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    SP
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    PP
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    MM
-                                  </div>
-                                </Link>
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    TP
-                                  </div>
-                                </Link>
-                              </div>
-                            </td>
-                            <td>$20,500</td>
-                            <td>
-                              <div className="mb-2 d-flex align-items-center">
-                                <h6>100%</h6>
-                              </div>
-                              <Progress
-                                softcolors="success"
-                                color="success"
-                                className="shadow-none w-100"
-                                value={100}
-                                minvalue={0}
-                                maxvalue={100}
-                                style={{ height: "4px" }}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <img
-                                  className="rounded bg-soft-primary img-fluid avatar-40 me-3"
-                                  src={shapes4}
-                                  alt="profile"
-                                />
-                                <h6>Community First</h6>
-                              </div>
-                            </td>
-                            <td>
-                              <div className="iq-media-group iq-media-group-1">
-                                <Link to="#" className="iq-media-1">
-                                  <div className="icon iq-icon-box-3 rounded-pill">
-                                    MM
-                                  </div>
-                                </Link>
-                              </div>
-                            </td>
-                            <td>$9,800</td>
-                            <td>
-                              <div className="mb-2 d-flex align-items-center">
-                                <h6>75%</h6>
-                              </div>
-                              <Progress
-                                softcolors="primary"
-                                color="primary"
-                                className="shadow-none w-100"
-                                value={75}
-                                minvalue={0}
-                                maxvalue={100}
-                                style={{ height: "4px" }}
-                              />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          </Col>
-          <Col md="12" lg="4">
-            <Row>
-              <Col md="12" lg="12">
-                <div
-                  className="card credit-card-widget"
-                  data-aos="fade-up"
-                  data-aos-delay="700"
-                >
-                  <div className="pb-4 border-0 card-header">
-                    <div className="p-4 border border-white rounded primary-gradient-card">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <h5 className="font-weight-bold">VISA </h5>
-                          <p className="mb-0">PREMIUM ACCOUNT</p>
-                        </div>
-                        <div className="master-card-content">
-                          <svg
-                            className="master-card-1"
-                            width="60"
-                            height="60"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="#ffffff"
-                              d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                            />
-                          </svg>
-                          <svg
-                            className="master-card-2"
-                            width="60"
-                            height="60"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fill="#ffffff"
-                              d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="my-4">
-                        <div className="card-number">
-                          <span className="fs-5 me-2">5789</span>
-                          <span className="fs-5 me-2">****</span>
-                          <span className="fs-5 me-2">****</span>
-                          <span className="fs-5">2847</span>
-                        </div>
-                      </div>
-                      <div className="mb-2 d-flex align-items-center justify-content-between">
-                        <p className="mb-0">Card holder</p>
-                        <p className="mb-0">Expire Date</p>
-                      </div>
-                      <div className="d-flex align-items-center justify-content-between">
-                        <h6>Mike Smith</h6>
-                        <h6 className="ms-5">06/11</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-body">
+                      {/* <div className="card-body">
                     <div className="flex-wrap mb-4 d-flex align-itmes-center">
                       <div className="d-flex align-itmes-center me-0 me-md-4">
                         <div>
@@ -1133,25 +809,10 @@ const Index = memo((props) => {
                         ANALYTICS
                       </button>
                     </div>
-                  </div>
-                </div>
-                <div className="card" data-aos="fade-up" data-aos-delay="500">
-                  <div className="text-center card-body d-flex justify-content-around">
-                    <div>
-                      <h2 className="mb-2">
-                        750<small>K</small>
-                      </h2>
-                      <p className="mb-0 text-gray">Website Visitors</p>
+                  </div> */}
                     </div>
-                    <hr className="hr-vertial" />
-                    <div>
-                      <h2 className="mb-2">7,500</h2>
-                      <p className="mb-0 text-gray">New Customers</p>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-              <Col md="12">
+                  </Col>
+                  {/* <Col md="12">
                 <div className="card" data-aos="fade-up" data-aos-delay="600">
                   <div className="flex-wrap card-header d-flex justify-content-between">
                     <div className="header-title">
@@ -1210,8 +871,56 @@ const Index = memo((props) => {
                     </div>
                   </div>
                 </div>
+              </Col> */}
+                </Row>
               </Col>
             </Row>
+          </Col>
+          <Col md="12" lg="12">
+            <div
+              className="overflow-hidden card"
+              data-aos="fade-up"
+              data-aos-delay="600"
+            >
+              <div className="flex-wrap card-header d-flex justify-content-between">
+                <div className="header-title">
+                  <h4 className="mb-2 card-title">Danh thu theo đơn hàng</h4>
+                </div>
+              </div>
+              <div className="p-0 card-body">
+                <div className="mt-4 table-responsive">
+                  <table
+                    id="basic-table"
+                    className="table mb-0 table-striped"
+                    role="grid"
+                  >
+                    <thead>
+                      <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Thành tiền</th>
+                        <th>Giảm giá</th>
+                        <th>Tổng tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {revenue?.map((item) => {
+                        console.log(item);
+                        return (
+                          <tr>
+                            <td>
+                              {!item.sendoId ? item.sendoId : "123456789"}
+                            </td>
+                            <td>{!item.subTotal ? "111" : item.subTotal}</td>
+                            <td>{item.discount}</td>
+                            <td>{item.subTotal + item.discount}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </Col>
         </Row>
       </div>
