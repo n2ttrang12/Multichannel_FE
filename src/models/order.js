@@ -33,4 +33,12 @@ export const Order = {
       { status }
     );
   },
+  async addOrderOffline(order) {
+    return axiosInstance.post(
+      axiosInstance.defaults.baseURL + "order/create-payment",
+      {
+        ...order,
+      }
+    );
+  },
 };

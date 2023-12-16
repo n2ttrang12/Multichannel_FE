@@ -17,6 +17,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SuccessModal } from "../../../components/common/success-modal";
 import { Order as OrderModel } from "../../../models/order";
 import { ErrorModal } from "../../../components/common/fail-modal";
+import { ConfirmModal } from "../../../components/common/confirm-modal";
+import { Loading } from "../../../components/common/loading";
 
 const OrderDetail = () => {
   let { id: paramId } = useParams();
@@ -142,61 +144,96 @@ const OrderDetail = () => {
                         <p>Trạng thái đơn hàng</p>
                       </Col>
                       <Col md="6">
-                        <Form.Group className="form-group">
-                          {/* <Form.Label htmlFor="validationDefault02">
+                        {isLoading ? (
+                          <Loading></Loading>
+                        ) : (
+                          <Form.Group className="form-group">
+                            {/* <Form.Label htmlFor="validationDefault02">
                         Trạng thái
                       </Form.Label> */}
-                          <Form.Select
-                            disabled={type != "WEBSITE"}
-                            value={status}
-                            onChange={(e) => {
-                              const newStatus = e.target.value;
+                            <Form.Select
+                              disabled={type != "WEBSITE"}
+                              value={status}
+                              onChange={(e) => {
+                                const newStatus = e.target.value;
 
-                              OrderModel.updateStatusOrder(id, newStatus)
-                                .then(() => {
-                                  setOrder({
-                                    ...order,
-                                    status: newStatus,
-                                  });
-                                  setModal(
-                                    <SuccessModal
-                                      handleCloseModal={() => {
-                                        setModal(null);
-                                        navigate(
-                                          "/dashboard/order-management/list"
-                                        );
-                                      }}
-                                      message={`Đã chuyển trạn thái từ ${status} sang ${newStatus}`}
-                                    ></SuccessModal>
-                                  );
-                                })
-                                .catch((e) => {
-                                  setModal(
-                                    <ErrorModal
-                                      handleCloseModal={() => setModal(null)}
-                                      errorMessage={`Chuyển trạng thái không thành công`}
-                                    ></ErrorModal>
-                                  );
-                                });
-                            }}
-                            id="validationDefault04"
-                            required
-                          >
-                            {orderStatuses.map((orderStatus) => {
-                              console.log("orderStatus", orderStatus);
-                              const _status = Object.values(orderStatus)[0];
-                              return _status == "NEW" ||
-                                _status == "PROCESSING" ||
-                                _status == "SHIPPING" ||
-                                _status == "COMPLETED" ||
-                                _status == "CANCELLED" ? (
-                                <option value={_status}>{_status}</option>
-                              ) : (
-                                ""
-                              );
-                            })}
-                          </Form.Select>
-                        </Form.Group>
+                                setModal(
+                                  <ConfirmModal
+                                    onConfirm={() => {
+                                      setModal(null);
+                                      setIsLoading(true);
+                                      OrderModel.updateStatusOrder(
+                                        id,
+                                        newStatus
+                                      )
+                                        .then(() => {
+                                          setOrder({
+                                            ...order,
+                                            status: newStatus,
+                                          });
+                                          setModal(
+                                            <SuccessModal
+                                              handleCloseModal={() => {
+                                                setModal(null);
+                                                // navigate(
+                                                //   "/dashboard/order-management/list"
+                                                // );
+                                              }}
+                                              message={`Đã chuyển trạng thái từ ${status} sang ${newStatus}`}
+                                            ></SuccessModal>
+                                          );
+                                        })
+                                        .catch((e) => {
+                                          setModal(
+                                            <ErrorModal
+                                              handleCloseModal={() =>
+                                                setModal(null)
+                                              }
+                                              errorMessage={`Chuyển trạng thái không thành công`}
+                                            ></ErrorModal>
+                                          );
+                                        })
+                                        .finally(() => setIsLoading(false));
+                                    }}
+                                    handleCloseModal={() => {
+                                      setModal(null);
+                                      // navigate(
+                                      //   "/dashboard/order-management/list"
+                                      // );
+                                    }}
+                                    message={`Bán có chắc muốn chuyển trạng thái từ ${status} sang ${newStatus}. Thao tác này sẽ không hoàn lại được`}
+                                  ></ConfirmModal>
+                                );
+                              }}
+                              id="validationDefault04"
+                              required
+                            >
+                              {orderStatuses.map((orderStatus) => {
+                                const statuses = orderStatuses.map(
+                                  (s) => Object.values(s)[0]
+                                );
+                                const _status = Object.values(orderStatus)[0];
+                                return _status == "NEW" ||
+                                  _status == "PROCESSING" ||
+                                  _status == "SHIPPING" ||
+                                  _status == "COMPLETED" ||
+                                  _status == "CANCELLED" ? (
+                                  <option
+                                    disabled={
+                                      statuses.indexOf(_status) <
+                                      statuses.indexOf()
+                                    }
+                                    value={_status}
+                                  >
+                                    {_status}
+                                  </option>
+                                ) : (
+                                  ""
+                                );
+                              })}
+                            </Form.Select>
+                          </Form.Group>
+                        )}
                       </Col>
                     </Row>
                   </Col>
@@ -270,7 +307,17 @@ const OrderDetail = () => {
                         <p>Địa chỉ </p>
                       </Col>
                       <Col>
-                        <p> {": " + address}</p>
+                        <p>
+                          {" "}
+                          {": " +
+                            address?.detail +
+                            ", " +
+                            address?.mtWard?.name +
+                            ", " +
+                            address?.mtDistrict?.name +
+                            ", " +
+                            address?.mtProvince?.name}
+                        </p>
                       </Col>
                     </Row>
                   </Col>

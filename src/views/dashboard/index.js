@@ -333,7 +333,7 @@ const Index = memo((props) => {
         <SubHeader />
       </div>
       <div className="conatiner-fluid content-inner mt-n5">
-        <Row class="py-0 mt-5">
+        <Row class="py-0">
           <Col md="12" lg="12">
             <Row className="row-cols-1">
               <div

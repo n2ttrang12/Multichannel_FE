@@ -27,6 +27,7 @@ import { SupplierModel } from "../../../models/supplier";
 import { SuccessModal } from "../../../components/common/success-modal";
 import { ErrorModal } from "../../../components/common/fail-modal";
 import { LoadingModal } from "../../../components/common/loading-modal";
+import { forEach } from "lodash";
 
 const CategoryModal = ({
   handleCategoryChange,
@@ -120,6 +121,7 @@ const Product = () => {
   const [isInvalidBarcode, setInvalidBarcode] = useState(false);
   const [isInvalidDescription, setInvalidDescription] = useState(false);
   const [isInvalidCategory, setInvalidCategory] = useState(false);
+  const [isInvalidSupplier, setInvalidSupplier] = useState(false);
   const [isInvalidPhoto, setInvalidPhoto] = useState(false);
   const [isInvalidPrice, setInvalidPrice] = useState(false);
   const navigate = useNavigate();
@@ -145,7 +147,7 @@ const Product = () => {
         const basicPriceInfo = {
           price: price.exportPrice,
           quantity: price.quantity,
-          sku: "",
+          sku: price.sku,
         };
 
         if (price.variant) {
@@ -220,8 +222,8 @@ const Product = () => {
                 variants
               );
             });
-            // console.log("variants", variants);
-            setVariants(variants);
+            const _variants = variants.filter((v) => v.name);
+            setVariants(_variants);
           }
 
           dispatchProduct({
@@ -382,17 +384,37 @@ const Product = () => {
       return true;
     }
   };
-  const validatePrice = () => {
-    const listHasPrice = priceList.filter((price) => {
-      return price.price && price.price > 0;
-    });
-    if (listHasPrice.length == 0) {
-      setInvalidPrice(true);
+  const validateSupplier = () => {
+    if (!categoryId) {
+      setInvalidSupplier(true);
       return false;
     } else {
-      setInvalidPrice(false);
+      setInvalidSupplier(false);
       return true;
     }
+  };
+  const validatePrice = () => {
+    const isInvalid = priceList.some(({ price, quantity, sku }) => {
+      if (
+        priceList.length !== 1 &&
+        price == "" &&
+        quantity == "" &&
+        sku == ""
+      ) {
+        return false;
+      }
+
+      return (
+        !price ||
+        parseInt(price) <= 0 ||
+        !quantity ||
+        parseInt(quantity) <= 0 ||
+        !sku ||
+        sku.trim().length === 0
+      );
+    });
+    setInvalidPrice(isInvalid);
+    return !isInvalid;
   };
 
   const validatePhoto = () => {
@@ -655,6 +677,14 @@ const Product = () => {
                       return <option value={id}>{name}</option>;
                     })}
                   </Form.Select>
+                  {isInvalidSupplier ? (
+                    <p
+                      style={{ display: "block" }}
+                      className="invalid-feedback"
+                    >
+                      Vui lòng chọn nhà cung cấp
+                    </p>
+                  ) : null}
                 </Form.Group>
               </Col>
             </Row>
@@ -948,6 +978,7 @@ const Product = () => {
           </Card.Header>
           <Card.Body>
             <Variants
+              isInvalidPrice={isInvalidPrice}
               variants={variants}
               prices={priceList}
               onChangePrices={(prices) =>
@@ -958,14 +989,6 @@ const Product = () => {
               }
               onChange={(variants) => setVariants(variants)}
             ></Variants>
-            {isInvalidPrice &&
-            priceList.filter((price) => {
-              return price.price && price.price > 0;
-            }).length === 0 ? (
-              <p style={{ display: "block" }} className="invalid-feedback">
-                Vui lòng thêm giá bán
-              </p>
-            ) : null}
           </Card.Body>
         </Card>
 
@@ -978,14 +1001,15 @@ const Product = () => {
               const isValidCategory = validateCategory();
               const isValidPhoto = validatePhoto();
               const isInvalidPrice = validatePrice();
-
+              const isvalidSupplier = validateSupplier();
               if (
                 !isValidName ||
                 !isValidBarcode ||
                 !isValidDescription ||
                 !isValidCategory ||
                 !isValidPhoto ||
-                !isInvalidPrice
+                !isInvalidPrice ||
+                !isvalidSupplier
               ) {
                 return;
               }
@@ -1000,6 +1024,7 @@ const Product = () => {
                     const _price = {
                       exportPrice: parseInt(price.price),
                       quantity: parseInt(price.quantity),
+                      sku: price.sku,
                     };
 
                     if (price[variants[0]?.name] !== undefined) {
@@ -1049,17 +1074,20 @@ const Product = () => {
                       ></SuccessModal>
                     );
                   })
-                  .catch((e) => {
-                    // setModal(null);
-                    setModal(
-                      <ErrorModal
-                        handleCloseModal={() => {
-                          setModal(null);
-                        }}
-                        errorMessage={"Thao tác không thành công"}
-                      ></ErrorModal>
-                    );
-                  })
+                  .catch(
+                    ({
+                      response: { data: { error: { message } = {} } = {} } = {},
+                    }) => {
+                      setModal(
+                        <ErrorModal
+                          handleCloseModal={() => {
+                            setModal(null);
+                          }}
+                          errorMessage={message ?? "Thao tác không thành công"}
+                        ></ErrorModal>
+                      );
+                    }
+                  )
                   .finally(() => setIsLoading(false));
               });
             }}
@@ -1095,7 +1123,13 @@ const Product = () => {
  * e.g price = {color: 'blue', size: 'M', price: 1000, quantity: 12, sku: "123"}
  * e.g variant = {name: 'color', values: ['blue', 'red']}
  */
-const Variants = ({ variants, onChange, prices, onChangePrices }) => {
+const Variants = ({
+  variants,
+  onChange,
+  prices,
+  onChangePrices,
+  isInvalidPrice,
+}) => {
   const [fails, setFailed] = useState([]);
 
   //remote unvalid values
@@ -1278,34 +1312,54 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
             {rows.length === 0 ? (
               <tr>
                 <td>
-                  <Form.Control
-                    value={defaultPrice.price}
-                    type="number"
-                    onChange={(e) => {
-                      defaultPrice.price = e.target.value;
-                      onChangePrices(handleBeforeSavingPrices([...prices]));
-                    }}
-                  />
+                  <Form.Group className="form-group">
+                    <Form.Control
+                      value={defaultPrice.price}
+                      isInvalid={isInvalidPrice && defaultPrice.price <= 0}
+                      type="number"
+                      onChange={(e) => {
+                        defaultPrice.price = e.target.value;
+                        onChangePrices(handleBeforeSavingPrices([...prices]));
+                      }}
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui làm nhập giá
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </td>
                 <td>
-                  <Form.Control
-                    value={defaultPrice.quantity}
-                    type="number"
-                    onChange={(e) => {
-                      defaultPrice.quantity = e.target.value;
-                      onChangePrices(handleBeforeSavingPrices([...prices]));
-                    }}
-                  />
+                  <Form.Group className="form-group">
+                    <Form.Control
+                      value={defaultPrice.quantity}
+                      isInvalid={isInvalidPrice && defaultPrice.quantity <= 0}
+                      type="number"
+                      onChange={(e) => {
+                        defaultPrice.quantity = e.target.value;
+                        onChangePrices(handleBeforeSavingPrices([...prices]));
+                      }}
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui lòng nhập số lượng
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </td>
                 <td>
-                  <Form.Control
-                    value={defaultPrice.sku}
-                    type="text"
-                    onChange={(e) => {
-                      defaultPrice.sku = e.target.value;
-                      onChangePrices(handleBeforeSavingPrices([...prices]));
-                    }}
-                  />
+                  <Form.Group className="form-group">
+                    <Form.Control
+                      value={defaultPrice.sku}
+                      isInvalid={
+                        isInvalidPrice && defaultPrice.sku?.length <= 0
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        defaultPrice.sku = e.target.value;
+                        onChangePrices(handleBeforeSavingPrices([...prices]));
+                      }}
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui lòng nhập sku
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </td>
               </tr>
             ) : (
@@ -1341,37 +1395,74 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
                     <td>{value1}</td>
                     {value2 && <td>{value2}</td>}
                     <td>
-                      <Form.Control
-                        key={index}
-                        value={priceObject.price}
-                        type="number"
-                        onChange={(e) => {
-                          priceObject.price = e.target.value;
-                          onChangePrices(handleBeforeSavingPrices([...prices]));
-                        }}
-                      />
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          key={index}
+                          value={priceObject.price}
+                          isInvalid={isInvalidPrice && priceObject?.price <= 0}
+                          type="number"
+                          onChange={(e) => {
+                            priceObject.price = e.target.value;
+                            onChangePrices(
+                              handleBeforeSavingPrices([...prices])
+                            );
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          type={"invalid"}
+                          className="invalid"
+                        >
+                          Vui lòng nhập giá
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     </td>
                     <td>
-                      <Form.Control
-                        key={index}
-                        value={priceObject.quantity}
-                        type="number"
-                        onChange={(e) => {
-                          priceObject.quantity = e.target.value;
-                          onChangePrices(handleBeforeSavingPrices([...prices]));
-                        }}
-                      />
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          key={index}
+                          value={priceObject.quantity}
+                          isInvalid={
+                            isInvalidPrice && priceObject?.quantity <= 0
+                          }
+                          type="number"
+                          onChange={(e) => {
+                            priceObject.quantity = e.target.value;
+                            onChangePrices(
+                              handleBeforeSavingPrices([...prices])
+                            );
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          type={"invalid"}
+                          className="invalid"
+                        >
+                          Vui lòng nhập số lượng
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     </td>
                     <td>
-                      <Form.Control
-                        key={index}
-                        value={priceObject.sku}
-                        type="text"
-                        onChange={(e) => {
-                          priceObject.sku = e.target.value;
-                          onChangePrices(handleBeforeSavingPrices([...prices]));
-                        }}
-                      />
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          key={index}
+                          value={priceObject.sku}
+                          isInvalid={
+                            isInvalidPrice && priceObject?.sku.length <= 0
+                          }
+                          type="text"
+                          onChange={(e) => {
+                            priceObject.sku = e.target.value;
+                            onChangePrices(
+                              handleBeforeSavingPrices([...prices])
+                            );
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          type={"invalid"}
+                          className="invalid"
+                        >
+                          Vui lòng nhập SKU
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     </td>
                   </tr>
                 );

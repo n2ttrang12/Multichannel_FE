@@ -70,6 +70,7 @@ import Warehouse from "../views/dashboard/warehouse/ warehouse";
 import HistoryImportPerProduct from "../views/dashboard/warehouse/history-import-per-product";
 import ImportGoodsDetails from "../views/dashboard/warehouse/import-goods-details";
 import UnitList from "../views/dashboard/unit-management/unit-list";
+import OrderOffline from "../views/dashboard/order-management/order-offline";
 
 export const DefaultRouter = [
   {
@@ -92,6 +93,10 @@ export const DefaultRouter = [
       {
         path: "/dashboard/order-management/list/order-detail/:id",
         element: <OrderDetail />,
+      },
+      {
+        path: "/dashboard/order-management/list/order-offline/:id",
+        element: <OrderOffline />,
       },
       // Customer management
       {

@@ -36,7 +36,7 @@ const CustomerDetail = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const { id, name, phonenumber, address, createdAt, orders } = customer;
+  const { id, name, phonenumber, address, email, createdAt, orders } = customer;
 
   const onChange = () => {};
 
@@ -84,6 +84,20 @@ const CustomerDetail = () => {
                       </Col>
                     </Row>
                   </Col>
+                  {email ? (
+                    <Col md="6">
+                      <Row>
+                        <Col md="6">
+                          <p>Email </p>
+                        </Col>
+                        <Col>
+                          <p> {": " + email}</p>
+                        </Col>
+                      </Row>
+                    </Col>
+                  ) : (
+                    ""
+                  )}
                 </Row>
                 <Row>
                   <Col md="12">

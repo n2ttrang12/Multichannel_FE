@@ -44,4 +44,11 @@ export const Product = {
   async get(id) {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "product/" + id);
   },
+  async getAll() {
+    return Product.getList({
+      page: 0, // Offset
+      perPage: 0, // limit,
+      search: "",
+    });
+  },
 };
