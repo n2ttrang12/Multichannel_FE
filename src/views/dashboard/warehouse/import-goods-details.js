@@ -324,6 +324,7 @@ const ImportGoodsDetails = () => {
                     <tr>
                       <th>Tên sản phẩm</th>
                       <th>Số lượng</th>
+                      <th>Thao tác</th>
                     </tr>
                   </thead>
                   {isNewMode ? (
@@ -343,7 +344,7 @@ const ImportGoodsDetails = () => {
                                   className="mb-3"
                                   controlId="formBasicPassword"
                                 >
-                                  <Form.Label>Số lượng</Form.Label>
+                                  {/* <Form.Label>Số lượng</Form.Label> */}
                                   <Form.Control
                                     type="number"
                                     value={quantity}
@@ -376,11 +377,11 @@ const ImportGoodsDetails = () => {
                                         selectedProductVariants.filter(
                                           (productVariant) =>
                                             productPriceId !=
-                                              productVariant.productPriceId &&
+                                              productVariant.productPriceId ||
                                             productId !=
                                               productVariant.productId
                                         );
-
+                                      console.log(productPriceId, variants);
                                       setSelectedProductVariants(variants);
                                     }}
                                   >

@@ -528,7 +528,7 @@ const Product = () => {
                 <Form.Group className="form-group">
                   <Form.Label md="6" htmlFor="validationDefault01">
                     Mã vạch (Barcode)
-                    {/* <span className="text-danger"> {" *"}</span> */}
+                    <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Control
                     isInvalid={isInvalidBarcode}
@@ -554,6 +554,7 @@ const Product = () => {
                 <Form.Group className="form-group">
                   <Form.Label htmlFor="validationDefault02">
                     Đơn vị tính
+                    <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Select
                     value={unitId}
@@ -660,6 +661,7 @@ const Product = () => {
                 <Form.Group className="form-group">
                   <Form.Label htmlFor="validationDefault02">
                     Nhà cung cấp
+                    <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Select
                     value={supplierId}

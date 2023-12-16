@@ -35,4 +35,10 @@ export const VoucherModel = {
   async get(id) {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "voucher/" + id);
   },
+
+  async getByCode(code) {
+    return axiosInstance.get(
+      axiosInstance.defaults.baseURL + "voucher/code/" + code
+    );
+  },
 };

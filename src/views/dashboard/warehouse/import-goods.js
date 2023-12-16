@@ -122,7 +122,7 @@ const ImportGoods = () => {
                               )
                             : null}
                         </td>
-                        <td>{item.creator}</td>
+                        <td>{item.creater?.name}</td>
                         <td>{item.supplier?.name}</td>
                         <td>{item.supplier?.personalContactName}</td>
                         <td>{item.warehouseHistory?.length}</td>

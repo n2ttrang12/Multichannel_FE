@@ -691,7 +691,7 @@ const Supplier = () => {
                         <th>Loại sản phẩm</th>
 
                         {/* <th>Nhà cung cấp</th> */}
-                        <th>Giá bán</th>
+                        {/* <th>Giá bán</th> */}
                         {/* <th>Tồn kho</th> */}
                         {/* <th>Ngày tạo</th> */}
                         {/* <th>Trạng thái</th> */}

@@ -141,7 +141,7 @@ const VoucherList = () => {
           .then((res) => {
             const voucher = res?.data?.data;
 
-            setIsPercentage(voucher.percent ? true : false);
+            setIsPercentage(voucher?.percent ? true : false);
             dispatch({
               type: "SET_VOUCHER",
               payload: voucher,

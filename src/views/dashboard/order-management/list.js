@@ -62,86 +62,88 @@ const List = () => {
         <div className="header-title">
           <h4 className="card-title">Danh sách đơn hàng</h4>
         </div>
-        <Button className="btn btn-md btn-soft-primary me-2 mt-lg-0 mt-md-0 mt-3">
-          <Link
-            onClick={() => {
-              setModal(<LoadingModal></LoadingModal>);
-              Order.getVendorOrders({}).then(({ data }) => {
-                setModal(
-                  <SuccessModal
-                    handleCloseModal={() => {
-                      setModal(null);
-                      fetchList(page, perPage, searchText);
-                    }}
-                    message={`Lấy sản phẩm từ Sendo thành công`}
-                  ></SuccessModal>
-                );
-              });
-            }}
-          >
-            <i className="btn-inner">
-              <svg
-                class="icon-32"
-                width="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {" "}
-                <path
-                  d="M16.8397 20.1642V6.54639"
+        <div>
+          <Button className="btn btn-md btn-soft-primary me-2 mt-lg-0 mt-md-0 mt-3">
+            <Link
+              onClick={() => {
+                setModal(<LoadingModal></LoadingModal>);
+                Order.getVendorOrders({}).then(({ data }) => {
+                  setModal(
+                    <SuccessModal
+                      handleCloseModal={() => {
+                        setModal(null);
+                        fetchList(page, perPage, searchText);
+                      }}
+                      message={`Lấy sản phẩm từ Sendo thành công`}
+                    ></SuccessModal>
+                  );
+                });
+              }}
+            >
+              <i className="btn-inner">
+                <svg
+                  class="icon-32"
+                  width="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {" "}
+                  <path
+                    d="M16.8397 20.1642V6.54639"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>{" "}
+                  <path
+                    d="M20.9173 16.0681L16.8395 20.1648L12.7617 16.0681"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>{" "}
+                  <path
+                    d="M6.91102 3.83276V17.4505"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>{" "}
+                  <path
+                    d="M2.8335 7.92894L6.91127 3.83228L10.9891 7.92894"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></path>{" "}
+                </svg>
+              </i>
+              <span>Lấy đơn hàng</span>
+            </Link>
+          </Button>
+          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+            <Link to="/dashboard/order-management/list/order-offline/new">
+              <i className="btn-inner">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></path>{" "}
-                <path
-                  d="M20.9173 16.0681L16.8395 20.1648L12.7617 16.0681"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></path>{" "}
-                <path
-                  d="M6.91102 3.83276V17.4505"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></path>{" "}
-                <path
-                  d="M2.8335 7.92894L6.91127 3.83228L10.9891 7.92894"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></path>{" "}
-              </svg>
-            </i>
-            <span>Lấy đơn hàng</span>
-          </Link>
-        </Button>
-        <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-          <Link to="/dashboard/order-management/list/order-offline/new">
-            <i className="btn-inner">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </i>
-            <span>Thêm đơn hàng</span>
-          </Link>
-        </Button>
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </i>
+              <span>Thêm đơn hàng</span>
+            </Link>
+          </Button>
+        </div>
       </Card.Header>
       <Card.Body>
         <div>

@@ -11,13 +11,17 @@ import {
 } from "react-bootstrap";
 import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
-import { SupplierModel } from "../../../models/order";
+import { Order, SupplierModel } from "../../../models/order";
 import { Province as ProvinceModel } from "../../../models/province";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Order as OrderModel } from "../../../models/order";
 import { Product as ProductModel } from "../../../models/product";
 import { SuccessModal } from "../../../components/common/success-modal";
+import { VoucherModel } from "../../../models/voucher";
+import { isValidDate } from "@fullcalendar/react";
+import * as moment from "moment";
+
 const OrderOffline = () => {
   let { id } = useParams();
 
@@ -27,13 +31,8 @@ const OrderOffline = () => {
   const [modal, setModal] = useState(null);
   const [images, setImages] = useState([]);
   const maxNumber = 5;
-  const [selectedSupplierId, setSelectedSupplierId] = useState(null);
-  const [suppliers, setSuppliers] = useState([]);
-  const [importGoods, setImportGoods] = useState([]);
   const [selectedProductVariants, setSelectedProductVariants] = useState([]);
-  const [supplierDetail, setSupplierDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInvalidSupplier, setInvalidSupplier] = useState(false);
   const [isInvalidProduct, setInvalidProduct] = useState(false);
   const [isInvalidName, setInvalidName] = useState(false);
   const [isInvalidEmail, setInvalidEmail] = useState(false);
@@ -46,6 +45,7 @@ const OrderOffline = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [productVariants, setProductVariants] = useState([]);
+  const [discount, setDiscount] = useState("");
 
   useEffect(() => {
     ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
@@ -61,7 +61,6 @@ const OrderOffline = () => {
       OrderModel.get(id)
         .then((res) => {
           const order = res?.data?.buyerDto;
-          console.log("qqqq", order);
           if (order) {
             if (order.address?.mtProvince) {
               ProvinceModel.getDistricts(
@@ -114,6 +113,8 @@ const OrderOffline = () => {
             productId: product.id,
             productName: getProductVariantName(product, price),
             productPriceId: price.id,
+            price: price.exportPrice,
+            quantity: 1,
           };
 
           if (
@@ -198,6 +199,11 @@ const OrderOffline = () => {
             ...state,
             productDto: action.payload,
           };
+        case "SET_VOUCHER_ID":
+          return {
+            ...state,
+            voucherId: action.payload,
+          };
         case "SET_ORDER":
           return action.payload;
 
@@ -232,7 +238,6 @@ const OrderOffline = () => {
     addressDto: { detail = "", provinceId = "", districtId = "", wardId = "" },
     productDto: { productId, quantity, shopProgramPercent, productPriceId },
   } = order;
-  console.log(provinceId);
 
   useEffect(() => {
     if (!provinceId) {
@@ -346,6 +351,14 @@ const OrderOffline = () => {
       return true;
     }
   };
+
+  const subTotal = selectedProductVariants
+    .map(({ quantity, price }) => quantity * price)
+    .reduce((total, price) => total + price, 0);
+  const total = !discount
+    ? subTotal
+    : subTotal - discount.discount - (discount.percent * subTotal) / 100;
+
   return (
     <>
       {modal}
@@ -604,6 +617,8 @@ const OrderOffline = () => {
                 <div className="header-title">
                   <h5 className="card-title">Danh sách sản phẩm</h5>
                 </div>
+              </Card.Header>
+              <Card.Body>
                 <Row>
                   <Col>
                     <Form.Group className="form-group">
@@ -658,29 +673,7 @@ const OrderOffline = () => {
                     </Form.Group>
                   </Col>
                 </Row>
-                {/* <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-                  <Link to="/dashboard/order/new">
-                    <i className="btn-inner">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </i>
-                    <span>Thêm sản phẩm</span>
-                  </Link>
-                </Button> */}
-              </Card.Header>
-              <Card.Body>
+
                 <Table
                   responsive
                   striped
@@ -691,8 +684,8 @@ const OrderOffline = () => {
                   <thead>
                     <tr>
                       <th>Tên sản phẩm</th>
-                      <th>Số lượng</th>
                       <th>Đơn giá</th>
+                      <th>Số lượng</th>
                       <th>Thành tiền</th>
                       <th>Thao tác</th>
                     </tr>
@@ -700,23 +693,23 @@ const OrderOffline = () => {
                   {
                     isNewMode ? (
                       <tbody>
-                        {productVariants.map(
+                        {selectedProductVariants.map(
                           ({
                             productId,
                             productName,
                             productPriceId,
                             quantity = 0,
+                            price,
                           }) => {
                             return (
                               <tr key={productId + productPriceId}>
                                 <td>{productName}</td>
-                                <td>{productName}</td>
+                                <td>{price}</td>
                                 <td>
                                   <Form.Group
                                     className="mb-3"
                                     controlId="formBasicPassword"
                                   >
-                                    <Form.Label>Số lượng</Form.Label>
                                     <Form.Control
                                       type="number"
                                       value={quantity}
@@ -737,7 +730,7 @@ const OrderOffline = () => {
                                     />
                                   </Form.Group>
                                 </td>
-                                <td>{productName}</td>
+                                <td>{price * quantity}</td>
                                 <td>
                                   <div style={{ float: "right" }}>
                                     <Link
@@ -750,7 +743,7 @@ const OrderOffline = () => {
                                           selectedProductVariants.filter(
                                             (productVariant) =>
                                               productPriceId !=
-                                                productVariant.productPriceId &&
+                                                productVariant.productPriceId ||
                                               productId !=
                                                 productVariant.productId
                                           );
@@ -800,6 +793,143 @@ const OrderOffline = () => {
                     //   )}
                   }
                 </Table>
+
+                <Row
+                  style={{
+                    margin: "0 24px 24px 24px",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <Col md="6">
+                    <Row>
+                      <Col md="6">
+                        <p style={{ fontWeight: "500" }}>Thành tiền </p>
+                      </Col>
+                      <Col>
+                        <p style={{ fontWeight: "700" }}>
+                          {" "}
+                          {": " + subTotal + "VND"}
+                        </p>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col
+                        md="6"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <p style={{ fontWeight: "500" }}>Mã giảm giá </p>
+                      </Col>
+                      <Col>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="formBasicPassword"
+                        >
+                          <Form.Control
+                            type="text"
+                            onChange={(e) => {
+                              VoucherModel.getByCode(e.target.value)
+                                .then(({ data: { data: voucher } }) => {
+                                  const isVoucherValid = () => {
+                                    const startTime = moment(voucher.fromDate);
+                                    const endTime = moment(voucher.toDate);
+
+                                    if (voucher.available <= 0) {
+                                      return false;
+                                    }
+                                    if (voucher.isDisable) {
+                                      return false;
+                                    }
+                                    if (
+                                      !moment().isBetween(startTime, endTime)
+                                    ) {
+                                      return false;
+                                    }
+                                    return true;
+                                  };
+
+                                  if (isVoucherValid(voucher)) {
+                                    const message = voucher.discount
+                                      ? `  - ${voucher.discount} VND`
+                                      : `  - ${voucher.percent}%`;
+
+                                    setDiscount({
+                                      message,
+                                      discount: voucher.discount ?? 0,
+                                      percent: voucher.percent ?? 0,
+                                    });
+                                    dispatchOrder({
+                                      type: "SET_VOUCHER_ID",
+                                      payload: voucher.id,
+                                    });
+                                  } else {
+                                    setDiscount(null);
+                                    dispatchOrder({
+                                      type: "SET_VOUCHER_ID",
+                                      payload: null,
+                                    });
+                                  }
+                                })
+                                .catch((e) => {
+                                  setDiscount(null);
+                                  dispatchOrder({
+                                    type: "SET_VOUCHER_ID",
+                                    payload: null,
+                                  });
+                                });
+                            }}
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col
+                        md="6"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <p style={{ fontWeight: "500" }}>Giảm giá </p>
+                      </Col>
+                      <Col>
+                        {discount ? (
+                          <div style={{ fontWeight: "700" }}>
+                            :{" "}
+                            <span style={{ color: "red" }}>
+                              {" "}
+                              {discount.message}
+                            </span>
+                          </div>
+                        ) : (
+                          <div style={{ fontWeight: "700" }}>
+                            : <span style={{ color: "red" }}> 0</span>
+                          </div>
+                        )}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col
+                        md="6"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <p style={{ fontWeight: "500" }}>Tổng tiền </p>
+                      </Col>
+                      <Col>
+                        <p style={{ fontWeight: "700" }}>
+                          {" "}
+                          {": " + total + "VND"}
+                        </p>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
               </Card.Body>
             </Card>
           </Col>
@@ -807,50 +937,59 @@ const OrderOffline = () => {
         {isNewMode ? (
           <div>
             <Button
-              //   onClick={() => {
-              //     const isValidName = validateName();
-              //     const isValidEmail = validateEmail();
-              //     const isValidPhone = validatePhone();
-              //     const isValidAddress = validateAddress();
-              //     const isValidProvince = validateProvince();
-              //     const isValidDistrict = validateDistrict();
-              //     const isValidWard = validateWard();
-              //     if (
-              //       !isValidName ||
-              //       !isValidEmail ||
-              //       !isValidAddress ||
-              //       !isValidPhone ||
-              //       !isValidProvince ||
-              //       !isValidDistrict ||
-              //       !isValidWard
-              //     ) {
-              //       return;
-              //     }
-              //     const importProduct = {
-              //       supplierId: selectedSupplierId,
-              //       productDto: selectedProductVariants.map((variant) => {
-              //         return {
-              //           productId: variant.productId,
-              //           productPriceId: variant.productPriceId,
-              //           quantity: parseInt(variant.quantity),
-              //         };
-              //       }),
-              //     };
+              onClick={() => {
+                //   const isValidName = validateName();
+                //   const isValidEmail = validateEmail();
+                //   const isValidPhone = validatePhone();
+                //   const isValidAddress = validateAddress();
+                //   const isValidProvince = validateProvince();
+                //   const isValidDistrict = validateDistrict();
+                //   const isValidWard = validateWard();
+                //   if (
+                //     !isValidName ||
+                //     !isValidEmail ||
+                //     !isValidAddress ||
+                //     !isValidPhone ||
+                //     !isValidProvince ||
+                //     !isValidDistrict ||
+                //     !isValidWard
+                //   ) {
+                //     return;
+                //   }
+                const orderOfflineDto = {
+                  buyerDto: {
+                    name: order.name,
+                    phonenumber: order.phoneNumber,
+                    email: order.email,
+                    addressDto: {
+                      ...order.addressDto,
+                      isDefault: true,
+                    },
+                  },
+                  productDto: selectedProductVariants.map((variant) => {
+                    return {
+                      productId: variant.productId,
+                      productPriceId: variant.productPriceId,
+                      quantity: parseInt(variant.quantity),
+                    };
+                  }),
+                  voucherId: order.voucherId,
+                };
 
-              //     WarehouseModal.addImport(importProduct)
-              //       .then(() => {
-              //         setModal(
-              //           <SuccessModal
-              //             handleCloseModal={() => {
-              //               setModal(null);
-              //               navigate("/dashboard/warehouse/import-goods");
-              //             }}
-              //             message={"Nhập hàng thành công"}
-              //           ></SuccessModal>
-              //         );
-              //       })
-              //       .catch((e) => console.log(e));
-              //   }}
+                Order.addOrderOffline(orderOfflineDto)
+                  .then(() => {
+                    setModal(
+                      <SuccessModal
+                        handleCloseModal={() => {
+                          setModal(null);
+                          navigate("/dashboard/order-management/list");
+                        }}
+                        message={"Tạo đơn hàng trực tiếp thành công"}
+                      ></SuccessModal>
+                    );
+                  })
+                  .catch((e) => console.log(e));
+              }}
               variant="btn btn-primary"
               type="submit"
             >
