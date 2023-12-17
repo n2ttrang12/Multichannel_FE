@@ -17,6 +17,7 @@ import { Province as ProvinceModel } from "../../../models/province";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { SuccessModal } from "../../../components/common/success-modal";
 import { WarehouseModal } from "../../../models/warehouse";
+import SearchableDropdown from "../../../components/common/search-dropdown/search-dropdown";
 
 const ImportGoodsDetails = () => {
   let { id } = useParams();
@@ -87,8 +88,10 @@ const ImportGoodsDetails = () => {
           product?.productPrices?.map((price) => {
             const productVariant = {
               productId: product.id,
+              productBarcode: product.barcode,
               productName: getProductVariantName(product, price),
               productPriceId: price.id,
+              productPhoto: product.productPhotos,
             };
 
             if (
@@ -109,6 +112,10 @@ const ImportGoodsDetails = () => {
         setSupplierDetail(supplier);
       }
     );
+  }, [selectedSupplierId]);
+
+  useEffect(() => {
+    setSelectedProductVariants([]);
   }, [selectedSupplierId]);
 
   const getProductVariantName = (product, price) => {
@@ -156,64 +163,163 @@ const ImportGoodsDetails = () => {
                 </div>
               </Card.Header>
               <Card.Body>
-                <Row>
-                  <Col>
-                    <Form.Group className="form-group">
-                      <Form.Label htmlFor="validationDefault02">
-                        Nhà cung cấp
-                        <span className="text-danger"> {" *"}</span>
-                      </Form.Label>
-                      <Form.Select
-                        value={selectedSupplierId}
-                        onChange={(event) => {
-                          setSelectedSupplierId(event.target.value);
-                        }}
-                        id="validationDefault04"
-                        required
-                        disabled={!isNewMode}
-                      >
-                        {isNewMode ? (
-                          <>
-                            <option value={""}>Chọn nhà cung cấp</option>
+                <Form.Group className="form-group">
+                  <Form.Label htmlFor="validationDefault02">
+                    Nhà cung cấp
+                    <span className="text-danger"> {" *"}</span>
+                  </Form.Label>
+                  <Form.Select
+                    value={selectedSupplierId}
+                    onChange={(event) => {
+                      setSelectedSupplierId(event.target.value);
+                    }}
+                    id="validationDefault04"
+                    required
+                    disabled={!isNewMode}
+                  >
+                    {isNewMode ? (
+                      <>
+                        <option value={""}>Chọn nhà cung cấp</option>
 
-                            {suppliers.map(({ id, name }) => {
-                              return <option value={id}>{name}</option>;
-                            })}
-                          </>
-                        ) : (
-                          <option value={supplierImportId}>{name}</option>
-                        )}
-                        {/* <Form.Control.Feedback
+                        {suppliers.map(({ id, name }) => {
+                          return <option value={id}>{name}</option>;
+                        })}
+                      </>
+                    ) : (
+                      <option value={supplierImportId}>{name}</option>
+                    )}
+                    {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn tỉnh/TP.
                         </Form.Control.Feedback> */}
-                      </Form.Select>
-                      {isInvalidSupplier ? (
-                        <p
-                          style={{ display: "block" }}
-                          className="invalid-feedback"
-                        >
-                          Vui lòng chọn nhà cung cấp
-                        </p>
-                      ) : null}
-                    </Form.Group>
-                  </Col>
-                </Row>
+                  </Form.Select>
+                  {isInvalidSupplier ? (
+                    <p
+                      style={{ display: "block" }}
+                      className="invalid-feedback"
+                    >
+                      Vui lòng chọn nhà cung cấp
+                    </p>
+                  ) : null}
+                </Form.Group>
                 {supplierDetail ? (
-                  <Row>
-                    <Col md="12">
-                      <Row>
+                  <div
+                    style={{
+                      background: "#f1f1f1",
+                      padding: "16px",
+                      borderRadius: "8px",
+                      border: "1px solid #f1f1f1",
+                    }}
+                  >
+                    {" "}
+                    <Row>
+                      <Col md="12">
+                        <Row>
+                          <Col md="3">
+                            <p>Tên nhà cung cấp </p>
+                          </Col>
+                          <Col>
+                            <p> {": " + supplierDetail?.name}</p>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col md="6">
+                        <Row>
+                          <Col md="6">
+                            <p>Số điện thoại </p>
+                          </Col>
+                          <Col>
+                            <p> {": " + supplierDetail?.phoneNumber}</p>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col md="6">
+                        <Row>
+                          <Col md="6">
+                            <p>Email</p>
+                          </Col>
+                          <Col>
+                            <p> {": " + supplierDetail?.email}</p>
+                          </Col>
+                        </Row>
+                      </Col>
+
+                      <Col md="12">
+                        <Row>
+                          <Col md="3">
+                            <p>Địa chỉ</p>
+                          </Col>
+                          <Col>
+                            <p>
+                              {" "}
+                              {": " +
+                                supplierDetail?.address.detail +
+                                ", " +
+                                supplierDetail?.address.mtWard.name +
+                                ", " +
+                                supplierDetail?.address.mtDistrict.name +
+                                ", " +
+                                supplierDetail?.address.mtProvince.name}
+                            </p>
+                          </Col>
+                        </Row>
+                      </Col>
+                      {personalContactName ? (
+                        <Col md="12">
+                          <Row>
+                            <Col md="3">
+                              <p>Người đại diện</p>
+                            </Col>
+                            <Col>
+                              <p>
+                                {" "}
+                                {": " + supplierDetail?.personalContactName}
+                              </p>
+                            </Col>
+                          </Row>
+                        </Col>
+                      ) : (
+                        ""
+                      )}
+
+                      {personalContactPhone ? (
                         <Col md="6">
-                          <p>Địa chỉ </p>
+                          <Row>
+                            <Col md="6">
+                              <p>Số điện thoại</p>
+                            </Col>
+                            <Col>
+                              <p>
+                                {" "}
+                                {": " + supplierDetail?.personalContactPhone}
+                              </p>
+                            </Col>
+                          </Row>
                         </Col>
-                        <Col>
-                          <p> {": " + supplierDetail?.address?.detail}</p>
+                      ) : (
+                        ""
+                      )}
+                      {personalContactEmail ? (
+                        <Col md="6">
+                          <Row>
+                            <Col md="6">
+                              <p>Email đại diện</p>
+                            </Col>
+                            <Col>
+                              <p>
+                                {" "}
+                                {": " + supplierDetail?.personalContactEmail}
+                              </p>
+                            </Col>
+                          </Row>
                         </Col>
-                      </Row>
-                    </Col>
-                  </Row>
+                      ) : (
+                        ""
+                      )}
+                    </Row>
+                  </div>
                 ) : (
                   ""
                 )}
@@ -224,71 +330,6 @@ const ImportGoodsDetails = () => {
                 <div className="header-title">
                   <h5 className="card-title">Danh sách sản phẩm</h5>
                 </div>
-                {supplierDetail?.products?.length >= 0 ? (
-                  <Row>
-                    <Col>
-                      <Form.Group className="form-group">
-                        {/* <Form.Label htmlFor="validationDefault02">
-                        Nhà cung cấp
-                        <span className="text-danger"> {" *"}</span>
-                      </Form.Label> */}
-                        <Form.Select
-                          value={-1}
-                          onChange={(e) => {
-                            const selectedProductVariant =
-                              supplierDetail.productVariants.find(
-                                (productVariant) =>
-                                  productVariant.productId +
-                                    "-" +
-                                    productVariant.productPriceId ==
-                                  e.target.value
-                              );
-                            if (
-                              selectedProductVariants.find(
-                                (product) =>
-                                  selectedProductVariant.productPriceId ==
-                                    product.productPriceId &&
-                                  selectedProductVariant.productId ==
-                                    product.productId
-                              )
-                            )
-                              return;
-
-                            setSelectedProductVariants([
-                              ...selectedProductVariants,
-                              selectedProductVariant,
-                            ]);
-                          }}
-                          id="validationDefault04"
-                          required
-                        >
-                          <option value={""}>Chọn sản phẩm</option>
-                          {supplierDetail.productVariants.map(
-                            ({ productId, productName, productPriceId }) => {
-                              return (
-                                <option
-                                  value={productId + "-" + productPriceId}
-                                >
-                                  {productName}
-                                </option>
-                              );
-                            }
-                          )}
-                        </Form.Select>
-                        {isInvalidProduct ? (
-                          <p
-                            style={{ display: "block" }}
-                            className="invalid-feedback"
-                          >
-                            Vui lòng thêm sản phẩm
-                          </p>
-                        ) : null}
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                ) : (
-                  ""
-                )}
 
                 {/* <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
                   <Link to="/dashboard/supplier/new">
@@ -313,6 +354,53 @@ const ImportGoodsDetails = () => {
                 </Button> */}
               </Card.Header>
               <Card.Body>
+                {supplierDetail?.products?.length >= 0 ? (
+                  <Row>
+                    <Col>
+                      <Form.Group className="form-group">
+                        <SearchableDropdown
+                          options={supplierDetail.productVariants}
+                          label="productName"
+                          id="productPriceId"
+                          handleChange={(productPriceId) => {
+                            if (productPriceId === null) {
+                              return;
+                            }
+                            const selectedProductVariant =
+                              supplierDetail.productVariants.find(
+                                (productVariant) =>
+                                  productVariant.productPriceId ==
+                                  productPriceId
+                              );
+                            if (
+                              selectedProductVariants.find(
+                                (product) =>
+                                  selectedProductVariant.productPriceId ==
+                                  product.productPriceId
+                              )
+                            )
+                              return;
+
+                            setSelectedProductVariants([
+                              ...selectedProductVariants,
+                              selectedProductVariant,
+                            ]);
+                          }}
+                        />
+                        {isInvalidProduct ? (
+                          <p
+                            style={{ display: "block" }}
+                            className="invalid-feedback"
+                          >
+                            Vui lòng thêm sản phẩm
+                          </p>
+                        ) : null}
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                ) : (
+                  ""
+                )}
                 <Table
                   responsive
                   striped
@@ -323,6 +411,7 @@ const ImportGoodsDetails = () => {
                   <thead>
                     <tr>
                       <th>Tên sản phẩm</th>
+                      <th>Mã vạch(Barcode)</th>
                       <th>Số lượng</th>
                       <th>Thao tác</th>
                     </tr>
@@ -332,13 +421,30 @@ const ImportGoodsDetails = () => {
                       {selectedProductVariants.map(
                         ({
                           productId,
+                          productPhoto,
+                          productBarcode,
                           productName,
                           productPriceId,
                           quantity = 0,
                         }) => {
                           return (
                             <tr key={productId + productPriceId}>
-                              <td>{productName}</td>
+                              <td>
+                                {productPhoto?.slice(0, 1).map((photo) => {
+                                  return (
+                                    <img
+                                      style={{
+                                        width: "80px",
+                                        borderRadius: "16px",
+                                        objectFit: "cover",
+                                      }}
+                                      src={photo.url}
+                                    ></img>
+                                  );
+                                })}
+                                <span>{productName}</span>
+                              </td>
+                              <td>{productBarcode}</td>
                               <td>
                                 <Form.Group
                                   className="mb-3"

@@ -19,6 +19,7 @@ import { Order as OrderModel } from "../../../models/order";
 import { ErrorModal } from "../../../components/common/fail-modal";
 import { ConfirmModal } from "../../../components/common/confirm-modal";
 import { Loading } from "../../../components/common/loading";
+import { currencyFormatter, formatter } from "../../../helper";
 
 const OrderDetail = () => {
   let { id: paramId } = useParams();
@@ -44,7 +45,7 @@ const OrderDetail = () => {
   const {
     id,
     sendoId,
-    subTotal,
+    voucher,
     status,
     deliveryStatus,
     paymentStatus,
@@ -62,6 +63,27 @@ const OrderDetail = () => {
   } = order;
 
   const onChange = () => {};
+  const getProductVariantName = (product, price) => {
+    let name = product.name;
+
+    if (price.variant) {
+      name = name + " - " + price.variant.value;
+    }
+
+    if (price.variant2) {
+      name = name + " - " + price.variant2.value;
+    }
+
+    return name;
+  };
+
+  const subTotal = orderItems
+    ?.map(
+      (orderItem) => orderItem.quantity * orderItem.productPrice.exportPrice
+    )
+    .reduce((total, price) => total + price, 0);
+  const discount = voucher?.discount + (voucher?.percent * subTotal) / 100;
+  const total = !discount ? subTotal : subTotal - discount;
 
   return (
     <>
@@ -208,8 +230,8 @@ const OrderDetail = () => {
                               id="validationDefault04"
                               required
                             >
-                              {orderStatuses.map((orderStatus) => {
-                                const statuses = orderStatuses.map(
+                              {orderStatuses?.map((orderStatus) => {
+                                const statuses = orderStatuses?.map(
                                   (s) => Object.values(s)[0]
                                 );
                                 const _status = Object.values(orderStatus)[0];
@@ -349,10 +371,10 @@ const OrderDetail = () => {
                       <th>Mã vạch</th>
                       <th>Loại sản phẩm</th>
 
-                      {/* <th>Nhà cung cấp</th> */}
+                      <th>Đơn vị</th>
                       <th>Giá bán</th>
-                      {/* <th>Tồn kho</th> */}
-                      {/* <th>Ngày tạo</th> */}
+                      <th>Số lượng</th>
+                      <th>Thành tiền</th>
                       {/* <th>Trạng thái</th> */}
                     </tr>
                   </thead>
@@ -387,16 +409,22 @@ const OrderDetail = () => {
                                   <img
                                     style={{
                                       width: "80px",
+                                      objectFit: "cover",
                                     }}
                                     src={productPhoto.url}
                                   ></img>
                                 );
                               })}
-                            <a>{item.name}</a>
+                            <a>
+                              {getProductVariantName(
+                                item,
+                                orderItem.productPrice
+                              )}
+                            </a>
                           </td>
                           <td>{item.barcode}</td>
                           <td>{item.category?.name}</td>
-                          {/* <td>{item.label}</td> */}
+                          <td>{item.unit.name}</td>
                           {/* <td
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 ></td> */}
@@ -404,18 +432,17 @@ const OrderDetail = () => {
                             {/* {item.productPrices?.map((productPrices) => {
                         return productPrices.exportPrice;
                       })} */}
-                            {minPrice && maxPrice ? (
-                              minPrice === maxPrice ? (
-                                <span>{maxPrice}</span>
-                              ) : (
-                                <span>
-                                  {minPrice} - {maxPrice}
-                                </span>
-                              )
-                            ) : null}
+                            {currencyFormatter.format(
+                              orderItem.productPrice.exportPrice
+                            )}
                           </td>
-                          {/* <td>{item.stock}</td> */}
-                          {/* <td>{item.status}</td> */}
+                          <td>{orderItem.quantity}</td>
+                          <td>
+                            {currencyFormatter.format(
+                              orderItem.productPrice.exportPrice *
+                                orderItem.quantity
+                            )}
+                          </td>
                           {/* <td>
                   <span className={`badge ${item.color}`}>{item.status}</span>
                 </td> */}
@@ -438,7 +465,9 @@ const OrderDetail = () => {
                       <p style={{ fontWeight: "500" }}>Thành tiền </p>
                     </Col>
                     <Col>
-                      <p style={{ fontWeight: "700" }}> {": " + subTotal}</p>
+                      <p style={{ fontWeight: "700" }}>
+                        {": " + currencyFormatter.format(subTotal)}
+                      </p>
                     </Col>
                   </Row>
                   <Row>
@@ -446,8 +475,15 @@ const OrderDetail = () => {
                       <p style={{ fontWeight: "500" }}>Tổng giảm giá </p>
                     </Col>
                     <Col>
-                      <p style={{ fontWeight: "700" }}> {""}</p>
-                      {/* <p style={{ fontWeight: "700" }}> {": " + discount}</p> */}
+                      {/* <p style={{ fontWeight: "700" }}> {""}</p> */}
+                      <p style={{ fontWeight: "700" }}>
+                        {" "}
+                        :
+                        <span style={{ color: "red" }}>
+                          {" "}
+                          {" - " + currencyFormatter.format(discount)}
+                        </span>{" "}
+                      </p>
                     </Col>
                   </Row>
                   <Row>
@@ -455,7 +491,10 @@ const OrderDetail = () => {
                       <p style={{ fontWeight: "500" }}>Tổng tiền </p>
                     </Col>
                     <Col>
-                      <p style={{ fontWeight: "700" }}> {""}</p>
+                      <p style={{ fontWeight: "700" }}>
+                        {" "}
+                        {": " + currencyFormatter.format(total)}
+                      </p>
                       {/* <p style={{ fontWeight: "700" }}> {": " + total}</p> */}
                     </Col>
                   </Row>

@@ -687,11 +687,12 @@ const Supplier = () => {
                       <tr>
                         {/* <th>Ảnh</th> */}
                         <th>Tên sản phẩm</th>
-                        <th>Mã vạch</th>
+                        <th>Mã sản phẩm</th>
+                        <th>Mã vạch(Barcode)</th>
+
                         <th>Loại sản phẩm</th>
 
-                        {/* <th>Nhà cung cấp</th> */}
-                        {/* <th>Giá bán</th> */}
+                        <th>Đơn vị</th>
                         {/* <th>Tồn kho</th> */}
                         {/* <th>Ngày tạo</th> */}
                         {/* <th>Trạng thái</th> */}
@@ -721,23 +722,24 @@ const Supplier = () => {
                                 cursor: "pointer",
                               }}
                             >
-                              {/* {item.productPhotos
-                              ?.slice(0, 1)
-                              .map((productPhoto) => {
-                                return (
-                                  <img
-                                    style={{
-                                      width: "80px",
-                                    }}
-                                    src={productPhoto.url}
-                                  ></img>
-                                );
-                              })} */}
+                              {item.productPhotos
+                                ?.slice(0, 1)
+                                .map((productPhoto) => {
+                                  return (
+                                    <img
+                                      style={{
+                                        width: "80px",
+                                      }}
+                                      src={productPhoto.url}
+                                    ></img>
+                                  );
+                                })}
                               <a>{item.name}</a>
                             </td>
+                            <td>{item.code}</td>
                             <td>{item.barcode}</td>
                             <td>{item.category?.name}</td>
-                            {/* <td>{item.label}</td> */}
+                            <td>{item.unitID}</td>
                             {/* <td
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 ></td> */}
@@ -770,7 +772,7 @@ const Supplier = () => {
             )}
           </Col>
         </Row>
-        <div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Button
             onClick={() => {
               const isValidName = validateName();
@@ -817,7 +819,7 @@ const Supplier = () => {
             variant="btn btn-primary"
             type="submit"
           >
-            Submit form
+            Lưu thông tin
           </Button>
         </div>
       </div>

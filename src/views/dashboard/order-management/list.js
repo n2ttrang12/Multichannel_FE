@@ -176,7 +176,7 @@ const List = () => {
               </thead>
               <tbody>
                 {order?.map((item) => {
-                  const statusColor =
+                  const orderStatusColor =
                     item.status === "NEW"
                       ? "primary"
                       : item.status === "COMPLETED"
@@ -188,6 +188,20 @@ const List = () => {
                       : item.status === "CANCELLED"
                       ? "danger"
                       : "dark";
+
+                  const deliveryStatusColor =
+                    item.deliveryStatus === "SHIPPING"
+                      ? "primary"
+                      : item.deliveryStatus === "DELIVERIRD"
+                      ? "success"
+                      : "warning";
+
+                  const paymentStatusColor =
+                    item.paymentStatus === "NOT_PAID"
+                      ? "primary"
+                      : item.paymentStatus === "COMPLETED"
+                      ? "success"
+                      : "info";
                   moment.locale("vi");
                   return (
                     <tr key={item.id}>
@@ -214,12 +228,37 @@ const List = () => {
                       <td>{item.type}</td>
                       {/* <td>{item.subTotal}</td> */}
                       <td>
-                        <span className={`badge bg-${statusColor}`}>
-                          {item.status}
+                        <span className={`badge bg-${orderStatusColor}`}>
+                          {item.status === "NEW"
+                            ? "Chờ xác nhận"
+                            : item.status === "PROCESSING"
+                            ? "Đã xác nhận"
+                            : item.status === "SHIPPING"
+                            ? "Đang vận chuyển"
+                            : item.status === "COMPLETED"
+                            ? "Hoàn thành"
+                            : "Đã hủy"}
                         </span>
                       </td>
-                      <td>{item.deliveryStatus}</td>
-                      <td>{item.paymentStatus}</td>
+
+                      <td>
+                        <span className={`badge bg-${deliveryStatusColor}`}>
+                          {item.deliveryStatus === "SHIPPING"
+                            ? "Đang vận chuyển"
+                            : item.deliveryStatus === "COMPDELIVERIRDLETED"
+                            ? "Đã giao hàng"
+                            : "Hoàn thành"}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`badge bg-${paymentStatusColor}`}>
+                          {item.paymentStatus === "NOT_PAID"
+                            ? "Chưa thanh toán"
+                            : item.paymentStatus === "PAID"
+                            ? "Đã thanh toán"
+                            : "Hoàn thành"}
+                        </span>
+                      </td>
                       {/* <td>
                       <div style={{ float: "right" }}>
                         <Link

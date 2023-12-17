@@ -1096,7 +1096,7 @@ const Product = () => {
             variant="btn btn-primary"
             type="submit"
           >
-            Submit
+            Lưu thông tin
           </Button>
         </div>
       </div>

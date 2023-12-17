@@ -21,6 +21,8 @@ import { SuccessModal } from "../../../components/common/success-modal";
 import { VoucherModel } from "../../../models/voucher";
 import { isValidDate } from "@fullcalendar/react";
 import * as moment from "moment";
+import { currencyFormatter } from "../../../helper";
+import SearchableDropdown from "../../../components/common/search-dropdown/search-dropdown";
 
 const OrderOffline = () => {
   let { id } = useParams();
@@ -50,10 +52,10 @@ const OrderOffline = () => {
   useEffect(() => {
     ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
       setProvinces(provinces);
-      dispatchOrder({
-        type: "SET_PROVINCE",
-        payload: provinces,
-      });
+      // dispatchOrder({
+      //   type: "SET_PROVINCE",
+      //   payload: provinces,
+      // });
     });
     if (!isNewMode) {
       //mode edit => fetch sản phẩm về
@@ -286,6 +288,15 @@ const OrderOffline = () => {
 
     return name;
   };
+  const validateProduct = () => {
+    if (selectedProductVariants.length <= 0) {
+      setInvalidProduct(true);
+      return false;
+    } else {
+      setInvalidProduct(false);
+      return true;
+    }
+  };
   // console.log(supplierDetail);
   const validateName = () => {
     if (!name || name.trim().length < 0) {
@@ -325,6 +336,7 @@ const OrderOffline = () => {
     }
   };
   const validateProvince = () => {
+    console.log(provinceId);
     if (!provinceId) {
       setInvalidProvince(true);
       return false;
@@ -358,6 +370,14 @@ const OrderOffline = () => {
   const total = !discount
     ? subTotal
     : subTotal - discount.discount - (discount.percent * subTotal) / 100;
+
+  const discountMessage = discount
+    ? discount.discount
+      ? `  - ${currencyFormatter.format(discount.discount)}`
+      : `  - ${discount.percent}% ( ${currencyFormatter.format(
+          (discount.percent * subTotal) / 100
+        )} )`
+    : "";
 
   return (
     <>
@@ -622,7 +642,34 @@ const OrderOffline = () => {
                 <Row>
                   <Col>
                     <Form.Group className="form-group">
-                      <Form.Select
+                      <SearchableDropdown
+                        options={productVariants}
+                        label="productName"
+                        id="productPriceId"
+                        handleChange={(productPriceId) => {
+                          if (productPriceId === null) {
+                            return;
+                          }
+                          const selectedProductVariant = productVariants.find(
+                            (productVariant) =>
+                              productVariant.productPriceId == productPriceId
+                          );
+                          if (
+                            selectedProductVariants.find(
+                              (product) =>
+                                selectedProductVariant.productPriceId ==
+                                product.productPriceId
+                            )
+                          )
+                            return;
+
+                          setSelectedProductVariants([
+                            ...selectedProductVariants,
+                            selectedProductVariant,
+                          ]);
+                        }}
+                      />
+                      {/* <Form.Select
                         value={-1}
                         onChange={(e) => {
                           const selectedProductVariant = productVariants.find(
@@ -661,7 +708,7 @@ const OrderOffline = () => {
                             );
                           }
                         )}
-                      </Form.Select>
+                      </Form.Select> */}
                       {isInvalidProduct ? (
                         <p
                           style={{ display: "block" }}
@@ -704,7 +751,7 @@ const OrderOffline = () => {
                             return (
                               <tr key={productId + productPriceId}>
                                 <td>{productName}</td>
-                                <td>{price}</td>
+                                <td>{currencyFormatter.format(price)}</td>
                                 <td>
                                   <Form.Group
                                     className="mb-3"
@@ -730,7 +777,9 @@ const OrderOffline = () => {
                                     />
                                   </Form.Group>
                                 </td>
-                                <td>{price * quantity}</td>
+                                <td>
+                                  {currencyFormatter.format(price * quantity)}
+                                </td>
                                 <td>
                                   <div style={{ float: "right" }}>
                                     <Link
@@ -809,7 +858,7 @@ const OrderOffline = () => {
                       <Col>
                         <p style={{ fontWeight: "700" }}>
                           {" "}
-                          {": " + subTotal + "VND"}
+                          {": " + currencyFormatter.format(subTotal)}
                         </p>
                       </Col>
                     </Row>
@@ -852,12 +901,7 @@ const OrderOffline = () => {
                                   };
 
                                   if (isVoucherValid(voucher)) {
-                                    const message = voucher.discount
-                                      ? `  - ${voucher.discount} VND`
-                                      : `  - ${voucher.percent}%`;
-
                                     setDiscount({
-                                      message,
                                       discount: voucher.discount ?? 0,
                                       percent: voucher.percent ?? 0,
                                     });
@@ -896,12 +940,11 @@ const OrderOffline = () => {
                         <p style={{ fontWeight: "500" }}>Giảm giá </p>
                       </Col>
                       <Col>
-                        {discount ? (
+                        {discountMessage ? (
                           <div style={{ fontWeight: "700" }}>
                             :{" "}
                             <span style={{ color: "red" }}>
-                              {" "}
-                              {discount.message}
+                              {discountMessage}
                             </span>
                           </div>
                         ) : (
@@ -924,7 +967,7 @@ const OrderOffline = () => {
                       <Col>
                         <p style={{ fontWeight: "700" }}>
                           {" "}
-                          {": " + total + "VND"}
+                          {": " + currencyFormatter.format(total)}
                         </p>
                       </Col>
                     </Row>
@@ -938,24 +981,26 @@ const OrderOffline = () => {
           <div>
             <Button
               onClick={() => {
-                //   const isValidName = validateName();
-                //   const isValidEmail = validateEmail();
-                //   const isValidPhone = validatePhone();
-                //   const isValidAddress = validateAddress();
-                //   const isValidProvince = validateProvince();
-                //   const isValidDistrict = validateDistrict();
-                //   const isValidWard = validateWard();
-                //   if (
-                //     !isValidName ||
-                //     !isValidEmail ||
-                //     !isValidAddress ||
-                //     !isValidPhone ||
-                //     !isValidProvince ||
-                //     !isValidDistrict ||
-                //     !isValidWard
-                //   ) {
-                //     return;
-                //   }
+                const isValidName = validateName();
+                const isValidEmail = validateEmail();
+                const isValidPhone = validatePhone();
+                const isValidAddress = validateAddress();
+                const isValidProvince = validateProvince();
+                const isValidDistrict = validateDistrict();
+                const isValidWard = validateWard();
+                const isValidProduct = validateProduct();
+                if (
+                  !isValidName ||
+                  !isValidEmail ||
+                  !isValidAddress ||
+                  !isValidPhone ||
+                  !isValidProvince ||
+                  !isValidDistrict ||
+                  !isValidWard ||
+                  !isValidProduct
+                ) {
+                  return;
+                }
                 const orderOfflineDto = {
                   buyerDto: {
                     name: order.name,
@@ -993,7 +1038,7 @@ const OrderOffline = () => {
               variant="btn btn-primary"
               type="submit"
             >
-              Submit
+              Lưu thông tin
             </Button>
           </div>
         ) : (

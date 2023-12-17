@@ -4,7 +4,7 @@ import Card from "../../../components/Card";
 
 import { Link, useNavigate } from "react-router-dom";
 import "./theme.css";
-import { createArrayFrom1ToN } from "../../../helper";
+import { createArrayFrom1ToN, currencyFormatter } from "../../../helper";
 import { Search } from "../../../components/common/search";
 import { Loading } from "../../../components/common/loading";
 
@@ -191,10 +191,11 @@ const ProductList = () => {
                       })} */}
                         {minPrice && maxPrice ? (
                           minPrice === maxPrice ? (
-                            <span>{maxPrice}</span>
+                            <span>{currencyFormatter.format(maxPrice)}</span>
                           ) : (
                             <span>
-                              {minPrice} - {maxPrice}
+                              {currencyFormatter.format(minPrice)} -{" "}
+                              {currencyFormatter.format(maxPrice)}
                             </span>
                           )
                         ) : null}

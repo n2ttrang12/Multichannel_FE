@@ -13,3 +13,7 @@ function debounce(func, delay) {
     timer = setTimeout(() => func(...args), delay);
   };
 }
+export const currencyFormatter = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+});

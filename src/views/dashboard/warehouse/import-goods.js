@@ -95,10 +95,11 @@ const ImportGoods = () => {
                 <thead>
                   <tr>
                     <th>Ngày tạo</th>
-                    <th>Nhân viên tạo</th>
+
                     <th>Tên nhà cung cấp</th>
                     <th>Người đại diện</th>
-                    <th>Số lượng sản phẩm</th>
+                    <th>Sản phẩm</th>
+                    <th>Nhân viên tạo</th>
                     {/* <th>Trạng thái</th> */}
                   </tr>
                 </thead>
@@ -122,11 +123,11 @@ const ImportGoods = () => {
                               )
                             : null}
                         </td>
-                        <td>{item.creater?.name}</td>
+
                         <td>{item.supplier?.name}</td>
                         <td>{item.supplier?.personalContactName}</td>
                         <td>{item.warehouseHistory?.length}</td>
-
+                        <td>{item.creater?.name}</td>
                         {/* <td>
                           {item.status}
                         </td> */}
