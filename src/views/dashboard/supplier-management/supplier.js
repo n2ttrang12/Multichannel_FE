@@ -739,7 +739,7 @@ const Supplier = () => {
                             <td>{item.code}</td>
                             <td>{item.barcode}</td>
                             <td>{item.category?.name}</td>
-                            <td>{item.unitID}</td>
+                            <td>{item.unit.name}</td>
                             {/* <td
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 ></td> */}
