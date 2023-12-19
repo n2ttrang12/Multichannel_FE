@@ -31,7 +31,7 @@ const UserProvider = ({ children }) => {
         dispatch({
           type: "SET_CURRENT_USER",
           payload: {
-            user: data,
+            user: data.data,
           },
         });
       })
@@ -71,12 +71,13 @@ const UserProvider = ({ children }) => {
     user,
     login,
     logout,
+    isStore: user?.role?.code === "STORE_OWNER",
   };
 
   if (isLoading) {
     return <Loading />;
   }
-
+  console.log(value);
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 

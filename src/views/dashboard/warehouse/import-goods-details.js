@@ -413,7 +413,7 @@ const ImportGoodsDetails = () => {
                       <th>Tên sản phẩm</th>
                       <th>Mã vạch(Barcode)</th>
                       <th>Số lượng</th>
-                      <th>Thao tác</th>
+                      {isNewMode ? <th>Thao tác</th> : ""}
                     </tr>
                   </thead>
                   {isNewMode ? (
@@ -522,7 +522,11 @@ const ImportGoodsDetails = () => {
                                 )}
                               </a>
                             </td>
-                            <td>{item.quantity}</td>
+
+                            <td>
+                              {item.warehouse?.productPrices?.product?.barcode}
+                            </td>
+                            <td>{item?.quantity}</td>
                           </tr>
                         );
                       })}

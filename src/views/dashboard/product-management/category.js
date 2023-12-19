@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { TreeTable } from "primereact/treetable";
 import { Column } from "primereact/column";
 import { Category } from "../../../models/category";
@@ -10,12 +10,13 @@ import "./theme.css";
 import { createArrayFrom1ToN } from "../../../helper";
 import { Search } from "../../../components/common/search";
 import { Loading } from "../../../components/common/loading";
+import UserContext from "../../../contexts/userContext";
 
 const CategoryManagement = () => {
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState(null);
-
+  const { isStore } = useContext(UserContext);
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1); // lưu current page, set thì render lại
   const [perPage, setPerpage] = useState(10); // Lưu perpage, đnag set cứng alf 5

@@ -2,7 +2,7 @@ import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-const HTMLEditor = ({ id, onChange, onBlur, data, isInvalid }) => {
+const HTMLEditor = ({ id, onChange, onBlur, data, isDisabled, isInvalid }) => {
   return (
     <div>
       <CKEditor
@@ -60,6 +60,7 @@ const HTMLEditor = ({ id, onChange, onBlur, data, isInvalid }) => {
         onFocus={(event, editor) => {
           //console.log("Focus.", editor);
         }}
+        disabled={isDisabled}
       />
     </div>
   );

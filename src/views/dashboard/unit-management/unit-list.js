@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { Form, Row, Col, Table, Button, Modal } from "react-bootstrap";
 import Card from "../../../components/Card";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,10 +13,11 @@ import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import { UnitModel } from "../../../models/unit";
+import UserContext from "../../../contexts/userContext";
 
 const UnitList = () => {
   const navigate = useNavigate();
-
+  const { isStore } = useContext(UserContext);
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);

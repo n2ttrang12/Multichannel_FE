@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import {
   Row,
   Col,
@@ -16,6 +16,7 @@ import { Province as ProvinceModel } from "../../../models/province";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { SuccessModal } from "../../../components/common/success-modal";
+import UserContext from "../../../contexts/userContext";
 
 const Supplier = () => {
   let { id } = useParams();
@@ -38,6 +39,7 @@ const Supplier = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { isStore } = useContext(UserContext);
 
   useEffect(() => {
     ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
@@ -343,6 +345,7 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         type="text"
                         value={name}
                         isInvalid={isInvalidName}
@@ -372,6 +375,7 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         isInvalid={isInvalidPhone}
                         type="text"
                         value={phoneNumber}
@@ -399,6 +403,7 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         isInvalid={isInvalidEmail}
                         onChange={(e) =>
                           dispatchSupplier({
@@ -429,6 +434,7 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
+                        disabled={!isStore}
                         value={provinceId}
                         onChange={(e) => {
                           dispatchSupplier({
@@ -476,6 +482,7 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
+                        disabled={!isStore}
                         value={districtId}
                         onChange={(e) => {
                           dispatchSupplier({
@@ -518,6 +525,7 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
+                        disabled={!isStore}
                         value={wardId}
                         onChange={(e) =>
                           dispatchSupplier({
@@ -557,6 +565,7 @@ const Supplier = () => {
                     <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Control
+                    disabled={!isStore}
                     isInvalid={isInvalidAddress}
                     onChange={(e) =>
                       dispatchSupplier({
@@ -589,6 +598,7 @@ const Supplier = () => {
                         Người đại diện
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         type="text"
                         value={personalContactName}
                         // isInvalid={isInvalidName}
@@ -609,6 +619,7 @@ const Supplier = () => {
                         Số điện thoại
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         type="text"
                         value={personalContactPhone}
                         // isInvalid={isInvalidName}
@@ -631,6 +642,7 @@ const Supplier = () => {
                         Email
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         type="text"
                         value={personalContactEmail}
                         // isInvalid={isInvalidName}
@@ -772,56 +784,60 @@ const Supplier = () => {
             )}
           </Col>
         </Row>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            onClick={() => {
-              const isValidName = validateName();
-              const isValidEmail = validateEmail();
-              const isValidPhone = validatePhone();
-              const isValidAddress = validateAddress();
-              const isValidProvince = validateProvince();
-              const isValidDistrict = validateDistrict();
-              const isValidWard = validateWard();
-              if (
-                !isValidName ||
-                !isValidEmail ||
-                !isValidAddress ||
-                !isValidPhone ||
-                !isValidProvince ||
-                !isValidDistrict ||
-                !isValidWard
-              ) {
-                return;
-              }
-              const _supplier = { ...supplier, products: undefined };
-              const promise = isNewMode
-                ? SupplierModel.addSupplier(_supplier)
-                : SupplierModel.updateSupplier(_supplier);
+        {isStore ? (
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => {
+                const isValidName = validateName();
+                const isValidEmail = validateEmail();
+                const isValidPhone = validatePhone();
+                const isValidAddress = validateAddress();
+                const isValidProvince = validateProvince();
+                const isValidDistrict = validateDistrict();
+                const isValidWard = validateWard();
+                if (
+                  !isValidName ||
+                  !isValidEmail ||
+                  !isValidAddress ||
+                  !isValidPhone ||
+                  !isValidProvince ||
+                  !isValidDistrict ||
+                  !isValidWard
+                ) {
+                  return;
+                }
+                const _supplier = { ...supplier, products: undefined };
+                const promise = isNewMode
+                  ? SupplierModel.addSupplier(_supplier)
+                  : SupplierModel.updateSupplier(_supplier);
 
-              promise
-                .then(() => {
-                  setModal(
-                    <SuccessModal
-                      handleCloseModal={() => {
-                        setModal(null);
-                        navigate("/dashboard/supplier-list");
-                      }}
-                      message={
-                        isNewMode
-                          ? "Thêm mới nhà cung cấp thành công"
-                          : "Chỉnh sửa nhà cung cấp thành công"
-                      }
-                    ></SuccessModal>
-                  );
-                })
-                .catch((e) => console.log(e));
-            }}
-            variant="btn btn-primary"
-            type="submit"
-          >
-            Lưu thông tin
-          </Button>
-        </div>
+                promise
+                  .then(() => {
+                    setModal(
+                      <SuccessModal
+                        handleCloseModal={() => {
+                          setModal(null);
+                          navigate("/dashboard/supplier-list");
+                        }}
+                        message={
+                          isNewMode
+                            ? "Thêm mới nhà cung cấp thành công"
+                            : "Chỉnh sửa nhà cung cấp thành công"
+                        }
+                      ></SuccessModal>
+                    );
+                  })
+                  .catch((e) => console.log(e));
+              }}
+              variant="btn btn-primary"
+              type="submit"
+            >
+              Lưu thông tin
+            </Button>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import {
   Row,
   Col,
@@ -20,6 +20,7 @@ import { ErrorModal } from "../../../components/common/fail-modal";
 import { ConfirmModal } from "../../../components/common/confirm-modal";
 import { Loading } from "../../../components/common/loading";
 import { currencyFormatter, formatter } from "../../../helper";
+import UserContext from "../../../contexts/userContext";
 
 const OrderDetail = () => {
   let { id: paramId } = useParams();
@@ -29,6 +30,7 @@ const OrderDetail = () => {
   const [orderStatuses, setOrderStatuses] = useState([]);
   const [modal, setModal] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { isStore } = useContext(UserContext);
   useEffect(() => {
     setIsLoading(true);
     OrderModel.get(paramId)
@@ -64,7 +66,7 @@ const OrderDetail = () => {
 
   const onChange = () => {};
   const getProductVariantName = (product, price) => {
-    let name = product.name;
+    let name = product?.name;
 
     if (price.variant) {
       name = name + " - " + price.variant.value;
@@ -82,7 +84,9 @@ const OrderDetail = () => {
       (orderItem) => orderItem.quantity * orderItem.productPrice.exportPrice
     )
     .reduce((total, price) => total + price, 0);
-  const discount = voucher?.discount + (voucher?.percent * subTotal) / 100;
+  const discount = voucher
+    ? voucher?.discount + (voucher?.percent * subTotal) / 100
+    : 0;
   const total = !discount ? subTotal : subTotal - discount;
 
   return (
@@ -174,7 +178,7 @@ const OrderDetail = () => {
                         Trạng thái
                       </Form.Label> */}
                             <Form.Select
-                              disabled={type != "WEBSITE"}
+                              disabled={type != "WEBSITE" || !isStore}
                               value={status}
                               onChange={(e) => {
                                 const newStatus = e.target.value;
@@ -424,7 +428,7 @@ const OrderDetail = () => {
                           </td>
                           <td>{item.barcode}</td>
                           <td>{item.category?.name}</td>
-                          <td>{item.unit.name}</td>
+                          <td>{item.unit?.name}</td>
                           {/* <td
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 ></td> */}

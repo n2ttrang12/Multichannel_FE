@@ -54,7 +54,7 @@ const CustomerList = () => {
           <div className="header-title">
             <h4 className="card-title">Danh sách khách hàng</h4>
           </div>
-          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+          {/* <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
             <Link to="/dashboard/customer-list/customer">
               <i className="btn-inner">
                 <svg
@@ -74,7 +74,7 @@ const CustomerList = () => {
               </i>
               <span>Thêm khách hàng</span>
             </Link>
-          </Button>
+          </Button> */}
         </Card.Header>
         <Card.Body>
           <div>

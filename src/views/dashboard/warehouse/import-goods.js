@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Row, Col, Table, Button, Modal } from "react-bootstrap";
 import Card from "../../../components/Card";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,7 +8,9 @@ import { Loading } from "../../../components/common/loading";
 import { WarehouseModal } from "../../../models/warehouse";
 import * as moment from "moment";
 import "moment/locale/vi";
+import UserContext from "../../../contexts/userContext";
 const ImportGoods = () => {
+  const { isStore } = useContext(UserContext);
   const navigate = useNavigate();
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +48,7 @@ const ImportGoods = () => {
     setPage(1);
     fetchList(1, perPage, searchText);
   }, [searchText]);
-
+  console.log(isStore);
   return (
     <>
       <Card>
@@ -55,27 +57,31 @@ const ImportGoods = () => {
           <div className="header-title">
             <h4 className="card-title">Danh sách nhập kho</h4>
           </div>
-          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-            <Link to="/dashboard/warehouse/import-goods/new">
-              <i className="btn-inner">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </i>
-              <span>Nhập hàng</span>
-            </Link>
-          </Button>
+          {isStore ? (
+            <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+              <Link to="/dashboard/warehouse/import-goods/new">
+                <i className="btn-inner">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                </i>
+                <span>Nhập hàng</span>
+              </Link>
+            </Button>
+          ) : (
+            ""
+          )}
         </Card.Header>
         <Card.Body>
           <div>

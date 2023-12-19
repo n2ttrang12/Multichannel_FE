@@ -843,136 +843,142 @@ const OrderOffline = () => {
                   }
                 </Table>
 
-                <Row
-                  style={{
-                    margin: "0 24px 24px 24px",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p style={{ fontWeight: "500" }}>Thành tiền </p>
-                      </Col>
-                      <Col>
-                        <p style={{ fontWeight: "700" }}>
-                          {" "}
-                          {": " + currencyFormatter.format(subTotal)}
-                        </p>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col
-                        md="6"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <p style={{ fontWeight: "500" }}>Mã giảm giá </p>
-                      </Col>
-                      <Col>
-                        <Form.Group
-                          className="mb-3"
-                          controlId="formBasicPassword"
+                {selectedProductVariants.length ? (
+                  <Row
+                    style={{
+                      margin: "0 24px 24px 24px",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Col md="6">
+                      <Row>
+                        <Col md="6">
+                          <p style={{ fontWeight: "500" }}>Thành tiền </p>
+                        </Col>
+                        <Col>
+                          <p style={{ fontWeight: "700" }}>
+                            {" "}
+                            {": " + currencyFormatter.format(subTotal)}
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col
+                          md="6"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}
                         >
-                          <Form.Control
-                            type="text"
-                            onChange={(e) => {
-                              VoucherModel.getByCode(e.target.value)
-                                .then(({ data: { data: voucher } }) => {
-                                  const isVoucherValid = () => {
-                                    const startTime = moment(voucher.fromDate);
-                                    const endTime = moment(voucher.toDate);
+                          <p style={{ fontWeight: "500" }}>Mã giảm giá </p>
+                        </Col>
+                        <Col>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="formBasicPassword"
+                          >
+                            <Form.Control
+                              type="text"
+                              onChange={(e) => {
+                                VoucherModel.getByCode(e.target.value)
+                                  .then(({ data: { data: voucher } }) => {
+                                    const isVoucherValid = () => {
+                                      const startTime = moment(
+                                        voucher.fromDate
+                                      );
+                                      const endTime = moment(voucher.toDate);
 
-                                    if (voucher.available <= 0) {
-                                      return false;
-                                    }
-                                    if (voucher.isDisable) {
-                                      return false;
-                                    }
-                                    if (
-                                      !moment().isBetween(startTime, endTime)
-                                    ) {
-                                      return false;
-                                    }
-                                    return true;
-                                  };
+                                      if (voucher.available <= 0) {
+                                        return false;
+                                      }
+                                      if (voucher.isDisable) {
+                                        return false;
+                                      }
+                                      if (
+                                        !moment().isBetween(startTime, endTime)
+                                      ) {
+                                        return false;
+                                      }
+                                      return true;
+                                    };
 
-                                  if (isVoucherValid(voucher)) {
-                                    setDiscount({
-                                      discount: voucher.discount ?? 0,
-                                      percent: voucher.percent ?? 0,
-                                    });
-                                    dispatchOrder({
-                                      type: "SET_VOUCHER_ID",
-                                      payload: voucher.id,
-                                    });
-                                  } else {
+                                    if (isVoucherValid(voucher)) {
+                                      setDiscount({
+                                        discount: voucher.discount ?? 0,
+                                        percent: voucher.percent ?? 0,
+                                      });
+                                      dispatchOrder({
+                                        type: "SET_VOUCHER_ID",
+                                        payload: voucher.id,
+                                      });
+                                    } else {
+                                      setDiscount(null);
+                                      dispatchOrder({
+                                        type: "SET_VOUCHER_ID",
+                                        payload: null,
+                                      });
+                                    }
+                                  })
+                                  .catch((e) => {
                                     setDiscount(null);
                                     dispatchOrder({
                                       type: "SET_VOUCHER_ID",
                                       payload: null,
                                     });
-                                  }
-                                })
-                                .catch((e) => {
-                                  setDiscount(null);
-                                  dispatchOrder({
-                                    type: "SET_VOUCHER_ID",
-                                    payload: null,
                                   });
-                                });
-                            }}
-                          />
-                        </Form.Group>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col
-                        md="6"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <p style={{ fontWeight: "500" }}>Giảm giá </p>
-                      </Col>
-                      <Col>
-                        {discountMessage ? (
-                          <div style={{ fontWeight: "700" }}>
-                            :{" "}
-                            <span style={{ color: "red" }}>
-                              {discountMessage}
-                            </span>
-                          </div>
-                        ) : (
-                          <div style={{ fontWeight: "700" }}>
-                            : <span style={{ color: "red" }}> 0</span>
-                          </div>
-                        )}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col
-                        md="6"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <p style={{ fontWeight: "500" }}>Tổng tiền </p>
-                      </Col>
-                      <Col>
-                        <p style={{ fontWeight: "700" }}>
-                          {" "}
-                          {": " + currencyFormatter.format(total)}
-                        </p>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
+                              }}
+                            />
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col
+                          md="6"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <p style={{ fontWeight: "500" }}>Giảm giá </p>
+                        </Col>
+                        <Col>
+                          {discountMessage ? (
+                            <div style={{ fontWeight: "700" }}>
+                              :{" "}
+                              <span style={{ color: "red" }}>
+                                {discountMessage}
+                              </span>
+                            </div>
+                          ) : (
+                            <div style={{ fontWeight: "700" }}>
+                              : <span style={{ color: "red" }}> 0</span>
+                            </div>
+                          )}
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col
+                          md="6"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <p style={{ fontWeight: "500" }}>Tổng tiền </p>
+                        </Col>
+                        <Col>
+                          <p style={{ fontWeight: "700" }}>
+                            {" "}
+                            {": " + currencyFormatter.format(total)}
+                          </p>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                ) : (
+                  ""
+                )}
               </Card.Body>
             </Card>
           </Col>
