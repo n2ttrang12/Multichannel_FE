@@ -147,9 +147,9 @@ export const DefaultRouter = [
       {
         path: "/dashboard/unit-management",
         element: (
-          <AdminComponent>
-            <UnitList />
-          </AdminComponent>
+          // <AdminComponent>
+          <UnitList />
+          // </AdminComponent>
         ),
       },
       //Debt management

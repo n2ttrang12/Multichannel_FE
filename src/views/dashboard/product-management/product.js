@@ -140,7 +140,7 @@ const Product = () => {
       id: resProduct.id,
       name: resProduct.name,
       status: resProduct.status,
-      code: resProduct.status,
+      code: resProduct.code,
       barcode: resProduct.barcode,
       description: resProduct.description,
       photoList: resProduct.productPhotos,
@@ -165,6 +165,7 @@ const Product = () => {
       categoryId: resProduct.category?.id,
       categoryName: resProduct.category?.name,
       unitId: resProduct.unit?.id,
+      supplierId: resProduct.supplier?.id,
     };
   };
 

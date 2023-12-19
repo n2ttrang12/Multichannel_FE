@@ -188,15 +188,13 @@ const List = () => {
                   const orderStatusColor =
                     item.status === "NEW"
                       ? "primary"
-                      : item.status === "COMPLETED"
-                      ? "success"
                       : item.status === "SHIPPING"
                       ? "warning"
                       : item.status === "PROCESSING"
                       ? "info"
                       : item.status === "CANCELLED"
                       ? "danger"
-                      : "dark";
+                      : "success";
 
                   const deliveryStatusColor =
                     item.deliveryStatus === "SHIPPING"
@@ -225,7 +223,7 @@ const List = () => {
                           cursor: "pointer",
                         }}
                       >
-                        {"DH" + item.id}
+                        {item.id}
                       </td>
                       <td>
                         {item.createdAt
@@ -244,9 +242,9 @@ const List = () => {
                             ? "Đã xác nhận"
                             : item.status === "SHIPPING"
                             ? "Đang vận chuyển"
-                            : item.status === "COMPLETED"
-                            ? "Hoàn thành"
-                            : "Đã hủy"}
+                            : item.status === "CANCELED"
+                            ? "Đã hủy"
+                            : "Hoàn thành"}
                         </span>
                       </td>
 
@@ -254,9 +252,9 @@ const List = () => {
                         <span className={`badge bg-${deliveryStatusColor}`}>
                           {item.deliveryStatus === "SHIPPING"
                             ? "Đang vận chuyển"
-                            : item.deliveryStatus === "COMPDELIVERIRDLETED"
+                            : item.deliveryStatus === "DELIVERIRD"
                             ? "Đã giao hàng"
-                            : "Hoàn thành"}
+                            : "Chờ lấy hàng"}
                         </span>
                       </td>
                       <td>
@@ -265,7 +263,7 @@ const List = () => {
                             ? "Chưa thanh toán"
                             : item.paymentStatus === "PAID"
                             ? "Đã thanh toán"
-                            : "Hoàn thành"}
+                            : "Shop đã nhận"}
                         </span>
                       </td>
                       {/* <td>

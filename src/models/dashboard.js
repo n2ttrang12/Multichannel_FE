@@ -17,4 +17,14 @@ export const StatisticModel = {
       axiosInstance.defaults.baseURL + "revenue/count-order"
     );
   },
+  async getRevenueByYear(year = null) {
+    //lấy data api
+    // console.log("fetch list");
+    if (!year) {
+      year = new Date().getFullYear();
+    }
+    return axiosInstance.get(
+      axiosInstance.defaults.baseURL + "revenue/month/" + year
+    );
+  },
 };
