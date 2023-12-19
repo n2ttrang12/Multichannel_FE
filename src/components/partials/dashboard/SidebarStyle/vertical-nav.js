@@ -166,7 +166,7 @@ const VerticalNav = memo((props) => {
                   </span>
                 </Link>
               </li>
-              <li className="nav-item">
+              {/* <li className="nav-item">
                 <Link
                   className={`${
                     location.pathname === "/dashboard/order-management/bills"
@@ -197,7 +197,7 @@ const VerticalNav = memo((props) => {
                     Hóa đơn
                   </span>
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </Accordion.Collapse>
         </Accordion.Item>

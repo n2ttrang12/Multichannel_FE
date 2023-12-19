@@ -325,7 +325,7 @@ const VoucherList = () => {
                     {/* <Form.Label>Giảm tiền</Form.Label> */}
                     <Form.Control
                       isInvalid={isInvalidDiscount}
-                      disabled={isPercentage || isStore}
+                      disabled={isPercentage || !isStore}
                       type="number"
                       value={discount}
                       onChange={(e) =>
