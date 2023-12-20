@@ -2,7 +2,7 @@ import axios from "axios";
 import axiosInstance from "./axios";
 
 export const Order = {
-  async getList({ page, perPage, search = undefined }) {
+  async getList({ page, perPage, filter, search = undefined }) {
     //lấy data api
     // console.log("fetch list");
 
@@ -10,7 +10,7 @@ export const Order = {
     url.searchParams.append("page", page); // nososi vào url để khai báo page
     url.searchParams.append("perPage", perPage); // nối để lấy perpage
     if (search) url.searchParams.append("fullTextSearch", search); // nối để lấy perpage
-
+    url.searchParams.append("filter", JSON.stringify(filter));
     return axiosInstance.get(url.toString());
   },
   async getVendorOrders() {

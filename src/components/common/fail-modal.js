@@ -35,7 +35,7 @@ export const ErrorModal = ({ handleCloseModal, errorMessage }) => {
         <p>{errorMessage}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="gray" onClick={handleCloseModal}>
+        <Button variant="outline-secondary" onClick={handleCloseModal}>
           Đóng
         </Button>
       </Modal.Footer>

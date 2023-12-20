@@ -1,5 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Row, Col, Table, Button } from "react-bootstrap";
+import React, { useContext, useEffect, useReducer, useState } from "react";
+import {
+  Row,
+  Col,
+  Table,
+  Button,
+  Popover,
+  OverlayTrigger,
+  Form,
+} from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import Card from "../../../components/Card";
 import Swiper from "swiper";
@@ -15,7 +23,9 @@ import { createArrayFrom1ToN } from "../../../helper";
 import { SuccessModal } from "../../../components/common/success-modal";
 import { LoadingModal } from "../../../components/common/loading-modal";
 import UserContext from "../../../contexts/userContext";
-
+import DateTimePicker from "react-datetime-picker";
+import "./list.css";
+import "../../../components/common/datepicker.css";
 const List = () => {
   const navigate = useNavigate();
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
@@ -27,6 +37,47 @@ const List = () => {
   const total = pagination?.total ?? 0;
   const { isStore } = useContext(UserContext);
   const totalPage = Math.ceil(total / perPage); // dư 1 sp vân là 1 page
+
+  const [filter, dispatchFilter] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case "SET_STATUS":
+          return {
+            ...state,
+            status: action.payload,
+          };
+        case "SET_TYPE":
+          return {
+            ...state,
+            type: action.payload,
+          };
+        case "SET_FROM_DATE":
+          return {
+            ...state,
+            dateFrom: action.payload,
+          };
+        case "SET_TO_DATE":
+          return {
+            ...state,
+            dateTo: action.payload,
+          };
+        case "RESET":
+          return {
+            status: "",
+            type: "",
+            dateFrom: "",
+            dateTo: "",
+          };
+      }
+    },
+    {
+      status: "",
+      type: "",
+      dateFrom: "",
+      dateTo: "",
+    }
+  );
+
   const fetchList = (page, perPage, search = undefined) => {
     // lấy từ API
     // console.log("aaaa", customer);
@@ -34,6 +85,8 @@ const List = () => {
     Order.getList({
       page, // Offset
       perPage, // limit,
+      filter,
+
       search,
     })
       .then(({ data }) => {
@@ -42,10 +95,109 @@ const List = () => {
         }
         setResponse(data); // set data cho state respone
       })
+      .catch(() => {})
       .finally(() => {
         setIsLoading(false);
       });
   };
+  const popover = (
+    <Popover width={"500px"} id="popover-basic">
+      <Popover.Header as="h3">Bộ lọc</Popover.Header>
+      <Popover.Body>
+        <Form.Group className="form-group">
+          <Form.Label htmlFor="validationDefault02">
+            Kênh bán hàng
+            <span className="text-danger"> {" *"}</span>
+          </Form.Label>
+          <Form.Select
+            value={filter.type}
+            onChange={(e) => {
+              dispatchFilter({
+                type: "SET_TYPE",
+                payload: e.target.value,
+              });
+            }}
+            id="validationDefault04"
+            required
+          >
+            <option value={""}>Chọn kênh bán hàng</option>
+            {["WEBSITE", "SENDO", "OFFLINE"].map((type) => {
+              return <option value={type}>{type}</option>;
+            })}
+          </Form.Select>
+        </Form.Group>
+        <Form.Group className="form-group">
+          <Form.Label htmlFor="validationDefault02">
+            Trạng thái
+            <span className="text-danger"> {" *"}</span>
+          </Form.Label>
+          <Form.Select
+            value={filter.status}
+            onChange={(e) => {
+              dispatchFilter({
+                type: "SET_STATUS",
+                payload: e.target.value,
+              });
+            }}
+            id="validationDefault04"
+            required
+          >
+            <option value={""}>Chọn trạng thái</option>
+            {[
+              { status: "NEW", name: "Chờ xác nhận" },
+              { status: "SHIPPING", name: "Đang vận chuyển" },
+              { status: "PROCESSING", name: "Đã xác nhận" },
+              { status: "CANCELLED", name: "Đã hủy" },
+              { status: "COMPLETED", name: "Hoàn thành" },
+            ].map(({ status, name }) => {
+              return <option value={status}>{name}</option>;
+            })}
+          </Form.Select>
+        </Form.Group>
+        <Row>
+          <Col md="6">
+            <Form.Group controlId="startDate">
+              <Form.Label>Bắt đầu </Form.Label>
+              <DateTimePicker
+                disableClock
+                format="dd/MM/y"
+                value={filter.dateFrom}
+                onChange={(date) => {
+                  dispatchFilter({
+                    type: "SET_FROM_DATE",
+                    payload: date?.toISOString() ?? "",
+                  });
+                }}
+              />
+            </Form.Group>
+          </Col>
+          <Col md="6">
+            <Form.Group controlId="endDate">
+              <Form.Label>Kết thúc </Form.Label>
+              <DateTimePicker
+                disableClock
+                format="dd/MM/y"
+                value={filter.dateTo}
+                onChange={(date) => {
+                  dispatchFilter({
+                    type: "SET_TO_DATE",
+                    payload: date?.toISOString() ?? "",
+                  });
+                }}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Button
+          variant="gray"
+          onClick={() => dispatchFilter({ type: "RESET" })}
+        >
+          Thiết lập lại
+        </Button>
+      </Popover.Body>
+    </Popover>
+  );
+
   const [searchText, setSearchText] = useState("");
   useEffect(() => {
     //chạy khi page change khi set page/ text change/ filter
@@ -55,7 +207,7 @@ const List = () => {
     //chạy khi page change khi set page/ text change/ filter
     setPage(1);
     fetchList(1, perPage, searchText);
-  }, [searchText]);
+  }, [searchText, filter]);
   return (
     <Card>
       {modal}
@@ -127,6 +279,7 @@ const List = () => {
           ) : (
             ""
           )}
+
           {isStore ? (
             <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
               <Link to="/dashboard/order-management/list/order-offline/new">
@@ -155,8 +308,11 @@ const List = () => {
         </div>
       </Card.Header>
       <Card.Body>
-        <div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Search onEnter={(value) => setSearchText(value)}></Search>
+          <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+            <Button variant="outline-gray">Bộ lọc</Button>
+          </OverlayTrigger>
         </div>
         {isLoading ? (
           <Loading></Loading>

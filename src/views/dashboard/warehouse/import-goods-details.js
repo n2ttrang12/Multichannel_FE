@@ -159,7 +159,7 @@ const ImportGoodsDetails = () => {
             <Card>
               <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
-                  <h5 className="card-title"> Thông tin nnhà cung cấp</h5>
+                  <h5 className="card-title"> Thông tin nhà cung cấp</h5>
                 </div>
               </Card.Header>
               <Card.Body>

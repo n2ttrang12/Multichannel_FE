@@ -89,9 +89,9 @@ const HistoryImportPerProduct = () => {
                           </Col>
                         </Row>
                       </Col>
-                      <Col md="6">
+                      <Col md="12">
                         <Row>
-                          <Col md="6">
+                          <Col md="3">
                             <p>Tên sản phẩm </p>
                           </Col>
                           <Col>
@@ -99,9 +99,9 @@ const HistoryImportPerProduct = () => {
                           </Col>
                         </Row>
                       </Col>
-                      <Col md="6">
+                      <Col md="12">
                         <Row>
-                          <Col md="6">
+                          <Col md="3">
                             <p>Phân loại</p>
                           </Col>
                           <Col>
@@ -124,20 +124,20 @@ const HistoryImportPerProduct = () => {
                           </Col>
                         </Row>
                       </Col>
-                      <Col md="6">
+                      <Col md="12">
                         <Row>
-                          <Col md="6">
-                            <p>Số lượng trong kho </p>
+                          <Col md="3">
+                            <p>Tồn kho </p>
                           </Col>
                           <Col>
                             <p>{": " + quantityInStock}</p>
                           </Col>
                         </Row>
                       </Col>
-                      <Col md="6">
+                      <Col md="12">
                         <Row>
-                          <Col md="6">
-                            <p>Số lượng trong đơn hàng </p>
+                          <Col md="3">
+                            <p>Trong đơn hàng </p>
                           </Col>
                           <Col>
                             <p>{": " + quantityInOrder}</p>

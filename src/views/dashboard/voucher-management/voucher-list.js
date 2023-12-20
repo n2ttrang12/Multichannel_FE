@@ -3,7 +3,7 @@ import { Form, Row, Col, Table, Button, Modal } from "react-bootstrap";
 import Card from "../../../components/Card";
 import { Link, useNavigate } from "react-router-dom";
 import { Search } from "../../../components/common/search";
-import { createArrayFrom1ToN } from "../../../helper";
+import { createArrayFrom1ToN, currencyFormatter } from "../../../helper";
 import { Loading } from "../../../components/common/loading";
 import { VoucherModel } from "../../../models/voucher";
 import * as moment from "moment";
@@ -13,7 +13,7 @@ import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import UserContext from "../../../contexts/userContext";
-
+import "../../../components/common/datepicker.css";
 const VoucherList = () => {
   const navigate = useNavigate();
   const { isStore } = useContext(UserContext);
@@ -227,29 +227,53 @@ const VoucherList = () => {
           ) : (
             <>
               <Row>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                  <Form.Label>Mã voucher</Form.Label>
-                  <Form.Control
-                    disabled={!isStore}
-                    isInvalid={isInvalidCode}
-                    type="text"
-                    value={code}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "SET_CODE",
-                        payload: e.target.value,
-                      })
-                    }
-                  />
-                  <Form.Control.Feedback type={"invalid"} className="invalid">
-                    Vui lòng nhập mã voucher
-                  </Form.Control.Feedback>
-                </Form.Group>
+                <Col md="6">
+                  <Form.Group className="mb-3" controlId="formBasicPassword">
+                    <Form.Label>Mã voucher</Form.Label>
+                    <Form.Control
+                      disabled={!isStore}
+                      isInvalid={isInvalidCode}
+                      type="text"
+                      value={code}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "SET_CODE",
+                          payload: e.target.value,
+                        })
+                      }
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui lòng nhập mã voucher
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md="6">
+                  <Form.Group className="mb-3" controlId="formBasicPassword">
+                    <Form.Label>Số lượng</Form.Label>
+                    <Form.Control
+                      disabled={!isStore}
+                      isInvalid={isInvalidAvailable}
+                      type="number"
+                      value={available}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "SET_AVAILABLE",
+                          payload: e.target.value,
+                        })
+                      }
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Số lượng voucher phải lớn hơn 0
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
               </Row>
               <Row>
-                <Col>
+                <Col md="6">
                   <Form.Group controlId="startDate">
-                    <Form.Label>Bắt đầu </Form.Label>
+                    <Form.Label>
+                      <span style={{ marginRight: "24px" }}>Bắt đầu</span>{" "}
+                    </Form.Label>
                     <DateTimePicker
                       disabled={!isStore}
                       disableClock
@@ -272,9 +296,11 @@ const VoucherList = () => {
                     ) : null}
                   </Form.Group>
                 </Col>
-                <Col>
+                <Col md="6">
                   <Form.Group controlId="endDate">
-                    <Form.Label>Kết thúc </Form.Label>
+                    <Form.Label>
+                      <span style={{ marginRight: "24px" }}>Kết thúc</span>
+                    </Form.Label>
                     <DateTimePicker
                       disabled={!isStore}
                       disableClock
@@ -370,28 +396,6 @@ const VoucherList = () => {
                     />
                     <Form.Control.Feedback type={"invalid"} className="invalid">
                       Phần trăm giảm phải lớn hơn 0
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col md="6">
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Số lượng</Form.Label>
-                    <Form.Control
-                      disabled={!isStore}
-                      isInvalid={isInvalidAvailable}
-                      type="number"
-                      value={available}
-                      onChange={(e) =>
-                        dispatch({
-                          type: "SET_AVAILABLE",
-                          payload: e.target.value,
-                        })
-                      }
-                    />
-                    <Form.Control.Feedback type={"invalid"} className="invalid">
-                      Số lượng voucher phải lớn hơn 0
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
@@ -530,8 +534,12 @@ const VoucherList = () => {
                           {item.code}
                         </td>
                         <td>{item.available}</td>
-                        <td>{item.discount}</td>
-                        <td>{item.percent}</td>
+                        <td>
+                          {item.discount > 0
+                            ? currencyFormatter.format(item.discount)
+                            : "--"}
+                        </td>
+                        <td>{item.percent > 0 ? item.percent : "--"}</td>
                         <td>
                           {item.fromDate
                             ? moment(item.fromDate).format(

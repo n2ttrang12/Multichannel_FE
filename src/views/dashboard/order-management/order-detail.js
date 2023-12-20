@@ -247,7 +247,7 @@ const OrderDetail = () => {
                                   <option
                                     disabled={
                                       statuses.indexOf(_status) <
-                                      statuses.indexOf()
+                                      statuses.indexOf(status)
                                     }
                                     value={_status}
                                   >
