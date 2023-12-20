@@ -242,7 +242,7 @@ const List = () => {
                             ? "Đã xác nhận"
                             : item.status === "SHIPPING"
                             ? "Đang vận chuyển"
-                            : item.status === "CANCELED"
+                            : item.status === "CANCELLED"
                             ? "Đã hủy"
                             : "Hoàn thành"}
                         </span>

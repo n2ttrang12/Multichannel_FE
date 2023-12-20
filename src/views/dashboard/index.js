@@ -751,7 +751,7 @@ const Index = memo((props) => {
                           </g>
                         </svg>
                         <div className="ms-2">
-                          <span className="text-gray">Đơn hàng trực tiếp</span>
+                          <span className="text-gray">Tại cửa hàng</span>
                         </div>
                       </div>
 
@@ -772,9 +772,7 @@ const Index = memo((props) => {
                           </g>
                         </svg>
                         <div className="ms-2">
-                          <span className="text-gray">
-                            Đơn hàng tại Website
-                          </span>
+                          <span className="text-gray">Tại Website</span>
                         </div>
                       </div>
                       <div className="d-flex align-items-center ms-3 text-danger">
@@ -794,7 +792,7 @@ const Index = memo((props) => {
                           </g>
                         </svg>
                         <div className="ms-2">
-                          <span className="text-gray">Đơn hàng tại Sendo</span>
+                          <span className="text-gray">Tại Sendo</span>
                         </div>
                       </div>
                     </div>
