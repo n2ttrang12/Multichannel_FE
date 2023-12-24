@@ -22,23 +22,13 @@ import CategoryProvider, {
 } from "../../../contexts/categoryProvider";
 import "./theme.css";
 import { Loading } from "../../../components/common/loading";
-const SuccessModel = ({ handleCloseModal }) => {
-  return (
-    <Modal show={true} onHide={handleCloseModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông báo</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>{`Thêm sản phẩm mới thành công`}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
+import Supplier from "../supplier-management/supplier";
+import { SupplierModel } from "../../../models/supplier";
+import { SuccessModal } from "../../../components/common/success-modal";
+import { ErrorModal } from "../../../components/common/fail-modal";
+import { LoadingModal } from "../../../components/common/loading-modal";
+import { forEach } from "lodash";
+import UserContext from "../../../contexts/userContext";
 
 const CategoryModal = ({
   handleCategoryChange,
@@ -125,13 +115,14 @@ const CategoryModal = ({
 
 const Product = () => {
   let { id } = useParams();
-
+  const { isStore } = useContext(UserContext);
   const isNewMode = id === "new";
   //form validation
   const [isInvalidName, setInvalidName] = useState(false);
   const [isInvalidBarcode, setInvalidBarcode] = useState(false);
   const [isInvalidDescription, setInvalidDescription] = useState(false);
   const [isInvalidCategory, setInvalidCategory] = useState(false);
+  const [isInvalidSupplier, setInvalidSupplier] = useState(false);
   const [isInvalidPhoto, setInvalidPhoto] = useState(false);
   const [isInvalidPrice, setInvalidPrice] = useState(false);
   const navigate = useNavigate();
@@ -141,6 +132,7 @@ const Product = () => {
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
   const [units, setUnits] = useState([]);
+  const [suppliers, setSupplier] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const convertProductResponse = (resProduct) => {
@@ -148,7 +140,7 @@ const Product = () => {
       id: resProduct.id,
       name: resProduct.name,
       status: resProduct.status,
-      code: resProduct.status,
+      code: resProduct.code,
       barcode: resProduct.barcode,
       description: resProduct.description,
       photoList: resProduct.productPhotos,
@@ -156,7 +148,7 @@ const Product = () => {
         const basicPriceInfo = {
           price: price.exportPrice,
           quantity: price.quantity,
-          sku: "",
+          sku: price.sku,
         };
 
         if (price.variant) {
@@ -173,6 +165,7 @@ const Product = () => {
       categoryId: resProduct.category?.id,
       categoryName: resProduct.category?.name,
       unitId: resProduct.unit?.id,
+      supplierId: resProduct.supplier?.id,
     };
   };
 
@@ -185,6 +178,12 @@ const Product = () => {
           payload: units[0].id,
         });
       }
+    });
+    SupplierModel.getList({
+      page: 1, // Offset
+      perPage: 100, // limit,
+    }).then(({ data: { data: suppliers } }) => {
+      setSupplier(suppliers);
     });
 
     if (!isNewMode) {
@@ -225,8 +224,8 @@ const Product = () => {
                 variants
               );
             });
-            console.log("variants", variants);
-            setVariants(variants);
+            const _variants = variants.filter((v) => v.name);
+            setVariants(_variants);
           }
 
           dispatchProduct({
@@ -240,8 +239,6 @@ const Product = () => {
 
   const [product, dispatchProduct] = useReducer(
     (state, action) => {
-      console.log(action);
-
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -293,6 +290,11 @@ const Product = () => {
             ...state,
             unitId: action.payload,
           };
+        case "SET_SUPPLIER":
+          return {
+            ...state,
+            supplierId: action.payload,
+          };
         case "SET_PRODUCT":
           return {
             ...action.payload,
@@ -320,10 +322,11 @@ const Product = () => {
       categoryId: null,
       categoryName: "",
       unitId: 0,
+      supplierId: 0,
     }
   );
 
-  console.log(variants);
+  // console.log(variants);
   console.log(product);
 
   const {
@@ -337,6 +340,7 @@ const Product = () => {
     categoryId,
     categoryName,
     unitId,
+    supplierId,
   } = product;
 
   const onChange = (imageList, addUpdateIndex) => {
@@ -382,21 +386,42 @@ const Product = () => {
       return true;
     }
   };
-  const validatePrice = () => {
-    const listHasPrice = priceList.filter((price) => {
-      return price.price && price.price > 0;
-    });
-    if (listHasPrice.length == 0) {
-      setInvalidPrice(true);
+  const validateSupplier = () => {
+    if (!categoryId) {
+      setInvalidSupplier(true);
       return false;
     } else {
-      setInvalidPrice(false);
+      setInvalidSupplier(false);
       return true;
     }
   };
+  const validatePrice = () => {
+    const isInvalid = priceList.some(({ price, quantity, sku }) => {
+      if (
+        priceList.length !== 1 &&
+        price == "" &&
+        quantity == "" &&
+        sku == ""
+      ) {
+        return false;
+      }
+
+      return (
+        !price ||
+        parseInt(price) <= 0 ||
+        !quantity ||
+        parseInt(quantity) <= 0 ||
+        !sku ||
+        sku.trim().length === 0
+      );
+    });
+    setInvalidPrice(isInvalid);
+    return !isInvalid;
+  };
 
   const validatePhoto = () => {
-    if (!images || images.length === 0) {
+    const allImages = [...images, ...photoList];
+    if (allImages.length === 0) {
       setInvalidPhoto(true);
       return false;
     } else {
@@ -431,6 +456,7 @@ const Product = () => {
                     <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Control
+                    disabled={!isStore}
                     type="text"
                     value={name}
                     isInvalid={isInvalidName}
@@ -454,6 +480,7 @@ const Product = () => {
                     Trạng thái
                   </Form.Label>
                   <Form.Select
+                    disabled={!isStore}
                     value={status}
                     onChange={(e) =>
                       dispatchProduct({
@@ -478,6 +505,7 @@ const Product = () => {
                     {/* <span className="text-danger"> {" *"}</span> */}
                   </Form.Label>
                   <Form.Control
+                    disabled={!isStore}
                     type="text"
                     value={code}
                     id="validationDefault01"
@@ -505,9 +533,10 @@ const Product = () => {
                 <Form.Group className="form-group">
                   <Form.Label md="6" htmlFor="validationDefault01">
                     Mã vạch (Barcode)
-                    {/* <span className="text-danger"> {" *"}</span> */}
+                    <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Control
+                    disabled={!isStore}
                     isInvalid={isInvalidBarcode}
                     onChange={(e) =>
                       dispatchProduct({
@@ -531,8 +560,10 @@ const Product = () => {
                 <Form.Group className="form-group">
                   <Form.Label htmlFor="validationDefault02">
                     Đơn vị tính
+                    <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Select
+                    disabled={!isStore}
                     value={unitId}
                     onChange={(e) =>
                       dispatchProduct({
@@ -572,49 +603,53 @@ const Product = () => {
                         {categoryName}
                       </span>
                     ) : null}
-                    <Link
-                      className="btn btn-sm btn-icon text-primary flex-end"
-                      data-bs-toggle="tooltip"
-                      title="Edit "
-                      to="#"
-                      onClick={() => {
-                        setHideCategoryModel(false);
-                      }}
-                    >
-                      <span>
-                        <svg
-                          class="icon-32"
-                          width="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M13.7476 20.4428H21.0002"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          ></path>{" "}
-                          <path
-                            fill-rule="evenodd"
-                            clip-rule="evenodd"
-                            d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          ></path>{" "}
-                          <path
-                            d="M11.021 6.00098L16.4732 10.1881"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          ></path>{" "}
-                        </svg>
-                      </span>
-                    </Link>
+                    {isStore ? (
+                      <Link
+                        className="btn btn-sm btn-icon text-primary flex-end"
+                        data-bs-toggle="tooltip"
+                        title="Edit "
+                        to="#"
+                        onClick={() => {
+                          setHideCategoryModel(false);
+                        }}
+                      >
+                        <span>
+                          <svg
+                            class="icon-32"
+                            width="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M13.7476 20.4428H21.0002"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>{" "}
+                            <path
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>{" "}
+                            <path
+                              d="M11.021 6.00098L16.4732 10.1881"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>{" "}
+                          </svg>
+                        </span>
+                      </Link>
+                    ) : (
+                      ""
+                    )}
                     {/* <Button
                       
                     >
@@ -633,10 +668,46 @@ const Product = () => {
               </Col>
             </Row>
             <Row>
+              <Col md="6">
+                <Form.Group className="form-group">
+                  <Form.Label htmlFor="validationDefault02">
+                    Nhà cung cấp
+                    <span className="text-danger"> {" *"}</span>
+                  </Form.Label>
+                  <Form.Select
+                    disabled={!isStore}
+                    value={supplierId}
+                    onChange={(e) =>
+                      dispatchProduct({
+                        type: "SET_SUPPLIER",
+                        payload: e.target.value,
+                      })
+                    }
+                    id="validationDefault04"
+                    required
+                  >
+                    <option value={""}>{"Vui lòng chọn nhà cung cấp"}</option>;
+                    {suppliers.map(({ id, name }) => {
+                      return <option value={id}>{name}</option>;
+                    })}
+                  </Form.Select>
+                  {isInvalidSupplier ? (
+                    <p
+                      style={{ display: "block" }}
+                      className="invalid-feedback"
+                    >
+                      Vui lòng chọn nhà cung cấp
+                    </p>
+                  ) : null}
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
               <div>
                 Mô tả
                 <span className="text-danger"> {" *"}</span>
                 <HTMLEditor
+                  isDisabled={!isStore}
                   isInvalid={isInvalidDescription}
                   onChange={(data) => {
                     dispatchProduct({
@@ -686,17 +757,27 @@ const Product = () => {
               }) => (
                 // write your building UI
                 <div className="upload__image-wrapper">
-                  <div>
-                    <Button
-                      className="button-upload"
-                      style={isDragging ? { color: "red" } : undefined}
-                      onClick={onImageUpload}
-                      {...dragProps}
-                    >
-                      Click or Drop here
-                    </Button>
-                  </div>
-                  <div className="mt-3">
+                  {isStore ? (
+                    <div>
+                      <Button
+                        disabled={!isStore}
+                        className="button-upload"
+                        style={isDragging ? { color: "red" } : undefined}
+                        onClick={onImageUpload}
+                        {...dragProps}
+                      >
+                        Click or Drop here
+                      </Button>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  <div
+                    className="mt-3"
+                    style={{
+                      display: "flex",
+                    }}
+                  >
                     {
                       //this is from edit
                       photoList?.map((photo, index) => {
@@ -711,9 +792,94 @@ const Product = () => {
                             <img
                               src={photo.url}
                               style={{ borderRadius: "8px" }}
-                              alt=""
+                              alt="Not found"
                               width="200"
                             />
+                            {isStore ? (
+                              <div
+                                className="image-item__btn-wrapper"
+                                style={{
+                                  position: "absolute",
+                                  top: "8px",
+                                  right: "4px",
+                                }}
+                              >
+                                <Link
+                                  className="btn btn-sm btn-icon btn-danger"
+                                  data-bs-toggle="tooltip"
+                                  title="Delete User"
+                                  to="#"
+                                  style={{
+                                    borderRadius: "50%",
+                                    alignItems: "center",
+                                  }}
+                                  onClick={() => {
+                                    photoList.splice(
+                                      photoList.indexOf(photo),
+                                      1
+                                    );
+                                    dispatchProduct({
+                                      type: "SET_PHOTOS",
+                                      payload: photoList,
+                                    });
+                                  }}
+                                >
+                                  <svg
+                                    class="icon-32"
+                                    width="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    {" "}
+                                    <path
+                                      d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                      d="M20.708 6.23975H3.75"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                      d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>{" "}
+                                  </svg>
+                                </Link>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        );
+                      })
+                    }
+                    {imageList.map((image, index) => (
+                      <div style={{ marginRight: "24px" }}>
+                        <div
+                          key={index}
+                          className="image-item"
+                          style={{
+                            position: "relative",
+                          }}
+                        >
+                          <img
+                            src={image["data_url"]}
+                            style={{ borderRadius: "8px", objectFit: "cover" }}
+                            alt="Not found"
+                            width="200"
+                            height="200"
+                          />
+                          {isStore ? (
                             <div
                               className="image-item__btn-wrapper"
                               style={{
@@ -723,6 +889,51 @@ const Product = () => {
                               }}
                             >
                               <Link
+                                className="btn btn-sm btn-icon btn-primary"
+                                data-bs-toggle="tooltip"
+                                title="Edit "
+                                to="#"
+                                onClick={() => onImageUpdate(index)}
+                                style={{
+                                  borderRadius: "70%",
+                                  alignItems: "center",
+                                  marginRight: "8px",
+                                }}
+                              >
+                                <svg
+                                  class="icon-32"
+                                  width="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M13.7476 20.4428H21.0002"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>{" "}
+                                  <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>{" "}
+                                  <path
+                                    d="M11.021 6.00098L16.4732 10.1881"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>{" "}
+                                </svg>
+                              </Link>
+
+                              <Link
                                 className="btn btn-sm btn-icon btn-danger"
                                 data-bs-toggle="tooltip"
                                 title="Delete User"
@@ -731,13 +942,7 @@ const Product = () => {
                                   borderRadius: "50%",
                                   alignItems: "center",
                                 }}
-                                onClick={() => {
-                                  photoList.splice(photoList.indexOf(photo), 1);
-                                  dispatchProduct({
-                                    type: "SET_PHOTOS",
-                                    payload: photoList,
-                                  });
-                                }}
+                                onClick={() => onImageRemove(index)}
                               >
                                 <svg
                                   class="icon-32"
@@ -771,118 +976,9 @@ const Product = () => {
                                 </svg>
                               </Link>
                             </div>
-                          </div>
-                        );
-                      })
-                    }
-                    {imageList.map((image, index) => (
-                      <div
-                        key={index}
-                        className="image-item"
-                        style={{
-                          position: "relative",
-                        }}
-                      >
-                        <img
-                          src={image["data_url"]}
-                          style={{ borderRadius: "8px" }}
-                          alt=""
-                          width="200"
-                        />
-                        <div
-                          className="image-item__btn-wrapper"
-                          style={{
-                            position: "absolute",
-                            top: "8px",
-                            right: "4px",
-                          }}
-                        >
-                          <Link
-                            className="btn btn-sm btn-icon btn-primary"
-                            data-bs-toggle="tooltip"
-                            title="Edit "
-                            to="#"
-                            onClick={() => onImageUpdate(index)}
-                            style={{
-                              borderRadius: "70%",
-                              alignItems: "center",
-                              marginRight: "8px",
-                            }}
-                          >
-                            <svg
-                              class="icon-32"
-                              width="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M13.7476 20.4428H21.0002"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></path>{" "}
-                              <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></path>{" "}
-                              <path
-                                d="M11.021 6.00098L16.4732 10.1881"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></path>{" "}
-                            </svg>
-                          </Link>
-                          <Link
-                            className="btn btn-sm btn-icon btn-danger"
-                            data-bs-toggle="tooltip"
-                            title="Delete User"
-                            to="#"
-                            style={{
-                              borderRadius: "50%",
-                              alignItems: "center",
-                            }}
-                            onClick={() => onImageRemove(index)}
-                          >
-                            <svg
-                              class="icon-32"
-                              width="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              {" "}
-                              <path
-                                d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></path>{" "}
-                              <path
-                                d="M20.708 6.23975H3.75"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></path>{" "}
-                              <path
-                                d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></path>{" "}
-                            </svg>
-                          </Link>
+                          ) : (
+                            ""
+                          )}
                         </div>
                       </div>
                     ))}
@@ -890,6 +986,7 @@ const Product = () => {
                   {!!imageList.length && (
                     <div className="mt-3">
                       <Button
+                        disabled={!isStore}
                         style={{
                           background: "white",
                           color: "black",
@@ -922,6 +1019,8 @@ const Product = () => {
           </Card.Header>
           <Card.Body>
             <Variants
+              isStore={isStore}
+              isInvalidPrice={isInvalidPrice}
               variants={variants}
               prices={priceList}
               onChangePrices={(prices) =>
@@ -932,96 +1031,122 @@ const Product = () => {
               }
               onChange={(variants) => setVariants(variants)}
             ></Variants>
-            {isInvalidPrice &&
-            priceList.filter((price) => {
-              return price.price && price.price > 0;
-            }).length === 0 ? (
-              <p style={{ display: "block" }} className="invalid-feedback">
-                Vui lòng thêm giá bán
-              </p>
-            ) : null}
           </Card.Body>
         </Card>
 
-        <div>
-          <Button
-            onClick={() => {
-              const isValidName = validateName();
-              const isValidBarcode = validateBarcode();
-              const isValidDescription = validateDescription();
-              const isValidCategory = validateCategory();
-              const isValidPhoto = validatePhoto();
-              const isInvalidPrice = validatePrice();
+        {isStore ? (
+          <div>
+            <Button
+              onClick={() => {
+                const isValidName = validateName();
+                const isValidBarcode = validateBarcode();
+                const isValidDescription = validateDescription();
+                const isValidCategory = validateCategory();
+                const isValidPhoto = validatePhoto();
+                const isInvalidPrice = validatePrice();
+                const isvalidSupplier = validateSupplier();
+                if (
+                  !isValidName ||
+                  !isValidBarcode ||
+                  !isValidDescription ||
+                  !isValidCategory ||
+                  !isValidPhoto ||
+                  !isInvalidPrice ||
+                  !isvalidSupplier
+                ) {
+                  return;
+                }
 
-              if (
-                !isValidName ||
-                !isValidBarcode ||
-                !isValidDescription ||
-                !isValidCategory ||
-                !isValidPhoto ||
-                !isInvalidPrice
-              ) {
-                return;
-              }
+                const _product = {
+                  ...product,
+                  priceList: product.priceList
+                    .filter((price) => {
+                      return price.price && price.price > 0;
+                    })
+                    .map((price) => {
+                      const _price = {
+                        exportPrice: parseInt(price.price),
+                        quantity: parseInt(price.quantity),
+                        sku: price.sku,
+                      };
 
-              const _product = {
-                ...product,
-                priceList: product.priceList
-                  .filter((price) => {
-                    return price.price && price.price > 0;
-                  })
-                  .map((price) => {
-                    const _price = {
-                      exportPrice: parseInt(price.price),
-                      quantity: parseInt(price.quantity),
-                    };
+                      if (price[variants[0]?.name] !== undefined) {
+                        _price.variantName = variants[0].name;
+                        _price.variantValue = price[variants[0].name];
+                      }
+                      if (price[variants[1]?.name] !== undefined) {
+                        _price.variantName2 = variants[1].name;
+                        _price.variantValue2 = price[variants[1].name];
+                      }
+                      return _price;
+                    }),
+                };
+                setModal(<LoadingModal></LoadingModal>);
+                //push images
+                ImageModel.upload(images).then((res) => {
+                  const { data } = res;
 
-                    if (price[variants[0]?.name] !== undefined) {
-                      _price.variantName = variants[0].name;
-                      _price.variantValue = price[variants[0].name];
-                    }
-                    if (price[variants[1]?.name] !== undefined) {
-                      _price.variantName2 = variants[1].name;
-                      _price.variantValue2 = price[variants[1].name];
-                    }
-                    return _price;
-                  }),
-              };
-
-              //push images
-              ImageModel.upload(images).then((res) => {
-                const { data } = res;
-
-                data.forEach((url, i) => {
-                  _product.photoList.push({
-                    url,
-                    isMain: i === 0,
+                  data.forEach((url, i) => {
+                    _product.photoList.push({
+                      url,
+                      isMain: i === 0,
+                    });
                   });
-                });
 
-                //push product
-                ProductModel.addProduct(_product)
-                  .then(() => {
-                    setModal(
-                      <SuccessModel
-                        handleCloseModal={() => {
-                          setModal(null);
-                          navigate(
-                            "/dashboard/product-management/product-list"
-                          );
-                        }}
-                      ></SuccessModel>
-                    );
-                  })
-                  .catch((e) => console.log(e));
-              });
-            }}
-            variant="btn btn-primary"
-            type="submit"
-          >
-            Submit
-          </Button>
-        </div>
+                  setImages([]);
+
+                  const promise = isNewMode
+                    ? ProductModel.addProduct(_product)
+                    : ProductModel.update(_product);
+
+                  promise
+                    .then(() => {
+                      setModal(
+                        <SuccessModal
+                          handleCloseModal={() => {
+                            setModal(null);
+                            navigate(
+                              "/dashboard/product-management/product-list"
+                            );
+                          }}
+                          message={
+                            isNewMode
+                              ? "Thêm mới sản phẩm thành công"
+                              : "Chỉnh sửa sản phẩm thành công"
+                          }
+                        ></SuccessModal>
+                      );
+                    })
+                    .catch(
+                      ({
+                        response: {
+                          data: { error: { message } = {} } = {},
+                        } = {},
+                      }) => {
+                        setModal(
+                          <ErrorModal
+                            handleCloseModal={() => {
+                              setModal(null);
+                            }}
+                            errorMessage={
+                              message ?? "Thao tác không thành công"
+                            }
+                          ></ErrorModal>
+                        );
+                      }
+                    )
+                    .finally(() => setIsLoading(false));
+                });
+              }}
+              variant="btn btn-primary"
+              type="submit"
+            >
+              Lưu thông tin
+            </Button>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <CategoryProvider>
         <CategoryModal
@@ -1048,7 +1173,14 @@ const Product = () => {
  * e.g price = {color: 'blue', size: 'M', price: 1000, quantity: 12, sku: "123"}
  * e.g variant = {name: 'color', values: ['blue', 'red']}
  */
-const Variants = ({ variants, onChange, prices, onChangePrices }) => {
+const Variants = ({
+  isStore,
+  variants,
+  onChange,
+  prices,
+  onChangePrices,
+  isInvalidPrice,
+}) => {
   const [fails, setFailed] = useState([]);
 
   //remote unvalid values
@@ -1136,74 +1268,80 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
 
   return (
     <div>
-      <div>
-        <Row style={{ display: "flex" }}>
-          {_variants.map(({ name, values }, index) => {
-            const _values = [...values, ""];
-            return (
-              <Col md="6">
-                <div
-                  style={{
-                    marginBottom: "16px",
-                    border: "1px solid lightgrey",
-                    borderRadius: "8px",
-                    padding: "16px",
-                  }}
-                >
-                  <div>
-                    <Form.Label htmlFor={index}>
-                      Nhóm phân loại {index + 1}
-                    </Form.Label>
+      {isStore ? (
+        <div>
+          <Row style={{ display: "flex" }}>
+            {_variants.map(({ name, values }, index) => {
+              const _values = [...values, ""];
+              return (
+                <Col md="6">
+                  <div
+                    style={{
+                      marginBottom: "16px",
+                      border: "1px solid lightgrey",
+                      borderRadius: "8px",
+                      padding: "16px",
+                    }}
+                  >
+                    <div>
+                      <Form.Label htmlFor={index}>
+                        Nhóm phân loại {index + 1}
+                      </Form.Label>
 
-                    <Form.Control
-                      id={index}
-                      key={index}
-                      value={name}
-                      type="text"
-                      onChange={(e) => {
-                        _variants[index]["name"] = e.target.value;
-                        onChange(handleBeforeSavingVariants(_variants));
-                      }}
-                    />
-                  </div>
-                  <div>
-                    {_values.map((value, indexValue) => {
-                      return (
-                        <div
-                          className="mt-3"
-                          style={{ display: "flex", verticalAlign: "center" }}
-                        >
+                      <Form.Control
+                        id={index}
+                        key={index}
+                        value={name}
+                        type="text"
+                        onChange={(e) => {
+                          _variants[index]["name"] = e.target.value;
+                          onChange(handleBeforeSavingVariants(_variants));
+                        }}
+                      />
+                    </div>
+                    <div>
+                      {_values.map((value, indexValue) => {
+                        return (
                           <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginRight: "16px",
-                            }}
+                            className="mt-3"
+                            style={{ display: "flex", verticalAlign: "center" }}
                           >
-                            <div>Phân loại {indexValue + 1}</div>
-                          </div>
-                          <div>
-                            <Form.Control
-                              key={indexValue}
-                              value={value}
-                              type="text"
-                              onChange={(e) => {
-                                _variants[index]["values"][indexValue] =
-                                  e.target.value;
-                                onChange(handleBeforeSavingVariants(_variants));
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                marginRight: "16px",
                               }}
-                            />
+                            >
+                              <div>Phân loại {indexValue + 1}</div>
+                            </div>
+                            <div>
+                              <Form.Control
+                                key={indexValue}
+                                value={value}
+                                type="text"
+                                onChange={(e) => {
+                                  _variants[index]["values"][indexValue] =
+                                    e.target.value;
+                                  onChange(
+                                    handleBeforeSavingVariants(_variants)
+                                  );
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              </Col>
-            );
-          })}
-        </Row>
-      </div>
+                </Col>
+              );
+            })}
+          </Row>
+        </div>
+      ) : (
+        ""
+      )}
 
       <div className="mt-3">
         <h5>
@@ -1231,34 +1369,57 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
             {rows.length === 0 ? (
               <tr>
                 <td>
-                  <Form.Control
-                    value={defaultPrice.price}
-                    type="number"
-                    onChange={(e) => {
-                      defaultPrice.price = e.target.value;
-                      onChangePrices(handleBeforeSavingPrices([...prices]));
-                    }}
-                  />
+                  <Form.Group className="form-group">
+                    <Form.Control
+                      disabled={!isStore}
+                      value={defaultPrice.price}
+                      isInvalid={isInvalidPrice && defaultPrice.price <= 0}
+                      type="number"
+                      onChange={(e) => {
+                        defaultPrice.price = e.target.value;
+                        onChangePrices(handleBeforeSavingPrices([...prices]));
+                      }}
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui làm nhập giá
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </td>
                 <td>
-                  <Form.Control
-                    value={defaultPrice.quantity}
-                    type="number"
-                    onChange={(e) => {
-                      defaultPrice.quantity = e.target.value;
-                      onChangePrices(handleBeforeSavingPrices([...prices]));
-                    }}
-                  />
+                  <Form.Group className="form-group">
+                    <Form.Control
+                      disabled={!isStore}
+                      value={defaultPrice.quantity}
+                      isInvalid={isInvalidPrice && defaultPrice.quantity <= 0}
+                      type="number"
+                      onChange={(e) => {
+                        defaultPrice.quantity = e.target.value;
+                        onChangePrices(handleBeforeSavingPrices([...prices]));
+                      }}
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui lòng nhập số lượng
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </td>
                 <td>
-                  <Form.Control
-                    value={defaultPrice.sku}
-                    type="text"
-                    onChange={(e) => {
-                      defaultPrice.sku = e.target.value;
-                      onChangePrices(handleBeforeSavingPrices([...prices]));
-                    }}
-                  />
+                  <Form.Group className="form-group">
+                    <Form.Control
+                      disabled={!isStore}
+                      value={defaultPrice.sku}
+                      isInvalid={
+                        isInvalidPrice && defaultPrice.sku?.length <= 0
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        defaultPrice.sku = e.target.value;
+                        onChangePrices(handleBeforeSavingPrices([...prices]));
+                      }}
+                    />
+                    <Form.Control.Feedback type={"invalid"} className="invalid">
+                      Vui lòng nhập sku
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </td>
               </tr>
             ) : (
@@ -1294,37 +1455,77 @@ const Variants = ({ variants, onChange, prices, onChangePrices }) => {
                     <td>{value1}</td>
                     {value2 && <td>{value2}</td>}
                     <td>
-                      <Form.Control
-                        key={index}
-                        value={priceObject.price}
-                        type="number"
-                        onChange={(e) => {
-                          priceObject.price = e.target.value;
-                          onChangePrices(handleBeforeSavingPrices([...prices]));
-                        }}
-                      />
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          disabled={!isStore}
+                          key={index}
+                          value={priceObject.price}
+                          isInvalid={isInvalidPrice && priceObject?.price <= 0}
+                          type="number"
+                          onChange={(e) => {
+                            priceObject.price = e.target.value;
+                            onChangePrices(
+                              handleBeforeSavingPrices([...prices])
+                            );
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          type={"invalid"}
+                          className="invalid"
+                        >
+                          Vui lòng nhập giá
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     </td>
                     <td>
-                      <Form.Control
-                        key={index}
-                        value={priceObject.quantity}
-                        type="number"
-                        onChange={(e) => {
-                          priceObject.quantity = e.target.value;
-                          onChangePrices(handleBeforeSavingPrices([...prices]));
-                        }}
-                      />
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          disabled={!isStore}
+                          key={index}
+                          value={priceObject.quantity}
+                          isInvalid={
+                            isInvalidPrice && priceObject?.quantity <= 0
+                          }
+                          type="number"
+                          onChange={(e) => {
+                            priceObject.quantity = e.target.value;
+                            onChangePrices(
+                              handleBeforeSavingPrices([...prices])
+                            );
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          type={"invalid"}
+                          className="invalid"
+                        >
+                          Vui lòng nhập số lượng
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     </td>
                     <td>
-                      <Form.Control
-                        key={index}
-                        value={priceObject.sku}
-                        type="text"
-                        onChange={(e) => {
-                          priceObject.sku = e.target.value;
-                          onChangePrices(handleBeforeSavingPrices([...prices]));
-                        }}
-                      />
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          disabled={!isStore}
+                          key={index}
+                          value={priceObject.sku}
+                          isInvalid={
+                            isInvalidPrice && priceObject?.sku.length <= 0
+                          }
+                          type="text"
+                          onChange={(e) => {
+                            priceObject.sku = e.target.value;
+                            onChangePrices(
+                              handleBeforeSavingPrices([...prices])
+                            );
+                          }}
+                        />
+                        <Form.Control.Feedback
+                          type={"invalid"}
+                          className="invalid"
+                        >
+                          Vui lòng nhập SKU
+                        </Form.Control.Feedback>
+                      </Form.Group>
                     </td>
                   </tr>
                 );

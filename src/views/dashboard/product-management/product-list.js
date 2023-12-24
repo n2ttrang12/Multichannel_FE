@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Row, Col, Image, Modal, Form, Button, Table } from "react-bootstrap";
 import Card from "../../../components/Card";
 
 import { Link, useNavigate } from "react-router-dom";
 import "./theme.css";
-import { createArrayFrom1ToN } from "../../../helper";
+import { createArrayFrom1ToN, currencyFormatter } from "../../../helper";
 import { Search } from "../../../components/common/search";
 import { Loading } from "../../../components/common/loading";
 
 import { Product } from "../../../models/product";
+import UserContext from "../../../contexts/userContext";
 
 function ColorfulText({ status }) {
   return <span style={{ color: "green" }}>{status}</span>;
@@ -23,11 +24,11 @@ const ProductList = () => {
   const handleCloseModal = () => setModal(null);
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1); // lưu current page, set thì render lại
-  const [perPage, setPerpage] = useState(5); // Lưu perpage, đnag set cứng alf 5
+  const [perPage, setPerpage] = useState(10); // Lưu perpage, đnag set cứng alf 5
 
   const { data: products, pagination } = response; // products từ response
   const total = pagination?.total ?? 0;
-
+  const { isStore } = useContext(UserContext);
   const totalPage = Math.ceil(total / perPage); // dư 1 sp vân là 1 page
   const fetchList = (page, perPage, search = undefined) => {
     // lấy từ API
@@ -92,27 +93,31 @@ const ProductList = () => {
         <div className="header-title">
           <h4 className="card-title">Danh sách sản phẩm</h4>
         </div>
-        <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-          <Link to="/dashboard/product-management/product-list/product/new">
-            <i className="btn-inner">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </i>
-            <span>Thêm sản phẩm</span>
-          </Link>
-        </Button>
+        {isStore ? (
+          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+            <Link to="/dashboard/product-management/product-list/product/new">
+              <i className="btn-inner">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </i>
+              <span>Thêm sản phẩm</span>
+            </Link>
+          </Button>
+        ) : (
+          ""
+        )}
       </Card.Header>
       <Card.Body>
         <div>
@@ -136,12 +141,12 @@ const ProductList = () => {
                   <th>Mã vạch</th>
                   <th>Loại sản phẩm</th>
 
-                  {/* <th>Mô tả</th> */}
+                  {/* <th>Nhà cung cấp</th> */}
                   <th>Giá bán</th>
                   {/* <th>Tồn kho</th> */}
                   {/* <th>Ngày tạo</th> */}
                   <th>Trạng thái</th>
-                  <th>Thao tác</th>
+                  {isStore ? <th>Thao tác</th> : ""}
                 </tr>
               </thead>
               <tbody>
@@ -177,7 +182,7 @@ const ProductList = () => {
                           cursor: "pointer",
                         }}
                       >
-                        {item.name}
+                        <a>{item.name}</a>
                       </td>
                       <td>{item.barcode}</td>
                       <td>{item.category.name}</td>
@@ -191,10 +196,11 @@ const ProductList = () => {
                       })} */}
                         {minPrice && maxPrice ? (
                           minPrice === maxPrice ? (
-                            <span>{maxPrice}</span>
+                            <span>{currencyFormatter.format(maxPrice)}</span>
                           ) : (
                             <span>
-                              {minPrice} - {maxPrice}
+                              {currencyFormatter.format(minPrice)} -{" "}
+                              {currencyFormatter.format(maxPrice)}
                             </span>
                           )
                         ) : null}
@@ -204,69 +210,21 @@ const ProductList = () => {
                       {/* <td>
                   <span className={`badge ${item.color}`}>{item.status}</span>
                 </td> */}
-                      <td>
-                        <div style={{ float: "right" }}>
-                          <Link
-                            className="btn btn-sm btn-icon text-primary flex-end"
-                            data-bs-toggle="tooltip"
-                            title="Edit product"
-                            to="#"
-                            onClick={() => {
-                              navigate(
-                                "/dashboard/product-management/product-list/product/" +
-                                  item.id
-                              );
-                            }}
-                          >
-                            <span>
-                              <svg
-                                class="icon-32"
-                                width="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M13.7476 20.4428H21.0002"
-                                  stroke="currentColor"
-                                  stroke-width="1.5"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                ></path>{" "}
-                                <path
-                                  fill-rule="evenodd"
-                                  clip-rule="evenodd"
-                                  d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
-                                  stroke="currentColor"
-                                  stroke-width="1.5"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                ></path>{" "}
-                                <path
-                                  d="M11.021 6.00098L16.4732 10.1881"
-                                  stroke="currentColor"
-                                  stroke-width="1.5"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                ></path>{" "}
-                              </svg>
-                            </span>
-                          </Link>
-                          <Link
-                            className="btn btn-sm btn-icon text-danger"
-                            data-bs-toggle="tooltip"
-                            title="Delete Product"
-                            to="#"
-                            onClick={() =>
-                              setModal(
-                                <DeleteProductModal
-                                  product={item}
-                                  handleCloseModal={() => setModal(null)}
-                                />
-                              )
-                            }
-                          >
-                            <span>
+                      {isStore ? (
+                        <td>
+                          <div style={{ float: "right" }}>
+                            <Link
+                              className="btn btn-sm btn-icon text-primary flex-end"
+                              data-bs-toggle="tooltip"
+                              title="Edit product"
+                              to="#"
+                              onClick={() => {
+                                navigate(
+                                  "/dashboard/product-management/product-list/product/" +
+                                    item.id
+                                );
+                              }}
+                            >
                               <span>
                                 <svg
                                   class="icon-32"
@@ -275,23 +233,24 @@ const ProductList = () => {
                                   fill="none"
                                   xmlns="http://www.w3.org/2000/svg"
                                 >
-                                  {" "}
                                   <path
-                                    d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826"
+                                    d="M13.7476 20.4428H21.0002"
                                     stroke="currentColor"
                                     stroke-width="1.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                   ></path>{" "}
                                   <path
-                                    d="M20.708 6.23975H3.75"
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M12.78 3.79479C13.5557 2.86779 14.95 2.73186 15.8962 3.49173C15.9485 3.53296 17.6295 4.83879 17.6295 4.83879C18.669 5.46719 18.992 6.80311 18.3494 7.82259C18.3153 7.87718 8.81195 19.7645 8.81195 19.7645C8.49578 20.1589 8.01583 20.3918 7.50291 20.3973L3.86353 20.443L3.04353 16.9723C2.92866 16.4843 3.04353 15.9718 3.3597 15.5773L12.78 3.79479Z"
                                     stroke="currentColor"
                                     stroke-width="1.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                   ></path>{" "}
                                   <path
-                                    d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973"
+                                    d="M11.021 6.00098L16.4732 10.1881"
                                     stroke="currentColor"
                                     stroke-width="1.5"
                                     stroke-linecap="round"
@@ -299,10 +258,61 @@ const ProductList = () => {
                                   ></path>{" "}
                                 </svg>
                               </span>
-                            </span>
-                          </Link>
-                        </div>
-                      </td>
+                            </Link>
+                            <Link
+                              className="btn btn-sm btn-icon text-danger"
+                              data-bs-toggle="tooltip"
+                              title="Delete Product"
+                              to="#"
+                              onClick={() =>
+                                setModal(
+                                  <DeleteProductModal
+                                    product={item}
+                                    handleCloseModal={() => setModal(null)}
+                                  />
+                                )
+                              }
+                            >
+                              <span>
+                                <span>
+                                  <svg
+                                    class="icon-32"
+                                    width="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    {" "}
+                                    <path
+                                      d="M19.3248 9.46826C19.3248 9.46826 18.7818 16.2033 18.4668 19.0403C18.3168 20.3953 17.4798 21.1893 16.1088 21.2143C13.4998 21.2613 10.8878 21.2643 8.27979 21.2093C6.96079 21.1823 6.13779 20.3783 5.99079 19.0473C5.67379 16.1853 5.13379 9.46826 5.13379 9.46826"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                      d="M20.708 6.23975H3.75"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                      d="M17.4406 6.23973C16.6556 6.23973 15.9796 5.68473 15.8256 4.91573L15.5826 3.69973C15.4326 3.13873 14.9246 2.75073 14.3456 2.75073H10.1126C9.53358 2.75073 9.02558 3.13873 8.87558 3.69973L8.63258 4.91573C8.47858 5.68473 7.80258 6.23973 7.01758 6.23973"
+                                      stroke="currentColor"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                    ></path>{" "}
+                                  </svg>
+                                </span>
+                              </span>
+                            </Link>
+                          </div>
+                        </td>
+                      ) : (
+                        ""
+                      )}
                     </tr>
                   );
                 })}

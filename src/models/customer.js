@@ -13,30 +13,9 @@ export const Customer = {
 
     return axiosInstance.get(url.toString());
   },
-  async addCustomer(customer) {
-    return axiosInstance.post(
-      axiosInstance.defaults.baseURL + "customer/create",
-      {
-        ...customer,
-      }
-    );
-  },
-  async updateCustomer(customer) {
-    return axiosInstance.post(
-      axiosInstance.defaults.baseURL + `customer/${customer.id}`,
-      {
-        ...customer,
-      }
-    );
-  },
-  async deleteCustomer(id) {
-    return axiosInstance.delete(
-      axiosInstance.defaults.baseURL + `customer/${id}`
-    );
-  },
-  async getUnits() {
+  async get(id) {
     return axiosInstance.get(
-      axiosInstance.defaults.baseURL + "customer/mt/unit"
+      axiosInstance.defaults.baseURL + "customer/detail/" + id
     );
   },
 };

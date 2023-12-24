@@ -20,7 +20,7 @@ export const Product = {
       }
     );
   },
-  async updateProduct(product) {
+  async update(product) {
     return axiosInstance.post(
       axiosInstance.defaults.baseURL + `product/${product.id}`,
       {
@@ -29,8 +29,8 @@ export const Product = {
     );
   },
   async deleteProduct(id) {
-    return axiosInstance.post(
-      axiosInstance.defaults.baseURL + `product/deleted/${id}`
+    return axiosInstance.delete(
+      axiosInstance.defaults.baseURL + `product/${id}`
     );
   },
   async getUnits() {
@@ -38,7 +38,17 @@ export const Product = {
       axiosInstance.defaults.baseURL + "product/mt/unit"
     );
   },
+  async getSupplier() {
+    return axiosInstance.get(axiosInstance.defaults.baseURL + "supplier");
+  },
   async get(id) {
     return axiosInstance.get(axiosInstance.defaults.baseURL + "product/" + id);
+  },
+  async getAll() {
+    return Product.getList({
+      page: 0, // Offset
+      perPage: 0, // limit,
+      search: "",
+    });
   },
 };

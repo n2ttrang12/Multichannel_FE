@@ -7,10 +7,10 @@ const Footer = () => {
       <div className="footer-body">
         <ul className="left-panel list-inline mb-0 p-0">
           <li className="list-inline-item">
-            <Link to="/dashboard/extra/privacy-policy">Privacy Policy</Link>
+            {/* <Link to="/dashboard/extra/privacy-policy">Privacy Policy</Link> */}
           </li>
           <li className="list-inline-item">
-            <Link to="/dashboard/extra/terms-of-service">Terms of Use</Link>
+            {/* <Link to="/dashboard/extra/terms-of-service">Terms of Use</Link> */}
           </li>
         </ul>
         {/* <div className="right-panel">

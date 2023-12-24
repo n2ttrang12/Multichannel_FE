@@ -1,42 +1,49 @@
 import axios from "axios";
 import axiosInstance from "./axios";
 
-export const Supplier = {
+export const SupplierModel = {
   async getList({ page, perPage, search = undefined }) {
     //lấy data api
     // console.log("fetch list");
 
-    const url = new URL(axiosInstance.defaults.baseURL + "product");
+    const url = new URL(axiosInstance.defaults.baseURL + "supplier");
     url.searchParams.append("page", page); // nososi vào url để khai báo page
     url.searchParams.append("perPage", perPage); // nối để lấy perpage
     if (search) url.searchParams.append("fullTextSearch", search); // nối để lấy perpage
 
     return axiosInstance.get(url.toString());
   },
-  async addSupplier(upplier) {
-    return axiosInstance.post(
-      axiosInstance.defaults.baseURL + "upplier/create",
-      {
-        ...upplier,
-      }
-    );
+  async addSupplier(supplier) {
+    return axiosInstance.post(axiosInstance.defaults.baseURL + "supplier", {
+      ...supplier,
+    });
   },
-  async updateSupplier(upplier) {
+  async updateSupplier(supplier) {
     return axiosInstance.post(
-      axiosInstance.defaults.baseURL + `upplier/${upplier.id}`,
+      axiosInstance.defaults.baseURL + `supplier/${supplier.id}`,
       {
-        ...upplier,
+        ...supplier,
       }
     );
   },
   async deleteSupplier(id) {
     return axiosInstance.delete(
-      axiosInstance.defaults.baseURL + `upplier/${id}`
+      axiosInstance.defaults.baseURL + `supplier/${id}`
     );
   },
-  async getUnits() {
+  async getProvince() {
     return axiosInstance.get(
-      axiosInstance.defaults.baseURL + "upplier/mt/unit"
+      axiosInstance.defaults.baseURL + "supplier/mt-province"
     );
+  },
+  async get(id) {
+    return axiosInstance.get(axiosInstance.defaults.baseURL + "supplier/" + id);
+  },
+  async getAll() {
+    return SupplierModel.getList({
+      page: 0, // Offset
+      perPage: 0, // limit,
+      search: "",
+    });
   },
 };

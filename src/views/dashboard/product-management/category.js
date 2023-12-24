@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { TreeTable } from "primereact/treetable";
 import { Column } from "primereact/column";
 import { Category } from "../../../models/category";
@@ -10,15 +10,16 @@ import "./theme.css";
 import { createArrayFrom1ToN } from "../../../helper";
 import { Search } from "../../../components/common/search";
 import { Loading } from "../../../components/common/loading";
+import UserContext from "../../../contexts/userContext";
 
 const CategoryManagement = () => {
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
   const [isLoading, setIsLoading] = useState(false);
   const [modal, setModal] = useState(null);
-
+  const { isStore } = useContext(UserContext);
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1); // lưu current page, set thì render lại
-  const [perPage, setPerpage] = useState(5); // Lưu perpage, đnag set cứng alf 5
+  const [perPage, setPerpage] = useState(10); // Lưu perpage, đnag set cứng alf 5
 
   const actionTemplate = (data) => {
     const currentCategory = data?.data;
@@ -352,28 +353,32 @@ const CategoryManagement = () => {
         <div className="header-title">
           <h4 className="card-title">Danh mục sản phẩm</h4>
         </div>
-        <Button
-          className="text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3"
-          onClick={() => setModal(<AddCategoryModel />)}
-        >
-          <i className="btn-inner">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-          </i>
-          <span>Thêm danh mục</span>
-        </Button>
+        {!isStore ? (
+          <Button
+            className="text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3"
+            onClick={() => setModal(<AddCategoryModel />)}
+          >
+            <i className="btn-inner">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </i>
+            <span>Thêm danh mục</span>
+          </Button>
+        ) : (
+          ""
+        )}
       </Card.Header>
       <Card.Body>
         <div>
@@ -394,16 +399,20 @@ const CategoryManagement = () => {
               ></Column>
               <Column field="name" header="Tên danh mục" expander></Column>
               {/* <Column field="code" header="Code"></Column> */}
-              <Column
-                body={actionTemplate}
-                headerClassName="w-10rem"
-                header="Thao tác"
-                headerStyle={{
-                  padding: "24px",
-                  display: "flex",
-                  justifyContent: "end",
-                }}
-              ></Column>
+              {!isStore ? (
+                <Column
+                  body={actionTemplate}
+                  headerClassName="w-10rem"
+                  header="Thao tác"
+                  headerStyle={{
+                    padding: "24px",
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                ></Column>
+              ) : (
+                ""
+              )}
             </TreeTable>
           )}
 

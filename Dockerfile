@@ -1,4 +1,4 @@
-FROM node:19
+FROM node:16.15.0
 
 WORKDIR /usr/src/app
 
@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "build"]
+
+ENTRYPOINT ["npm", "start"]

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import {
   Row,
   Col,
@@ -11,49 +11,100 @@ import {
 } from "react-bootstrap";
 import ImageUploading from "react-images-uploading";
 import Card from "../../../components/Card";
-import { Product as ProductModel } from "../../../models/product";
-import { useNavigate } from "react-router-dom";
+import { SupplierModel } from "../../../models/supplier";
+import { Province as ProvinceModel } from "../../../models/province";
 
-const SuccessModel = ({ handleCloseModal }) => {
-  return (
-    <Modal show={true} onHide={handleCloseModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Thông báo</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>{`Thêm sản phẩm mới thành công`}</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={handleCloseModal}>
-          Đóng
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
+import { useNavigate, useParams } from "react-router-dom";
+import { SuccessModal } from "../../../components/common/success-modal";
+import UserContext from "../../../contexts/userContext";
 
 const Supplier = () => {
+  let { id } = useParams();
+
+  const isNewMode = id === "new";
   //form validation
   const [isInvalidName, setInvalidName] = useState(false);
-  const [isInvalidBarcode, setInvalidBarcode] = useState(false);
-  const [isInvalidDescription, setInvalidDescription] = useState(false);
+  const [isInvalidEmail, setInvalidEmail] = useState(false);
+  const [isInvalidPhone, setInvalidPhone] = useState(false);
+  const [isInvalidAddress, setInvalidAddress] = useState(false);
+  const [isInvalidProvince, setInvalidProvince] = useState(false);
+  const [isInvalidDistrict, setInvalidDistrict] = useState(false);
+  const [isInvalidWard, setInvalidWard] = useState(false);
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   const [images, setImages] = useState([]);
   const maxNumber = 5;
   const [variants, setVariants] = useState([]);
-  const [units, setUnits] = useState([]);
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { isStore } = useContext(UserContext);
+
   useEffect(() => {
-    ProductModel.getUnits().then(({ data: { data: units } }) => {
-      setUnits(units);
-      dispatchProduct({
-        type: "SET_UNIT",
-        payload: units[0].id,
+    ProvinceModel.getAll().then(({ data: { data: provinces } }) => {
+      setProvinces(provinces);
+      dispatchSupplier({
+        type: "SET_PROVINCE",
+        payload: provinces,
       });
     });
+    if (!isNewMode) {
+      //mode edit => fetch sản phẩm về
+      setIsLoading(true);
+      SupplierModel.get(id)
+        .then((res) => {
+          const supplier = res?.data?.data;
+
+          if (supplier) {
+            if (supplier.address?.mtProvince) {
+              ProvinceModel.getDistricts(
+                supplier.address?.mtProvince?.code
+              ).then(({ data: { data: districts } }) => {
+                setDistricts(districts);
+              });
+            }
+            if (supplier.address?.mtDistrict) {
+              ProvinceModel.getWards(supplier.address?.mtDistrict?.code).then(
+                ({ data: { data: wards } }) => {
+                  setWards(wards);
+                }
+              );
+            }
+
+            dispatchSupplier({
+              type: "SET_SUPPLIER",
+              payload: {
+                id: supplier?.id,
+                name: supplier?.name,
+                phoneNumber: supplier?.phoneNumber,
+                email: supplier?.email,
+                address: {
+                  id: supplier?.address?.id,
+                  detail: supplier?.address?.detail,
+                  provinceId: supplier.address?.mtProvinceId
+                    ? supplier.address?.mtProvinceId + ""
+                    : "",
+                  districtId: supplier.address?.mtDistrictId
+                    ? supplier.address?.mtDistrictId + ""
+                    : "",
+                  wardId: supplier.address?.mtWardId
+                    ? supplier.address?.mtWardId + ""
+                    : "",
+                },
+                personalContactName: supplier?.personalContactName,
+                personalContactEmail: supplier?.personalContactEmail,
+                personalContactPhone: supplier?.personalContactPhone,
+                products: supplier?.products,
+              },
+            });
+          }
+        })
+        .finally(() => setIsLoading(false));
+    }
   }, []);
 
-  const [product, dispatchProduct] = useReducer(
+  const [supplier, dispatchSupplier] = useReducer(
     (state, action) => {
       console.log(action);
       switch (action.type) {
@@ -62,50 +113,79 @@ const Supplier = () => {
             ...state,
             name: action.payload,
           };
-        case "SET_STATUS":
+        case "SET_EMAIL":
           return {
             ...state,
-            status: action.payload,
+            email: action.payload,
           };
-        case "SET_CODE":
+        case "SET_PHONE_NUMBER":
           return {
             ...state,
-            code: action.payload,
+            phoneNumber: action.payload,
           };
-        case "SET_BARCODE":
+        case "SET_ADDRESS":
           return {
             ...state,
-            barcode: action.payload,
+            address: {
+              ...state.address,
+              detail: action.payload,
+            },
           };
-        case "SET_DESCRIPTION":
+        case "SET_PROVINCE":
           return {
             ...state,
-            description: action.payload,
-          };
-
-        case "SET_PHOTOS":
-          return {
-            ...state,
-            photoList: action.payload,
-          };
-
-        case "SET_PRICES":
-          return {
-            ...state,
-            priceList: action.payload,
+            address: {
+              ...state.address,
+              provinceId: action.payload,
+            },
           };
 
-        case "SET_CATEGORY":
+        case "SET_DISTRICT":
           return {
             ...state,
-            categoryId: action.payload,
+            address: {
+              ...state.address,
+              districtId: action.payload,
+            },
+          };
+        case "SET_WARD":
+          return {
+            ...state,
+            address: {
+              ...state.address,
+              wardId: action.payload,
+            },
+          };
+        case "SET_PERSONAL_CONTACT_NAME":
+          return {
+            ...state,
+            personalContactName: action.payload,
           };
 
-        case "SET_UNIT":
+        case "SET_PERSONAL_CONTACT_EMAIL":
           return {
             ...state,
-            unitId: action.payload,
+            personalContactEmail: action.payload,
           };
+
+        case "SET_PERSONAL_CONTACT_PHONE":
+          return {
+            ...state,
+            personalContactPhone: action.payload,
+          };
+        case "SET_SUPPLIER":
+          return action.payload;
+        // case "SET_FAX":
+        //   return {
+        //     ...state,
+        //     fax: action.payload,
+        //   };
+
+        // case "SET_CREATOR":
+        //   return {
+        //     ...state,
+        //     creator: action.payload,
+        //   };
 
         default:
           return state;
@@ -113,35 +193,66 @@ const Supplier = () => {
     },
     {
       name: "",
-      status: "SALE",
-      code: "",
-      barcode: "",
-      description: "",
-      photoList: [],
-      priceList: [
-        {
-          price: "",
-          quantity: "",
-          sku: "",
-        },
-      ],
-      //Thời Trang Nữ | Quần nữ | Quần jean nữ
-      categoryId: 6268,
-      unitId: 0,
+      phoneNumber: "",
+      email: "",
+      address: {
+        id: "",
+        detail: "",
+        provinceId: "",
+        districtId: "",
+        wardId: "",
+      },
+      personalContactName: "",
+      personalContactEmail: "",
+      personalContactPhone: "",
     }
   );
 
   const {
     name,
-    status,
-    code,
-    barcode,
-    description,
-    photoList,
-    priceList,
-    categoryId,
-    unitId,
-  } = product;
+    phoneNumber,
+    email,
+    address: { detail = "", provinceId = "", districtId = "", wardId = "" },
+    personalContactName,
+    personalContactEmail,
+    personalContactPhone,
+    products,
+  } = supplier;
+  console.log(supplier);
+  useEffect(() => {
+    if (!provinceId) {
+      return;
+    }
+
+    const provinceCode = provinces?.find(({ id }) => id == provinceId)?.code;
+    // console.log("pppp", provinces, provinceId, provinceCode);
+
+    if (!provinceCode) {
+      return;
+    }
+
+    ProvinceModel.getDistricts(provinceCode).then(
+      ({ data: { data: districts } }) => {
+        setDistricts(districts);
+      }
+    );
+  }, [provinceId]);
+
+  useEffect(() => {
+    if (!districtId) {
+      return;
+    }
+
+    const districtCode = districts?.find(({ id }) => id == districtId)?.code;
+
+    if (!districtCode) {
+      return;
+    }
+
+    ProvinceModel.getWards(districtCode).then(({ data: { data: wards } }) => {
+      setWards(wards);
+    });
+  }, [districtId]);
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
@@ -150,7 +261,7 @@ const Supplier = () => {
   };
 
   const validateName = () => {
-    if (!name || name.trim().length < 10) {
+    if (!name || name.trim().length < 0) {
       setInvalidName(true);
       return false;
     } else {
@@ -158,32 +269,67 @@ const Supplier = () => {
       return true;
     }
   };
-  const validateBarcode = () => {
-    if (!barcode || barcode.trim().length <= 0) {
-      setInvalidBarcode(true);
+  const validateEmail = () => {
+    if (!email || email.trim().length <= 0) {
+      setInvalidEmail(true);
       return false;
     } else {
-      setInvalidBarcode(false);
+      setInvalidEmail(false);
+      return true;
+    }
+  };
+  const validatePhone = () => {
+    if (!phoneNumber || phoneNumber.trim().length <= 0) {
+      setInvalidPhone(true);
+      return false;
+    } else {
+      setInvalidPhone(false);
       return true;
     }
   };
 
-  const validateDescription = () => {
-    if (!description || description.trim().length <= 100) {
-      setInvalidDescription(true);
+  const validateAddress = () => {
+    if (!detail || detail.trim().length <= 0) {
+      setInvalidAddress(true);
       return false;
     } else {
-      setInvalidDescription(false);
+      setInvalidAddress(false);
       return true;
     }
   };
-
+  const validateProvince = () => {
+    if (!provinceId) {
+      setInvalidProvince(true);
+      return false;
+    } else {
+      setInvalidProvince(false);
+      return true;
+    }
+  };
+  const validateDistrict = () => {
+    if (!districtId) {
+      setInvalidDistrict(true);
+      return false;
+    } else {
+      setInvalidDistrict(false);
+      return true;
+    }
+  };
+  const validateWard = () => {
+    if (!wardId) {
+      setInvalidWard(true);
+      return false;
+    } else {
+      setInvalidWard(false);
+      return true;
+    }
+  };
   return (
     <>
       {modal}
       <div className="product">
         <Row>
-          <Col sm="12" lg="8">
+          <Col sm="12" lg="12">
             <Card>
               <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
@@ -195,16 +341,17 @@ const Supplier = () => {
                   <Col>
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
-                        Tên khách hàng
+                        Tên nhà cung cấp
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
                         type="text"
                         value={name}
                         isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
+                          dispatchSupplier({
                             type: "SET_NAME",
                             payload: e.target.value,
                           })
@@ -215,7 +362,7 @@ const Supplier = () => {
                         type={"invalid"}
                         className="invalid"
                       >
-                        Vui lòng nhập ít nhất 10 ký tự.
+                        Vui lòng nhập tên nhà cung cấp
                       </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
@@ -228,15 +375,18 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
+                        disabled={!isStore}
+                        isInvalid={isInvalidPhone}
                         type="text"
-                        value={code}
+                        value={phoneNumber}
                         id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_CODE",
+                          dispatchSupplier({
+                            type: "SET_PHONE_NUMBER",
                             payload: e.target.value,
                           })
                         }
+                        onBlur={() => validatePhone()}
                       />
                       <Form.Control.Feedback
                         type={"invalid"}
@@ -253,17 +403,18 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Control
-                        isInvalid={isInvalidBarcode}
+                        disabled={!isStore}
+                        isInvalid={isInvalidEmail}
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_BARCODE",
+                          dispatchSupplier({
+                            type: "SET_EMAIL",
                             payload: e.target.value,
                           })
                         }
-                        value={barcode}
+                        value={email}
                         type="text"
                         id="validationDefault01"
-                        onBlur={() => validateBarcode()}
+                        onBlur={() => validateEmail()}
                       />
                       <Form.Control.Feedback
                         type={"invalid"}
@@ -280,28 +431,48 @@ const Supplier = () => {
                     <Form.Group className="form-group">
                       <Form.Label htmlFor="validationDefault02">
                         Tỉnh/TP
+                        <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
-                        value={unitId}
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                        disabled={!isStore}
+                        value={provinceId}
+                        onChange={(e) => {
+                          dispatchSupplier({
+                            type: "SET_PROVINCE",
                             payload: e.target.value,
-                          })
-                        }
+                          });
+                          dispatchSupplier({
+                            type: "SET_WARD",
+                            payload: "",
+                          });
+
+                          dispatchSupplier({
+                            type: "SET_DISTRICT",
+                            payload: "",
+                          });
+                        }}
                         id="validationDefault04"
                         required
                       >
-                        {units.map(({ id, name }) => {
+                        <option value={""}>Chọn tỉnh</option>
+                        {provinces.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
-                        <Form.Control.Feedback
+                        {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn tỉnh/TP.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidProvince ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn Tỉnh/TP
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                   <Col md="4">
@@ -311,26 +482,40 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
-                        value={unitId}
-                        onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                        disabled={!isStore}
+                        value={districtId}
+                        onChange={(e) => {
+                          dispatchSupplier({
+                            type: "SET_DISTRICT",
                             payload: e.target.value,
-                          })
-                        }
+                          });
+                          dispatchSupplier({
+                            type: "SET_WARD",
+                            payload: "",
+                          });
+                        }}
                         id="validationDefault04"
                         required
                       >
-                        {units.map(({ id, name }) => {
+                        <option value={""}>Chọn Quận/huyện</option>
+                        {districts.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
-                        <Form.Control.Feedback
+                        {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn Quận/huyện.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidDistrict ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn Quận/huyện
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                   <Col md="4">
@@ -340,26 +525,37 @@ const Supplier = () => {
                         <span className="text-danger"> {" *"}</span>
                       </Form.Label>
                       <Form.Select
-                        value={unitId}
+                        disabled={!isStore}
+                        value={wardId}
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                          dispatchSupplier({
+                            type: "SET_WARD",
                             payload: e.target.value,
                           })
                         }
                         id="validationDefault04"
                         required
                       >
-                        {units.map(({ id, name }) => {
+                        <option value={""}>Chọn xã</option>
+                        {wards.map(({ id, name, code }) => {
                           return <option value={id}>{name}</option>;
                         })}
-                        <Form.Control.Feedback
+
+                        {/* <Form.Control.Feedback
                           type={"invalid"}
                           className="invalid"
                         >
                           Vui lòng chọn phường/xã.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback> */}
                       </Form.Select>
+                      {isInvalidWard ? (
+                        <p
+                          style={{ display: "block" }}
+                          className="invalid-feedback"
+                        >
+                          Vui lòng chọn Phường/Xã
+                        </p>
+                      ) : null}
                     </Form.Group>
                   </Col>
                 </Row>
@@ -369,17 +565,18 @@ const Supplier = () => {
                     <span className="text-danger"> {" *"}</span>
                   </Form.Label>
                   <Form.Control
-                    isInvalid={isInvalidBarcode}
+                    disabled={!isStore}
+                    isInvalid={isInvalidAddress}
                     onChange={(e) =>
-                      dispatchProduct({
-                        type: "SET_BARCODE",
+                      dispatchSupplier({
+                        type: "SET_ADDRESS",
                         payload: e.target.value,
                       })
                     }
-                    value={barcode}
+                    value={detail}
                     type="text"
                     id="validationDefault01"
-                    onBlur={() => validateBarcode()}
+                    onBlur={() => validateAddress()}
                   />
                   <Form.Control.Feedback type={"invalid"} className="invalid">
                     Vui lòng nhập địa chỉ cụ thể.
@@ -398,40 +595,69 @@ const Supplier = () => {
                   <Col md="6">
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
-                        Ngày sinh
+                        Người đại diện
                       </Form.Label>
                       <Form.Control
-                        type="date"
-                        id="exampleInputdate"
-                        defaultValue="2019-12-18"
+                        disabled={!isStore}
+                        type="text"
+                        value={personalContactName}
+                        // isInvalid={isInvalidName}
+                        id="validationDefault01"
+                        onChange={(e) =>
+                          dispatchSupplier({
+                            type: "SET_PERSONAL_CONTACT_NAME",
+                            payload: e.target.value,
+                          })
+                        }
+                        // onBlur={() => validateName()}
                       />
                     </Form.Group>
                   </Col>
                   <Col md="6">
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
-                        Giới tính
-                        <span className="text-danger"> {" *"}</span>
+                        Số điện thoại
                       </Form.Label>
-                      <Form.Select
-                        value={unitId}
+                      <Form.Control
+                        disabled={!isStore}
+                        type="text"
+                        value={personalContactPhone}
+                        // isInvalid={isInvalidName}
+                        id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
-                            type: "SET_UNIT",
+                          dispatchSupplier({
+                            type: "SET_PERSONAL_CONTACT_PHONE",
                             payload: e.target.value,
                           })
                         }
-                        id="validationDefault04"
-                      >
-                        {units.map(({ id, name }) => {
-                          return <option value={id}>{name}</option>;
-                        })}
-                      </Form.Select>
+                        // onBlur={() => validateName()}
+                      />
                     </Form.Group>
                   </Col>
                 </Row>
                 <Row>
                   <Col md="6">
+                    <Form.Group className="form-group">
+                      <Form.Label md="6" htmlFor="validationDefault01">
+                        Email
+                      </Form.Label>
+                      <Form.Control
+                        disabled={!isStore}
+                        type="text"
+                        value={personalContactEmail}
+                        // isInvalid={isInvalidName}
+                        id="validationDefault01"
+                        onChange={(e) =>
+                          dispatchSupplier({
+                            type: "SET_PERSONAL_CONTACT_EMAIL",
+                            payload: e.target.value,
+                          })
+                        }
+                        // onBlur={() => validateName()}
+                      />
+                    </Form.Group>
+                  </Col>
+                  {/* <Col md="6">
                     <Form.Group className="form-group">
                       <Form.Label md="6" htmlFor="validationDefault01">
                         Số fax
@@ -442,7 +668,7 @@ const Supplier = () => {
                         isInvalid={isInvalidName}
                         id="validationDefault01"
                         onChange={(e) =>
-                          dispatchProduct({
+                          dispatchSupplier({
                             type: "SET_NAME",
                             payload: e.target.value,
                           })
@@ -450,133 +676,168 @@ const Supplier = () => {
                         onBlur={() => validateName()}
                       />
                     </Form.Group>
-                  </Col>
+                  </Col> */}
                 </Row>
               </Card.Body>
             </Card>
-          </Col>
-          <Col sm="12" lg="4">
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h5 className="card-title"> Thông tin khác</h5>
-                </div>
-              </Card.Header>
-              <Card.Body>
-                <Form.Group className="form-group">
-                  <Form.Label md="6" htmlFor="validationDefault01">
-                    Nhân viên tạo
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={name}
-                    isInvalid={isInvalidName}
-                    id="validationDefault01"
-                    onChange={(e) =>
-                      dispatchProduct({
-                        type: "SET_NAME",
-                        payload: e.target.value,
-                      })
-                    }
-                    onBlur={() => validateName()}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3 form-group">
-                  <Form.Label htmlFor="exampleFormControlTextarea1">
-                    Mô tả
-                  </Form.Label>
-                  <Form.Control
-                    isInvalid={isInvalidDescription}
-                    onChange={(e) => {
-                      dispatchProduct({
-                        type: "SET_DESCRIPTION",
-                        payload: e.target.value,
-                      });
-                    }}
-                    value={description}
-                    as="textarea"
-                    id="exampleFormControlTextarea1"
-                    rows="5"
-                    onBlur={() => validateDescription()}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3 form-group">
-                  <Form.Label htmlFor="exampleFormControlTextarea1">
-                    Ghi chú
-                  </Form.Label>
-                  <Form.Control
-                    isInvalid={isInvalidDescription}
-                    onChange={(e) => {
-                      dispatchProduct({
-                        type: "SET_DESCRIPTION",
-                        payload: e.target.value,
-                      });
-                    }}
-                    value={description}
-                    as="textarea"
-                    id="exampleFormControlTextarea1"
-                    rows="5"
-                    onBlur={() => validateDescription()}
-                  />
-                </Form.Group>
-              </Card.Body>
-            </Card>
+            {!isNewMode ? (
+              <Card>
+                <Card.Header className="d-flex justify-content-between">
+                  <div className="header-title">
+                    <h5 className="card-title">Danh sách sản phẩm</h5>
+                  </div>
+                </Card.Header>
+                <Card.Body>
+                  <Table
+                    responsive
+                    striped
+                    id="datatable"
+                    className=""
+                    data-toggle="data-table"
+                  >
+                    <thead>
+                      <tr>
+                        {/* <th>Ảnh</th> */}
+                        <th>Tên sản phẩm</th>
+                        <th>Mã sản phẩm</th>
+                        <th>Mã vạch(Barcode)</th>
+
+                        <th>Loại sản phẩm</th>
+
+                        <th>Đơn vị</th>
+                        {/* <th>Tồn kho</th> */}
+                        {/* <th>Ngày tạo</th> */}
+                        {/* <th>Trạng thái</th> */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products?.map((item) => {
+                        // const item = orderItem.product;
+                        // const listPrices =
+                        //   item.productPrices?.map((price) =>
+                        //     parseInt(price.exportPrice)
+                        //   ) ?? [];
+
+                        // const minPrice = Math.min(...listPrices);
+                        // const maxPrice = Math.max(...listPrices);
+
+                        return (
+                          <tr key={item.id}>
+                            <td
+                              onClick={() => {
+                                navigate(
+                                  "/dashboard/product-management/product-list/product/" +
+                                    item.id
+                                );
+                              }}
+                              style={{
+                                cursor: "pointer",
+                              }}
+                            >
+                              {item.productPhotos
+                                ?.slice(0, 1)
+                                .map((productPhoto) => {
+                                  return (
+                                    <img
+                                      style={{
+                                        width: "80px",
+                                      }}
+                                      src={productPhoto.url}
+                                    ></img>
+                                  );
+                                })}
+                              <a>{item.name}</a>
+                            </td>
+                            <td>{item.code}</td>
+                            <td>{item.barcode}</td>
+                            <td>{item.category?.name}</td>
+                            <td>{item.unit.name}</td>
+                            {/* <td
+                  dangerouslySetInnerHTML={{ __html: item.description }}
+                ></td> */}
+                            {/* <td>
+                            
+                            {minPrice && maxPrice ? (
+                              minPrice === maxPrice ? (
+                                <span>{maxPrice}</span>
+                              ) : (
+                                <span>
+                                  {minPrice} - {maxPrice}
+                                </span>
+                              )
+                            ) : null}
+                          </td> */}
+                            {/* <td>{item.stock}</td> */}
+                            {/* <td>{item.status}</td> */}
+                            {/* <td>
+                  <span className={`badge ${item.color}`}>{item.status}</span>
+                </td> */}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </Table>
+                </Card.Body>
+              </Card>
+            ) : (
+              ""
+            )}
           </Col>
         </Row>
-        <div>
-          <Button
-            onClick={() => {
-              const isValidName = validateName();
-              const isValidBarcode = validateBarcode();
-              const isValidDescription = validateDescription();
+        {isStore ? (
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => {
+                const isValidName = validateName();
+                const isValidEmail = validateEmail();
+                const isValidPhone = validatePhone();
+                const isValidAddress = validateAddress();
+                const isValidProvince = validateProvince();
+                const isValidDistrict = validateDistrict();
+                const isValidWard = validateWard();
+                if (
+                  !isValidName ||
+                  !isValidEmail ||
+                  !isValidAddress ||
+                  !isValidPhone ||
+                  !isValidProvince ||
+                  !isValidDistrict ||
+                  !isValidWard
+                ) {
+                  return;
+                }
+                const _supplier = { ...supplier, products: undefined };
+                const promise = isNewMode
+                  ? SupplierModel.addSupplier(_supplier)
+                  : SupplierModel.updateSupplier(_supplier);
 
-              if (!isValidName || !isValidBarcode || !isValidDescription) {
-                return;
-              }
-
-              const _product = {
-                ...product,
-                priceList: product.priceList
-                  .filter((price) => {
-                    return price.price;
+                promise
+                  .then(() => {
+                    setModal(
+                      <SuccessModal
+                        handleCloseModal={() => {
+                          setModal(null);
+                          navigate("/dashboard/supplier-list");
+                        }}
+                        message={
+                          isNewMode
+                            ? "Thêm mới nhà cung cấp thành công"
+                            : "Chỉnh sửa nhà cung cấp thành công"
+                        }
+                      ></SuccessModal>
+                    );
                   })
-                  .map((price) => {
-                    const _price = {
-                      exportPrice: parseInt(price.price),
-                      quantity: parseInt(price.quantity),
-                    };
-
-                    if (price[variants[0]?.name] !== undefined) {
-                      _price.variantName = variants[0].name;
-                      _price.variantValue = price[variants[0].name];
-                    }
-                    if (price[variants[1]?.name] !== undefined) {
-                      _price.variantName2 = variants[1].name;
-                      _price.variantValue2 = price[variants[1].name];
-                    }
-                    return _price;
-                  }),
-              };
-
-              ProductModel.addProduct(_product)
-                .then(() => {
-                  setModal(
-                    <SuccessModel
-                      handleCloseModal={() => {
-                        setModal(null);
-                        navigate("/dashboard/product-management/product-list");
-                      }}
-                    ></SuccessModel>
-                  );
-                })
-                .catch((e) => console.log(e));
-            }}
-            variant="btn btn-primary"
-            type="submit"
-          >
-            Submit form
-          </Button>
-        </div>
+                  .catch((e) => console.log(e));
+              }}
+              variant="btn btn-primary"
+              type="submit"
+            >
+              Lưu thông tin
+            </Button>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

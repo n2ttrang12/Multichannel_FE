@@ -48,8 +48,8 @@ import CustomerList from "../views/dashboard/customer-management/customer-list";
 import Inventory from "../views/dashboard/warehouse/inventory";
 import Inventoryreceiving from "../views/dashboard/warehouse/inventory-receiving";
 import ImportGoods from "../views/dashboard/warehouse/import-goods";
-import Shipping from "../views/dashboard/warehouse/ shipping";
-import InventoryCheck from "../views/dashboard/warehouse/inventory-check";
+import Shipping from "../views/dashboard/warehouse/ warehouse";
+import InventoryCheck from "../views/dashboard/warehouse/import-goods-details";
 import ProductDestruction from "../views/dashboard/warehouse/product-destruction";
 import ProductReturn from "../views/dashboard/warehouse/product-return";
 import Receipt from "../views/dashboard/debt-management/receipt";
@@ -63,6 +63,15 @@ import Product from "../views/dashboard/product-management/product";
 import Customer from "../views/dashboard/customer-management/customer";
 import SupplierList from "../views/dashboard/supplier-management/supplier-list";
 import Supplier from "../views/dashboard/supplier-management/supplier";
+import OrderDetail from "../views/dashboard/order-management/order-detail";
+import CustomerDetail from "../views/dashboard/customer-management/customer-detail";
+import VoucherList from "../views/dashboard/voucher-management/voucher-list";
+import Warehouse from "../views/dashboard/warehouse/ warehouse";
+import HistoryImportPerProduct from "../views/dashboard/warehouse/history-import-per-product";
+import ImportGoodsDetails from "../views/dashboard/warehouse/import-goods-details";
+import UnitList from "../views/dashboard/unit-management/unit-list";
+import OrderOffline from "../views/dashboard/order-management/order-offline";
+import { AdminComponent } from "../components/common/admin-component";
 
 export const DefaultRouter = [
   {
@@ -82,6 +91,14 @@ export const DefaultRouter = [
         path: "/dashboard/order-management/bills",
         element: <Bill />,
       },
+      {
+        path: "/dashboard/order-management/list/order-detail/:id",
+        element: <OrderDetail />,
+      },
+      {
+        path: "/dashboard/order-management/list/order-offline/:id",
+        element: <OrderOffline />,
+      },
       // Customer management
       {
         path: "/dashboard/customer-list",
@@ -91,43 +108,49 @@ export const DefaultRouter = [
         path: "/dashboard/customer-list/customer",
         element: <Customer />,
       },
+      {
+        path: "/dashboard/customer-list/customer-detail/:id",
+        element: <CustomerDetail />,
+      },
       //NCC
       {
         path: "/dashboard/supplier-list",
         element: <SupplierList />,
       },
       {
-        path: "/dashboard/supplier-list",
+        path: "/dashboard/supplier/:id",
         element: <Supplier />,
       },
       // Warehouse
       {
-        path: "/dashboard/warehouse/inventory",
-        element: <Inventory />,
+        path: "/dashboard/warehouse/list-products",
+        element: <Warehouse />,
       },
       {
-        path: "/dashboard/warehouse/inventory-receiving",
-        element: <Inventoryreceiving />,
+        path: "/dashboard/warehouse/list-products/details/:id",
+        element: <HistoryImportPerProduct />,
       },
       {
-        path: "/dashboard/dashboard/warehouse/import-goods",
+        path: "/dashboard/warehouse/import-goods",
         element: <ImportGoods />,
       },
       {
-        path: "/dashboard/dashboard/warehouse/shipping",
-        element: <Shipping />,
+        path: "/dashboard/warehouse/import-goods/:id",
+        element: <ImportGoodsDetails />,
       },
+      // Voucher
       {
-        path: "/dashboard/warehouse/inventory-check",
-        element: <InventoryCheck />,
+        path: "/dashboard/voucher-list",
+        element: <VoucherList />,
       },
+      // Unit
       {
-        path: "/dashboard/warehouse/product-destruction",
-        element: <ProductDestruction />,
-      },
-      {
-        path: "/dashboard/warehouse/product-return",
-        element: <ProductReturn />,
+        path: "/dashboard/unit-management",
+        element: (
+          // <AdminComponent>
+          <UnitList />
+          // </AdminComponent>
+        ),
       },
       //Debt management
       {
@@ -151,91 +174,6 @@ export const DefaultRouter = [
         path: "/dashboard/product-management/product-list/product/:id",
         element: <Product />,
       },
-      // {
-      //   path: "dashboard/special-pages/pricing",
-      //   element: <Pricing />,
-      // },
-      // {
-      //   path: "dashboard/special-pages/timeline",
-      //   element: <Timeline />,
-      // },
-      // {
-      //   path: "dashboard/special-pages/rtl-support",
-      //   element: <RtlSupport />,
-      // },
-      // {
-      //   path: "dashboard/app/user-profile",
-      //   element: <UserProfile />,
-      // },
-      // {
-      //   path: "dashboard/app/user-add",
-      //   element: <UserAdd />,
-      // },
-      // {
-      //   path: "dashboard/app/user-list",
-      //   element: <UserList />,
-      // },
-      // {
-      //   path: "dashboard/admin/admin",
-      //   element: <Admin />,
-      // },
-      // // Widget
-      // {
-      //   path: "dashboard/widget/widgetbasic",
-      //   element: <Widgetbasic />,
-      // },
-      // {
-      //   path: "dashboard/widget/widgetchart",
-      //   element: <Widgetchart />,
-      // },
-      // {
-      //   path: "dashboard/widget/widgetcard",
-      //   element: <Widgetcard />,
-      // },
-      // // Map
-      // {
-      //   path: "dashboard/map/google",
-      //   element: <Google />,
-      // },
-      // {
-      //   path: "dashboard/map/vector",
-      //   element: <Vector />,
-      // },
-      // // Form
-      // {
-      //   path: "dashboard/form/form-element",
-      //   element: <FormElement />,
-      // },
-      // {
-      //   path: "dashboard/form/form-wizard",
-      //   element: <FormWizard />,
-      // },
-      // {
-      //   path: "dashboard/form/form-validation",
-      //   element: <FormValidation />,
-      // },
-      // // Table
-      // {
-      //   path: "dashboard/table/bootstrap-table",
-      //   element: <BootstrapTable />,
-      // },
-      // {
-      //   path: "dashboard/table/table-data",
-      //   element: <TableData />,
-      // },
-      // // Icon
-      // {
-      //   path: "dashboard/icon/solid",
-      //   element: <Solid />,
-      // },
-      // {
-      //   path: "dashboard/icon/outline",
-      //   element: <Outline />,
-      // },
-      // {
-      //   path: "dashboard/icon/dual-tone",
-      //   element: <DualTone />,
-      // },
     ],
   },
   {
