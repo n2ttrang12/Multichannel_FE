@@ -72,6 +72,9 @@ import ImportGoodsDetails from "../views/dashboard/warehouse/import-goods-detail
 import UnitList from "../views/dashboard/unit-management/unit-list";
 import OrderOffline from "../views/dashboard/order-management/order-offline";
 import { AdminComponent } from "../components/common/admin-component";
+import StoreList from "../views/dashboard/store-management/store-list";
+import StoreDetail from "../views/dashboard/store-management/store-list";
+import MyStore from "../views/dashboard/store-management/my-store";
 
 export const DefaultRouter = [
   {
@@ -120,6 +123,19 @@ export const DefaultRouter = [
       {
         path: "/dashboard/supplier/:id",
         element: <Supplier />,
+      },
+      //cửa hàng
+      {
+        path: "/dashboard/story-list",
+        element: <StoreList />,
+      },
+      {
+        path: "/dashboard/store/:id",
+        element: <StoreDetail />,
+      },
+      {
+        path: "/dashboard/my-store",
+        element: <MyStore />,
       },
       // Warehouse
       {
