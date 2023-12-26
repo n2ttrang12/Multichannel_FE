@@ -34,7 +34,10 @@ const SignIn = () => {
     };
     console.log("qqqqqqqqqqqqqqqqqqq");
     axios
-      .post("http://139.59.239.1:8001/api/v1/multi-chanel/app-user/login", data)
+      .post(
+        "https://mb-api-social-service.mangoads.com.vn/api/v1/multi-chanel/app-user/login",
+        data
+      )
       .then((response) => {
         console.log(response.data);
         if (response.data.statusCode == 200) {

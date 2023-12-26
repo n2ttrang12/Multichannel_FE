@@ -31,7 +31,7 @@ const SignUp = () => {
 
     axios
       .post(
-        "http://139.59.239.1:8001//api/v1/multi-chanel/app-user/register",
+        "https://mb-api-social-service.mangoads.com.vn/api/v1/multi-chanel/app-user/register",
         data
       )
       .then((response) => {
