@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://139.59.239.1:8001/api/v1/multi-chanel/",
+  baseURL: "https://mb-api-social-service.mangoads.com.vn/api/v1/multi-chanel/",
   headers: {
     "Content-Type": "application/json",
   },
