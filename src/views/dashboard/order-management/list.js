@@ -46,6 +46,11 @@ const List = () => {
             ...state,
             status: action.payload,
           };
+        case "SET_STATUS_PAYMENT":
+          return {
+            ...state,
+            statusPayment: action.payload,
+          };
         case "SET_TYPE":
           return {
             ...state,
@@ -64,6 +69,7 @@ const List = () => {
         case "RESET":
           return {
             status: "",
+            statusPayment: "",
             type: "",
             dateFrom: "",
             dateTo: "",
@@ -72,6 +78,7 @@ const List = () => {
     },
     {
       status: "",
+      statusPayment: "",
       type: "",
       dateFrom: "",
       dateTo: "",
@@ -128,7 +135,7 @@ const List = () => {
         </Form.Group>
         <Form.Group className="form-group">
           <Form.Label htmlFor="validationDefault02">
-            Trạng thái
+            Trạng thái đơn hàng
             <span className="text-danger"> {" *"}</span>
           </Form.Label>
           <Form.Select
@@ -151,6 +158,32 @@ const List = () => {
               { status: "COMPLETED", name: "Hoàn thành" },
             ].map(({ status, name }) => {
               return <option value={status}>{name}</option>;
+            })}
+          </Form.Select>
+        </Form.Group>
+        <Form.Group className="form-group">
+          <Form.Label htmlFor="validationDefault02">
+            Trạng thái thanh toán
+            <span className="text-danger"> {" *"}</span>
+          </Form.Label>
+          <Form.Select
+            value={filter.statusPayment}
+            onChange={(e) => {
+              dispatchFilter({
+                type: "SET_STATUS_PAYMENT",
+                payload: e.target.value,
+              });
+            }}
+            id="validationDefault04"
+            required
+          >
+            <option value={""}>Chọn trạng thái</option>
+            {[
+              { statusPayment: "NOT_PAID", name: "Chưa thanh toán" },
+              { statusPayment: "COMPLETED", name: "Đã nhận tiền" },
+              { statusPayment: "PAID", name: "Đã thanh toán" },
+            ].map(({ statusPayment, name }) => {
+              return <option value={statusPayment}>{name}</option>;
             })}
           </Form.Select>
         </Form.Group>

@@ -1,5 +1,15 @@
-import React, { useEffect, memo, Fragment, useState } from "react";
-import { Row, Col, Dropdown, Button } from "react-bootstrap";
+import React, { useEffect, memo, Fragment, useState, useReducer } from "react";
+import {
+  Row,
+  Col,
+  Dropdown,
+  Button,
+  Form,
+  Popover,
+  OverlayTrigger,
+  Table,
+  Card,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 //circular
@@ -39,8 +49,9 @@ import { useSelector } from "react-redux";
 import * as SettingSelector from "../../store/setting/selectors";
 import SubHeader from "../../components/partials/dashboard/HeaderStyle/sub-header.js";
 import { StatisticModel } from "../../models/dashboard.js";
-import { currencyFormatter } from "../../helper.js";
+import { createArrayFrom1ToN, currencyFormatter } from "../../helper.js";
 import { Loading } from "../../components/common/loading.js";
+import DateTimePicker from "react-datetime-picker";
 
 // install Swiper modules
 SwiperCore.use([Navigation]);
@@ -48,16 +59,23 @@ SwiperCore.use([Navigation]);
 const Index = memo((props) => {
   useSelector(SettingSelector.theme_color);
   const [response, setResponse] = useState({});
+
   const [total, setTotal] = useState({});
   const [totalOrderChart, setTotalOrderChart] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCircleChart, setIsLoadingCircleChart] = useState(false);
   const [isLoadingChart, setIsLoadingChart] = useState(false);
   const { data: revenue, pagination } = response;
+  console.log(pagination);
+  const totalCount = pagination?.total ?? 0;
   const [page, setPage] = useState(1);
   const [year, setYear] = useState("2023");
-  const [perPage, setPerpage] = useState(10);
-  const totalPage = Math.ceil(total / perPage); // dư 1 sp vân là 1 page
+  const [month, setMonth] = useState();
+  const [perPage, setPerpage] = useState(5);
+  const totalPage = Math.ceil(totalCount / perPage); // dư 1 sp vân là 1 page
   const [chartData, setChartData] = useState(null);
+  const [chartDataCircleStatus, setChartDataCircleStatus] = useState(null);
+  const [chartDataCircleType, setChartDataCircleType] = useState(null);
   useEffect(() => {
     setIsLoading(true);
     StatisticModel.getTotal()
@@ -66,35 +84,104 @@ const Index = memo((props) => {
       })
       .finally(() => setIsLoading(false));
   }, []);
+  const [filter, dispatchFilter] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case "SET_FROM_DATE":
+          return {
+            ...state,
+            dateFrom: action.payload,
+          };
+        case "SET_TO_DATE":
+          return {
+            ...state,
+            dateTo: action.payload,
+          };
+        case "RESET":
+          return {
+            dateFrom: "",
+            dateTo: "",
+          };
+      }
+    },
+    {
+      dateFrom: "",
+      dateTo: "",
+    }
+  );
+  const [revenueFilter, dispatchRevenueFilter] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case "SET_STATUS":
+          return {
+            ...state,
+            status: action.payload,
+          };
+        case "SET_STATUS_PAYMENT":
+          return {
+            ...state,
+            statusPayment: action.payload,
+          };
+        case "SET_TYPE":
+          return {
+            ...state,
+            type: action.payload,
+          };
+        case "SET_FROM_DATE":
+          return {
+            ...state,
+            dateFrom: action.payload,
+          };
+        case "SET_TO_DATE":
+          return {
+            ...state,
+            dateTo: action.payload,
+          };
+        case "RESET":
+          return {
+            status: "",
+            statusPayment: "",
+            type: "",
+            dateFrom: "",
+            dateTo: "",
+          };
+      }
+    },
+    {
+      status: "",
+      statusPayment: "",
+      type: "",
+      dateFrom: "",
+      dateTo: "",
+    }
+  );
+
   const fetchList = (page, perPage, search = undefined) => {
-    // lấy từ API
-    // console.log("aaaa", customer);
     setIsLoading(true);
     StatisticModel.getRevenue({
       page, // Offset
-      perPage, // limit,
-      search,
+      perPage,
+      revenueFilter,
     })
       .then(({ data }) => {
         if (!data) {
           return;
         }
-        setResponse(data); // set data cho state respone
+        setResponse(data);
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+
   const [searchText, setSearchText] = useState("");
   useEffect(() => {
-    //chạy khi page change khi set page/ text change/ filter
     fetchList(page, perPage, searchText);
   }, [page]);
   useEffect(() => {
-    //chạy khi page change khi set page/ text change/ filter
     setPage(1);
     fetchList(1, perPage, searchText);
-  }, [searchText]);
+  }, [revenueFilter]);
 
   useEffect(() => {
     setIsLoadingChart(true);
@@ -201,6 +288,88 @@ const Index = memo((props) => {
         setIsLoadingChart(false);
       });
   }, [year]);
+
+  useEffect(() => {
+    setIsLoadingCircleChart(true);
+    StatisticModel.getByFilter(filter)
+      .then(({ data: { data } }) => {
+        const colors = [
+          variableColors.primary,
+          variableColors.info,
+          variableColors.danger,
+        ];
+        const templateDataStatus = {
+          options: {
+            colors: colors,
+            plotOptions: {
+              radialBar: {
+                hollow: {
+                  margin: 10,
+                  size: "50%",
+                },
+                track: {
+                  margin: 10,
+                  strokeWidth: "50%",
+                },
+                dataLabels: {
+                  name: {
+                    show: true,
+                  },
+
+                  total: {
+                    formatter: function () {
+                      return data.totalOrder;
+                    },
+                    show: true,
+                    label: "Tổng đơn",
+                  },
+                },
+              },
+            },
+            labels: ["Thành công", "Thất bại"],
+          },
+          series: [
+            parseInt((data.totalSuccess / data.totalOrder) * 100),
+            parseInt((data.totalCancel / data.totalOrder) * 100),
+          ],
+          seriesData: [data.totalSuccess, data.totalCancel],
+        };
+        const templateDataType = {
+          options: {
+            colors: colors,
+            plotOptions: {
+              radialBar: {
+                hollow: {
+                  margin: 10,
+                  size: "50%",
+                },
+                track: {
+                  margin: 10,
+                  strokeWidth: "50%",
+                },
+                dataLabels: {
+                  show: false,
+                },
+              },
+            },
+            labels: ["Sendo", "Website", , "Cửa hàng"],
+          },
+          series: [
+            (data.totalSendo / data.totalOrder) * 100,
+            (data.totalWeb / data.totalOrder) * 100,
+            (data.totalOff / data.totalOrder) * 100,
+          ],
+          seriesData: [data.totalSendo, data.totalWeb, data.totalOff],
+        };
+        setChartDataCircleStatus(templateDataStatus);
+        setChartDataCircleType(templateDataType);
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoadingCircleChart(false);
+      });
+  }, [filter]);
+
   const getVariableColor = () => {
     let prefix =
       getComputedStyle(document.body).getPropertyValue("--prefix") || "bs-";
@@ -258,87 +427,6 @@ const Index = memo((props) => {
       offset: 10,
     });
   });
-  const chart1 = {
-    options: {
-      chart: {
-        fontFamily:
-          '"Inter", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-        toolbar: {
-          show: false,
-        },
-        sparkline: {
-          enabled: false,
-        },
-      },
-      colors: colors,
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        curve: "smooth",
-        width: 3,
-      },
-      yaxis: {
-        show: true,
-        labels: {
-          show: true,
-          minWidth: 19,
-          maxWidth: 19,
-          style: {
-            colors: "#8A92A6",
-          },
-          offsetX: -5,
-        },
-      },
-      legend: {
-        show: false,
-      },
-      xaxis: {
-        labels: {
-          minHeight: 22,
-          maxHeight: 22,
-          show: true,
-          style: {
-            colors: "#8A92A6",
-          },
-        },
-        lines: {
-          show: false, //or just here to disable only x axis grids
-        },
-        categories: ["Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug"],
-      },
-      grid: {
-        show: false,
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          shade: "dark",
-          type: "vertical",
-          shadeIntensity: 0,
-          gradientToColors: undefined, // optional, if not defined - uses the shades of same color in series
-          inverseColors: true,
-          opacityFrom: 0.4,
-          opacityTo: 0.1,
-          stops: [0, 50, 80],
-          colors: colors,
-        },
-      },
-      tooltip: {
-        enabled: true,
-      },
-    },
-    series: [
-      {
-        name: "total",
-        data: [94, 80, 94, 80, 94, 80, 94],
-      },
-      {
-        name: "pipline",
-        data: [72, 60, 84, 60, 74, 60, 78],
-      },
-    ],
-  };
 
   //chart2
   const chart2 = {
@@ -365,76 +453,121 @@ const Index = memo((props) => {
   };
   const chart3 = {
     options: {
-      chart: {
-        stacked: true,
-        toolbar: {
-          show: false,
-        },
-      },
       colors: colors,
       plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: "28%",
-          endingShape: "rounded",
-          borderRadius: 5,
-        },
-      },
-      legend: {
-        show: false,
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ["transparent"],
-      },
-      xaxis: {
-        categories: ["S", "M", "T", "W", "T", "F", "S", "M", "T", "W"],
-        labels: {
-          minHeight: 20,
-          maxHeight: 20,
-          style: {
-            colors: "#8A92A6",
+        radialBar: {
+          hollow: {
+            margin: 10,
+            size: "50%",
+          },
+          track: {
+            margin: 10,
+            strokeWidth: "50%",
+          },
+          dataLabels: {
+            show: false,
           },
         },
       },
-      yaxis: {
-        title: {
-          text: "",
-        },
-        labels: {
-          minWidth: 19,
-          maxWidth: 19,
-          style: {
-            colors: "#8A92A6",
-          },
-        },
-      },
-      fill: {
-        opacity: 1,
-      },
-      tooltip: {
-        y: {
-          formatter: function (val) {
-            return "$ " + val + " thousands";
-          },
-        },
-      },
+      labels: ["Apples", "Oranges"],
     },
-    series: [
-      {
-        name: "Successful deals",
-        data: [30, 50, 35, 60, 40, 60, 60, 30, 50, 35],
-      },
-      {
-        name: "Failed deals",
-        data: [40, 50, 55, 50, 30, 80, 30, 40, 50, 55],
-      },
-    ],
+    series: [55, 75, 90],
   };
+  const popover = (
+    <Popover width={"500px"} id="popover-basic">
+      <Popover.Header as="h3">Bộ lọc</Popover.Header>
+      <Popover.Body>
+        <Form.Group className="form-group">
+          <Form.Label htmlFor="validationDefault02">
+            Kênh bán hàng
+            <span className="text-danger"> {" *"}</span>
+          </Form.Label>
+          <Form.Select
+            value={revenueFilter.type}
+            onChange={(e) => {
+              dispatchRevenueFilter({
+                type: "SET_TYPE",
+                payload: e.target.value,
+              });
+            }}
+            id="validationDefault04"
+            required
+          >
+            <option value={""}>Chọn kênh bán hàng</option>
+            {["WEBSITE", "SENDO", "OFFLINE"].map((type) => {
+              return <option value={type}>{type}</option>;
+            })}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="form-group">
+          <Form.Label htmlFor="validationDefault02">
+            Trạng thái thanh toán
+            <span className="text-danger"> {" *"}</span>
+          </Form.Label>
+          <Form.Select
+            value={revenueFilter.statusPayment}
+            onChange={(e) => {
+              dispatchRevenueFilter({
+                type: "SET_STATUS_PAYMENT",
+                payload: e.target.value,
+              });
+            }}
+            id="validationDefault04"
+            required
+          >
+            <option value={""}>Chọn trạng thái</option>
+            {[
+              { statusPayment: "COMPLETED", name: "Đã nhận tiền" },
+              { statusPayment: "PAID", name: "Đã thanh toán" },
+            ].map(({ statusPayment, name }) => {
+              return <option value={statusPayment}>{name}</option>;
+            })}
+          </Form.Select>
+        </Form.Group>
+        <Row>
+          <Col md="6">
+            <Form.Group controlId="startDate">
+              <Form.Label>Bắt đầu </Form.Label>
+              <DateTimePicker
+                disableClock
+                format="dd/MM/y"
+                value={revenueFilter?.dateFrom}
+                onChange={(date) => {
+                  dispatchRevenueFilter({
+                    type: "SET_FROM_DATE",
+                    payload: date?.toISOString() ?? "",
+                  });
+                }}
+              />
+            </Form.Group>
+          </Col>
+          <Col md="6">
+            <Form.Group controlId="endDate">
+              <Form.Label>Kết thúc </Form.Label>
+              <DateTimePicker
+                disableClock
+                format="dd/MM/y"
+                value={revenueFilter.dateTo}
+                onChange={(date) => {
+                  dispatchRevenueFilter({
+                    type: "SET_TO_DATE",
+                    payload: date?.toISOString() ?? "",
+                  });
+                }}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Button
+          variant="gray"
+          onClick={() => dispatchRevenueFilter({ type: "RESET" })}
+        >
+          Thiết lập lại
+        </Button>
+      </Popover.Body>
+    </Popover>
+  );
   const {
     totalCancel,
     totalSuccess,
@@ -728,12 +861,12 @@ const Index = memo((props) => {
                 <div className="card" data-aos="fade-up" data-aos-delay="800">
                   <div className="flex-wrap card-header d-flex justify-content-between">
                     <div className="header-title">
-                      <h4 className="card-title">
-                        {isLoadingChart ? <Loading /> : totalOrderChart}
-                      </h4>
-                      <p className="mb-0">Đơn hàng</p>
+                      <h4 className="card-title mb-3">Thống kê theo năm</h4>
+
+                      <h5>{isLoadingChart ? <Loading /> : totalOrderChart} </h5>
+                      <span className="mb-0">Đơn hàng / năm</span>
                     </div>
-                    <div className="d-flex align-items-center align-self-center">
+                    <div className="d-flex align-items-center align-self-center mt-3">
                       <div className="d-flex align-items-center text-primary">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -831,63 +964,299 @@ const Index = memo((props) => {
               </Col>
             </Row>
           </Col>
-          <Col md="12" lg="12">
-            <div
-              className="overflow-hidden card"
-              data-aos="fade-up"
-              data-aos-delay="600"
-            >
+
+          <Col md="12">
+            <div className="card" data-aos="fade-up" data-aos-delay="900">
               <div className="flex-wrap card-header d-flex justify-content-between">
+                <div className="header-title">
+                  <h4 className="card-title">Thống kê theo tháng</h4>
+                </div>
+                <div>
+                  {/* <Form.Group controlId="startDate"> */}
+                  {/* <Form.Label>Bắt đầu </Form.Label> */}
+                  <DateTimePicker
+                    disableClock
+                    format="dd/MM/y"
+                    value={filter.dateFrom}
+                    onChange={(date) => {
+                      dispatchFilter({
+                        type: "SET_FROM_DATE",
+                        payload: date?.toISOString() ?? "",
+                      });
+                    }}
+                  />
+                  {/* </Form.Group> */}
+                  <span> - </span>
+                  {/* <Form.Group controlId="endDate"> */}
+                  {/* <Form.Label>Kết thúc </Form.Label> */}
+                  <DateTimePicker
+                    disableClock
+                    format="dd/MM/y"
+                    value={filter.dateTo}
+                    onChange={(date) => {
+                      dispatchFilter({
+                        type: "SET_TO_DATE",
+                        payload: date?.toISOString() ?? "",
+                      });
+                    }}
+                  />
+                  {/* </Form.Group> */}
+                </div>
+              </div>
+              <Row>
+                <Col md="6">
+                  <div className="card-body">
+                    <div className="flex-wrap d-flex align-items-center justify-content-between">
+                      {isLoadingCircleChart || !chartDataCircleStatus ? (
+                        <Loading />
+                      ) : (
+                        <Chart
+                          className="col-md-8 col-lg-8"
+                          options={chartDataCircleStatus?.options}
+                          series={chartDataCircleStatus?.series}
+                          type="radialBar"
+                          height="250"
+                        />
+                      )}
+
+                      <div className="d-grid gap col-md-4 col-lg-4">
+                        <div className="d-flex align-items-start">
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill="#3a57e8"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="#3a57e8"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">Thành công</span>
+                            <h6>
+                              {isLoadingCircleChart
+                                ? ""
+                                : chartDataCircleStatus?.seriesData[0]}
+                            </h6>
+                          </div>
+                        </div>
+                        <div className="d-flex align-items-start">
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill="#4bc7d2"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="#4bc7d2"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">Thất bại</span>
+                            <h6>
+                              {isLoadingCircleChart
+                                ? ""
+                                : chartDataCircleStatus?.seriesData[1]}
+                            </h6>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+                <Col md="6">
+                  <div className="card-body">
+                    <div className="flex-wrap d-flex align-items-center justify-content-between">
+                      <Chart
+                        className="col-md-8 col-lg-8"
+                        options={chart3.options}
+                        series={chart3.series}
+                        type="radialBar"
+                        height="250"
+                      />
+                      <div className="d-grid gap col-md-4 col-lg-4">
+                        <div className="d-flex align-items-start">
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill="#3a57e8"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="#3a57e8"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">Fashion</span>
+                            <h6>251K</h6>
+                          </div>
+                        </div>
+                        <div className="d-flex align-items-start">
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill="#4bc7d2"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="#4bc7d2"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">Accessories</span>
+                            <h6>176K</h6>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </div>
+          </Col>
+          <Col md="12">
+            <Card>
+              <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
                   <h4 className="mb-2 card-title">Danh thu theo đơn hàng</h4>
                 </div>
-              </div>
-              <div className="p-0 card-body">
-                <div className="mt-4 table-responsive">
-                  <table
-                    id="basic-table"
-                    className="table mb-0 table-striped"
-                    role="grid"
-                  >
-                    <thead>
-                      <tr>
-                        <th>Mã đơn hàng</th>
-                        <th>Thành tiền</th>
-                        <th>Giảm giá</th>
-                        <th>Tổng tiền</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {revenue?.map((item) => {
-                        const { orderItems, voucher } = item;
-                        const subTotal = orderItems
-                          ?.map(
-                            (orderItem) =>
-                              orderItem.quantity *
-                              orderItem.productPrice.exportPrice
-                          )
-                          .reduce((total, price) => total + price, 0);
-                        const discount = voucher
-                          ? voucher?.discount +
-                            (voucher?.percent * subTotal) / 100
-                          : 0;
-                        const total = !discount
-                          ? subTotal
-                          : subTotal - discount;
-                        return (
-                          <tr>
-                            <td>{item.id}</td>
-                            <td>{currencyFormatter.format(subTotal)}</td>
-                            <td>{currencyFormatter.format(discount)}</td>
-                            <td>{currencyFormatter.format(total)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+                <OverlayTrigger
+                  trigger="click"
+                  placement="bottom"
+                  overlay={popover}
+                >
+                  <Button variant="outline-gray">Bộ lọc</Button>
+                </OverlayTrigger>
+              </Card.Header>
+              <Card.Body>
+                {isLoading ? (
+                  <Loading></Loading>
+                ) : (
+                  <div className="border-bottom my-3">
+                    <Table
+                      responsive
+                      striped
+                      id="datatable"
+                      className=""
+                      data-toggle="data-table"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Mã đơn hàng</th>
+                          <th>Thành tiền</th>
+                          <th>Giảm giá</th>
+                          <th>Tổng tiền</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {revenue?.map((item) => {
+                          const { orderItems, voucher } = item;
+                          const subTotal = orderItems
+                            ?.map(
+                              (orderItem) =>
+                                orderItem.quantity *
+                                orderItem.productPrice.exportPrice
+                            )
+                            .reduce((total, price) => total + price, 0);
+                          const discount = voucher
+                            ? voucher?.discount +
+                              (voucher?.percent * subTotal) / 100
+                            : 0;
+                          const total = !discount
+                            ? subTotal
+                            : subTotal - discount;
+                          return (
+                            <tr>
+                              <td>{item.id}</td>
+                              <td>{currencyFormatter.format(subTotal)}</td>
+                              <td>{currencyFormatter.format(discount)}</td>
+                              <td>{currencyFormatter.format(total)}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </Table>
+                    <Row className="align-items-center">
+                      <Col md="6">
+                        <div
+                          className="dataTables_info"
+                          id="datatable_info"
+                          role="status"
+                          aria-live="polite"
+                        >
+                          {totalCount !== 0
+                            ? `Showing ${(page - 1) * perPage + 1} to ${
+                                page * perPage <= totalCount
+                                  ? page * perPage
+                                  : totalCount
+                              } of ${pagination?.total ?? 0} entries`
+                            : null}
+                        </div>
+                      </Col>
+                      <Col md="6" style={{ paddingTop: 16 }}>
+                        <div
+                          className="dataTables_paginate paging_simple_numbers"
+                          id="datatable_paginate"
+                        >
+                          <ul
+                            style={{ justifyContent: "end" }}
+                            className="pagination"
+                          >
+                            {createArrayFrom1ToN(totalPage).map((pageIndex) => {
+                              return (
+                                <li
+                                  className={
+                                    "paginate_button page-item " +
+                                    (page === pageIndex ? "active" : "")
+                                  }
+                                  id={pageIndex}
+                                  onClick={() => setPage(pageIndex)}
+                                >
+                                  <Link
+                                    to="#"
+                                    aria-controls="datatable"
+                                    aria-disabled="true"
+                                    data-dt-idx="previous"
+                                    tabIndex="0"
+                                    className="page-link"
+                                  >
+                                    {pageIndex}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </Col>
+                    </Row>
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
           </Col>
         </Row>
       </div>
