@@ -66,6 +66,7 @@ const Index = memo((props) => {
   const [isLoadingCircleChart, setIsLoadingCircleChart] = useState(false);
   const [isLoadingChart, setIsLoadingChart] = useState(false);
   const { data: revenue, pagination } = response;
+  const { revenue: totalAllOrder } = response;
   console.log(pagination);
   const totalCount = pagination?.total ?? 0;
   const [page, setPage] = useState(1);
@@ -293,11 +294,7 @@ const Index = memo((props) => {
     setIsLoadingCircleChart(true);
     StatisticModel.getByFilter(filter)
       .then(({ data: { data } }) => {
-        const colors = [
-          variableColors.primary,
-          variableColors.info,
-          variableColors.danger,
-        ];
+        const colors = [variableColors.success, variableColors.danger];
         const templateDataStatus = {
           options: {
             colors: colors,
@@ -334,9 +331,14 @@ const Index = memo((props) => {
           ],
           seriesData: [data.totalSuccess, data.totalCancel],
         };
+        const color2 = [
+          variableColors.info,
+          variableColors.primary_light,
+          variableColors.warning,
+        ];
         const templateDataType = {
+          colors: color2,
           options: {
-            colors: colors,
             plotOptions: {
               radialBar: {
                 hollow: {
@@ -348,19 +350,30 @@ const Index = memo((props) => {
                   strokeWidth: "50%",
                 },
                 dataLabels: {
-                  show: false,
+                  name: {
+                    show: true,
+                  },
+
+                  total: {
+                    formatter: function () {
+                      return data.totalOrder;
+                    },
+                    show: true,
+                    label: "Tổng đơn",
+                  },
                 },
               },
             },
-            labels: ["Sendo", "Website", , "Cửa hàng"],
+            labels: ["Sendo", "Website", "Cửa hàng"],
           },
           series: [
-            (data.totalSendo / data.totalOrder) * 100,
-            (data.totalWeb / data.totalOrder) * 100,
-            (data.totalOff / data.totalOrder) * 100,
+            parseInt((data.totalSendo / data.totalOrder) * 100),
+            parseInt((data.totalWeb / data.totalOrder) * 100),
+            parseInt((data.totalOff / data.totalOrder) * 100),
           ],
           seriesData: [data.totalSendo, data.totalWeb, data.totalOff],
         };
+        console.log(templateDataType);
         setChartDataCircleStatus(templateDataStatus);
         setChartDataCircleType(templateDataType);
       })
@@ -369,7 +382,7 @@ const Index = memo((props) => {
         setIsLoadingCircleChart(false);
       });
   }, [filter]);
-
+  console.log(chartDataCircleType);
   const getVariableColor = () => {
     let prefix =
       getComputedStyle(document.body).getPropertyValue("--prefix") || "bs-";
@@ -576,6 +589,7 @@ const Index = memo((props) => {
     totalWeb,
     totalSendo,
   } = total;
+
   return (
     <Fragment>
       <div className="position-relative">
@@ -1026,14 +1040,14 @@ const Index = memo((props) => {
                             xmlns="http://www.w3.org/2000/svg"
                             width="14"
                             viewBox="0 0 24 24"
-                            fill="#3a57e8"
+                            fill={variableColors.success}
                           >
                             <g>
                               <circle
                                 cx="12"
                                 cy="12"
                                 r="8"
-                                fill="#3a57e8"
+                                fill={variableColors.success}
                               ></circle>
                             </g>
                           </svg>
@@ -1052,14 +1066,14 @@ const Index = memo((props) => {
                             xmlns="http://www.w3.org/2000/svg"
                             width="14"
                             viewBox="0 0 24 24"
-                            fill="#4bc7d2"
+                            fill={variableColors.danger}
                           >
                             <g>
                               <circle
                                 cx="12"
                                 cy="12"
                                 r="8"
-                                fill="#4bc7d2"
+                                fill={variableColors.danger}
                               ></circle>
                             </g>
                           </svg>
@@ -1079,13 +1093,17 @@ const Index = memo((props) => {
                 <Col md="6">
                   <div className="card-body">
                     <div className="flex-wrap d-flex align-items-center justify-content-between">
-                      <Chart
-                        className="col-md-8 col-lg-8"
-                        options={chart3.options}
-                        series={chart3.series}
-                        type="radialBar"
-                        height="250"
-                      />
+                      {isLoadingCircleChart || !chartDataCircleType ? (
+                        <Loading />
+                      ) : (
+                        <Chart
+                          className="col-md-8 col-lg-8"
+                          options={chartDataCircleType?.options}
+                          series={chartDataCircleType?.series}
+                          type="radialBar"
+                          height="250"
+                        />
+                      )}
                       <div className="d-grid gap col-md-4 col-lg-4">
                         <div className="d-flex align-items-start">
                           <svg
@@ -1093,20 +1111,20 @@ const Index = memo((props) => {
                             xmlns="http://www.w3.org/2000/svg"
                             width="14"
                             viewBox="0 0 24 24"
-                            fill="#3a57e8"
+                            fill={variableColors.info}
                           >
                             <g>
                               <circle
                                 cx="12"
                                 cy="12"
                                 r="8"
-                                fill="#3a57e8"
+                                fill={variableColors.info}
                               ></circle>
                             </g>
                           </svg>
                           <div className="ms-3">
-                            <span className="text-gray">Fashion</span>
-                            <h6>251K</h6>
+                            <span className="text-gray">Offline</span>
+                            <h6>{chartDataCircleType?.seriesData[2]}</h6>
                           </div>
                         </div>
                         <div className="d-flex align-items-start">
@@ -1115,20 +1133,42 @@ const Index = memo((props) => {
                             xmlns="http://www.w3.org/2000/svg"
                             width="14"
                             viewBox="0 0 24 24"
-                            fill="#4bc7d2"
+                            fill={variableColors.warning}
                           >
                             <g>
                               <circle
                                 cx="12"
                                 cy="12"
                                 r="8"
-                                fill="#4bc7d2"
+                                fill={variableColors.warning}
                               ></circle>
                             </g>
                           </svg>
                           <div className="ms-3">
-                            <span className="text-gray">Accessories</span>
-                            <h6>176K</h6>
+                            <span className="text-gray">Sendo</span>
+                            <h6>{chartDataCircleType?.seriesData[0]}</h6>
+                          </div>
+                        </div>
+                        <div className="d-flex align-items-start">
+                          <svg
+                            className="mt-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            viewBox="0 0 24 24"
+                            fill={variableColors.primary_light}
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill={variableColors.primary_light}
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-3">
+                            <span className="text-gray">Website</span>
+                            <h6>{chartDataCircleType?.seriesData[1]}</h6>
                           </div>
                         </div>
                       </div>
@@ -1157,6 +1197,32 @@ const Index = memo((props) => {
                   <Loading></Loading>
                 ) : (
                   <div className="border-bottom my-3">
+                    <Row
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <Col md="6">
+                        <Row>
+                          <Col
+                            md="6"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <p style={{ fontWeight: "500" }}>Doanh thu </p>
+                          </Col>
+                          <Col>
+                            <p style={{ fontWeight: "700" }}>
+                              {" "}
+                              {": " + currencyFormatter.format(totalAllOrder)}
+                            </p>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
                     <Table
                       responsive
                       striped
@@ -1167,6 +1233,8 @@ const Index = memo((props) => {
                       <thead>
                         <tr>
                           <th>Mã đơn hàng</th>
+                          <th>Kênh</th>
+                          <th>Trạng thái thanh toán</th>
                           <th>Thành tiền</th>
                           <th>Giảm giá</th>
                           <th>Tổng tiền</th>
@@ -1174,27 +1242,42 @@ const Index = memo((props) => {
                       </thead>
                       <tbody>
                         {revenue?.map((item) => {
+                          console.log(item);
                           const { orderItems, voucher } = item;
-                          const subTotal = orderItems
-                            ?.map(
-                              (orderItem) =>
-                                orderItem.quantity *
-                                orderItem.productPrice.exportPrice
-                            )
+                          const subTotalAllOrder = orderItems
+                            ?.map((orderItem) => orderItem.subTotal)
                             .reduce((total, price) => total + price, 0);
-                          const discount = voucher
+                          const discountAllOrder = voucher
                             ? voucher?.discount +
-                              (voucher?.percent * subTotal) / 100
+                              (voucher?.percent * subTotalAllOrder) / 100
                             : 0;
-                          const total = !discount
-                            ? subTotal
-                            : subTotal - discount;
+                          const totalAllOrder = !discountAllOrder
+                            ? subTotalAllOrder
+                            : subTotalAllOrder - discountAllOrder;
                           return (
                             <tr>
                               <td>{item.id}</td>
-                              <td>{currencyFormatter.format(subTotal)}</td>
-                              <td>{currencyFormatter.format(discount)}</td>
-                              <td>{currencyFormatter.format(total)}</td>
+                              <td>{item.type}</td>
+                              <td>{item.paymentStatus}</td>
+                              <td>{currencyFormatter.format(item.subTotal)}</td>
+                              <td>
+                                {item.voucher
+                                  ? item.voucher?.discount
+                                    ? currencyFormatter.format(
+                                        item.voucher?.discount
+                                      )
+                                    : currencyFormatter.format(
+                                        (item.voucher?.percent *
+                                          item.subTotal) /
+                                          100
+                                      )
+                                  : currencyFormatter.format(0)}
+                              </td>
+                              <td>
+                                {currencyFormatter.format(
+                                  item.subTotal - item.voucher?.discount
+                                )}
+                              </td>
                             </tr>
                           );
                         })}

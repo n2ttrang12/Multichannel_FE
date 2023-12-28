@@ -76,6 +76,8 @@ import StoreList from "../views/dashboard/store-management/store-list";
 
 import MyStore from "../views/dashboard/store-management/my-store";
 import StoreDetail from "../views/dashboard/store-management/store-detail";
+import ExamineGoods from "../views/dashboard/warehouse/examine-goods-list";
+import ExamineGoodsDetail from "../views/dashboard/warehouse/examine-goods-detail";
 
 export const DefaultRouter = [
   {
@@ -154,6 +156,14 @@ export const DefaultRouter = [
       {
         path: "/dashboard/warehouse/import-goods/:id",
         element: <ImportGoodsDetails />,
+      },
+      {
+        path: "/dashboard/warehouse/check-goods",
+        element: <ExamineGoods />,
+      },
+      {
+        path: "/dashboard/warehouse/check-goods/:id",
+        element: <ExamineGoodsDetail />,
       },
       // Voucher
       {

@@ -9,7 +9,7 @@ import { WarehouseModal } from "../../../models/warehouse";
 import * as moment from "moment";
 import "moment/locale/vi";
 import UserContext from "../../../contexts/userContext";
-const ImportGoods = () => {
+const ExamineGoods = () => {
   const { isStore } = useContext(UserContext);
   const navigate = useNavigate();
   const [response, setResponse] = useState({}); // state đầu tiên -> rỗng
@@ -23,7 +23,7 @@ const ImportGoods = () => {
   const fetchList = (page, perPage, search = undefined) => {
     // lấy từ API
     setIsLoading(true);
-    WarehouseModal.getImportList({
+    WarehouseModal.getCheckList({
       page, // Offset
       perPage, // limit,
       search,
@@ -48,18 +48,17 @@ const ImportGoods = () => {
     setPage(1);
     fetchList(1, perPage, searchText);
   }, [searchText]);
-  console.log(isStore);
   return (
     <>
       <Card>
         {modal}
         <Card.Header className="d-flex justify-content-between">
           <div className="header-title">
-            <h4 className="card-title">Danh sách nhập kho</h4>
+            <h4 className="card-title">Danh sách kiểm kho</h4>
           </div>
           {isStore ? (
             <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
-              <Link to="/dashboard/warehouse/import-goods/new">
+              <Link to="/dashboard/warehouse/check-goods/new">
                 <i className="btn-inner">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +75,7 @@ const ImportGoods = () => {
                     />
                   </svg>
                 </i>
-                <span>Nhập hàng</span>
+                <span>Kiểm hàng</span>
               </Link>
             </Button>
           ) : (
@@ -100,22 +99,23 @@ const ImportGoods = () => {
               >
                 <thead>
                   <tr>
+                    <th>Mã kiểm kho</th>
                     <th>Ngày tạo</th>
-                    <th>Tên nhà cung cấp</th>
-                    <th>Người đại diện</th>
-                    <th>Sản phẩm</th>
+                    <th>SL sản phẩm</th>
                     <th>Nhân viên tạo</th>
-                    {/* <th>Trạng thái</th> */}
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   {supplier?.map((item) => {
                     return (
                       <tr key={item.id}>
+                        <td>{item.id}</td>
                         <td
                           onClick={() => {
                             navigate(
-                              "/dashboard/warehouse/import-goods/" + item.id
+                              "/dashboard/warehouse/check-goods/" + item.id
                             );
                           }}
                           style={{
@@ -129,13 +129,9 @@ const ImportGoods = () => {
                             : null}
                         </td>
 
-                        <td>{item.supplier?.name}</td>
-                        <td>{item.supplier?.personalContactName}</td>
                         <td>{item.warehouseHistory?.length}</td>
                         <td>{item.creater?.name}</td>
-                        {/* <td>
-                          {item.status}
-                        </td> */}
+                        <td>{item.status}</td>
                       </tr>
                     );
                   })}
@@ -200,4 +196,4 @@ const ImportGoods = () => {
   );
 };
 
-export default ImportGoods;
+export default ExamineGoods;
