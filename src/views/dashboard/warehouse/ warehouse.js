@@ -59,7 +59,7 @@ const Warehouse = () => {
       {modal}
       <Card.Header className="d-flex justify-content-between">
         <div className="header-title">
-          <h4 className="card-title">Danh sách kho</h4>
+          <h4 className="card-title">Tồn kho</h4>
         </div>
       </Card.Header>
       <Card.Body>
