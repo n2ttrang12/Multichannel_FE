@@ -731,6 +731,7 @@ const OrderOffline = () => {
                   <thead>
                     <tr>
                       <th>Tên sản phẩm</th>
+                      <th>Mã vạch</th>
                       <th>Đơn giá</th>
                       <th>Số lượng</th>
                       <th>Thành tiền</th>
@@ -744,6 +745,7 @@ const OrderOffline = () => {
                           ({
                             productId,
                             productName,
+                            productBarcode,
                             productPriceId,
                             quantity = 0,
                             price,
@@ -751,6 +753,7 @@ const OrderOffline = () => {
                             return (
                               <tr key={productId + productPriceId}>
                                 <td>{productName}</td>
+                                <td>{productBarcode}</td>
                                 <td>{currencyFormatter.format(price)}</td>
                                 <td>
                                   <Form.Group
