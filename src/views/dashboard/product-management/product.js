@@ -1034,7 +1034,24 @@ const Product = () => {
         </Card>
 
         {isStore ? (
-          <div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Form>
+              {["checkbox"].map((type) => (
+                <div key={"default-{type}"} className="mb-3">
+                  <Form.Check
+                    type={type}
+                    id={"default-{type}"}
+                    label={"Đăng bán trên Sendo"}
+                  />
+                  {/* <Form.Check
+                    type={type}
+                    id={"default-{type}"}
+                    label={"Checked"}
+                    checked
+                  /> */}
+                </div>
+              ))}
+            </Form>
             <Button
               onClick={() => {
                 const isValidName = validateName();

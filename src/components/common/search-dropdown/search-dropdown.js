@@ -79,7 +79,7 @@ const SearchableDropdown = ({
             >
               <Row>
                 <Col>{option[label]}</Col>
-                <Col>Barcode: {searchLabel && option[searchLabel]}</Col>
+                {/* <Col>Barcode: {searchLabel && option[searchLabel]}</Col> */}
               </Row>
             </div>
           );
