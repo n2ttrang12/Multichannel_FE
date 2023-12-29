@@ -405,7 +405,7 @@ const VerticalNav = memo((props) => {
             </span>
           </Link>
         </li>
-        {isStore ? (
+        {!isStore ? (
           <li className="nav-item">
             <Link
               className={`${
