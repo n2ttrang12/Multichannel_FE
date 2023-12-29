@@ -1270,9 +1270,18 @@ const Index = memo((props) => {
                                   : currencyFormatter.format(0)}
                               </td>
                               <td>
-                                {currencyFormatter.format(
-                                  item.subTotal - item.voucher?.discount
-                                )}
+                                {item.voucher
+                                  ? item.voucher?.discount
+                                    ? currencyFormatter.format(
+                                        item.subTotal - item.voucher?.discount
+                                      )
+                                    : currencyFormatter.format(
+                                        item.subTotal -
+                                          (item.voucher?.percent *
+                                            item.subTotal) /
+                                            100
+                                      )
+                                  : currencyFormatter.format(item.subTotal - 0)}
                               </td>
                             </tr>
                           );
