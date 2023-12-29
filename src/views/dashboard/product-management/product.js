@@ -327,7 +327,6 @@ const Product = () => {
   );
 
   // console.log(variants);
-  console.log(product);
 
   const {
     name,
@@ -1154,7 +1153,6 @@ const Product = () => {
           hideCategoryModel={hideCategoryModel}
           handleCategoryChange={(category) => {
             setInvalidCategory(false);
-            console.log("dispatchProduct, category", category);
             dispatchProduct({
               type: "SET_CATEGORY",
               payload: category,

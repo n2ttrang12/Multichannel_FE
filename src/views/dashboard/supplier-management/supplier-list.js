@@ -145,7 +145,6 @@ const SupplierList = () => {
                 </thead>
                 <tbody>
                   {supplier?.map((item) => {
-                    console.log(item.address);
                     return (
                       <tr key={item.id}>
                         <td>{item.id}</td>

@@ -65,6 +65,12 @@ export const WarehouseModal = {
       }
     );
   },
+
+  async deleteCheckGoods(id) {
+    return axiosInstance.delete(
+      axiosInstance.defaults.baseURL + `cancel-product-in-stock/${id}`
+    );
+  },
   async changeStatusInStock(id) {
     return axiosInstance.post(
       axiosInstance.defaults.baseURL + "warehouse/change-status-in-stock/" + id

@@ -48,7 +48,6 @@ const ImportGoods = () => {
     setPage(1);
     fetchList(1, perPage, searchText);
   }, [searchText]);
-  console.log(isStore);
   return (
     <>
       <Card>

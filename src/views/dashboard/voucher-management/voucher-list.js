@@ -134,7 +134,6 @@ const VoucherList = () => {
     }, [isPercentage]);
 
     useEffect(() => {
-      console.log("rerender");
       if (id) {
         //mode edit => fetch sản phẩm về
         setIsLoading(true);
@@ -161,7 +160,6 @@ const VoucherList = () => {
       }
     };
     const validateFromDate = () => {
-      console.log(fromDate);
       if (!fromDate || fromDate.trim().length <= 0) {
         setInvalidFromDate(true);
         return false;
@@ -171,7 +169,6 @@ const VoucherList = () => {
       }
     };
     const validateToDate = () => {
-      console.log(toDate);
       if (!toDate || toDate.trim().length <= 0) {
         setInvalidToDate(true);
         return false;

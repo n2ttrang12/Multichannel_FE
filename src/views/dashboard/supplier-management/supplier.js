@@ -106,7 +106,6 @@ const Supplier = () => {
 
   const [supplier, dispatchSupplier] = useReducer(
     (state, action) => {
-      console.log(action);
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -218,7 +217,6 @@ const Supplier = () => {
     personalContactPhone,
     products,
   } = supplier;
-  console.log(supplier);
   useEffect(() => {
     if (!provinceId) {
       return;
@@ -256,7 +254,6 @@ const Supplier = () => {
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
-    console.log(imageList, addUpdateIndex);
     setImages(imageList);
   };
 

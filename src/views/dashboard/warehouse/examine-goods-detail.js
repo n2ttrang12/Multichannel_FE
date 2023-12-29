@@ -61,7 +61,6 @@ const ExamineGoodsDetail = () => {
             };
             selectedProductVariants.push(productVariant);
           });
-          console.log(selectedProductVariants);
           setSelectedProductVariants(selectedProductVariants);
         })
         .finally(() => setIsLoading(false));
@@ -95,7 +94,6 @@ const ExamineGoodsDetail = () => {
 
   const [checkList, dispatchCheckList] = useReducer(
     (state, action) => {
-      console.log(action);
       switch (action.type) {
         case "SET_PRODUCT":
           return {

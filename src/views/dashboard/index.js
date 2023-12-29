@@ -67,7 +67,6 @@ const Index = memo((props) => {
   const [isLoadingChart, setIsLoadingChart] = useState(false);
   const { data: revenue, pagination } = response;
   const { revenue: totalAllOrder } = response;
-  console.log(pagination);
   const totalCount = pagination?.total ?? 0;
   const [page, setPage] = useState(1);
   const [year, setYear] = useState("2023");
@@ -373,7 +372,6 @@ const Index = memo((props) => {
           ],
           seriesData: [data.totalSendo, data.totalWeb, data.totalOff],
         };
-        console.log(templateDataType);
         setChartDataCircleStatus(templateDataStatus);
         setChartDataCircleType(templateDataType);
       })
@@ -382,7 +380,6 @@ const Index = memo((props) => {
         setIsLoadingCircleChart(false);
       });
   }, [filter]);
-  console.log(chartDataCircleType);
   const getVariableColor = () => {
     let prefix =
       getComputedStyle(document.body).getPropertyValue("--prefix") || "bs-";
@@ -1242,7 +1239,6 @@ const Index = memo((props) => {
                       </thead>
                       <tbody>
                         {revenue?.map((item) => {
-                          console.log(item);
                           const { orderItems, voucher } = item;
                           const subTotalAllOrder = orderItems
                             ?.map((orderItem) => orderItem.subTotal)

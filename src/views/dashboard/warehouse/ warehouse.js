@@ -90,7 +90,6 @@ const Warehouse = () => {
               </thead>
               <tbody>
                 {productInWarehouses?.map((item) => {
-                  console.log("aaaaa", item);
                   return (
                     <tr key={item.id}>
                       <td>

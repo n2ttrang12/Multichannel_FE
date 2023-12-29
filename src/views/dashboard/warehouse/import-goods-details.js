@@ -77,8 +77,6 @@ const ImportGoodsDetails = () => {
     orderItems,
   } = importGoods;
 
-  console.log("importG", importGoods);
-
   useEffect(() => {
     if (!selectedSupplierId) return;
     SupplierModel.get(selectedSupplierId).then(
@@ -150,6 +148,7 @@ const ImportGoodsDetails = () => {
       return true;
     }
   };
+
   return (
     <>
       {modal}
@@ -362,6 +361,7 @@ const ImportGoodsDetails = () => {
                           options={supplierDetail.productVariants}
                           label="productName"
                           id="productPriceId"
+                          searchLabel="productBarcode"
                           handleChange={(productPriceId) => {
                             if (productPriceId === null) {
                               return;
@@ -487,7 +487,6 @@ const ImportGoodsDetails = () => {
                                             productId !=
                                               productVariant.productId
                                         );
-                                      console.log(productPriceId, variants);
                                       setSelectedProductVariants(variants);
                                     }}
                                   >

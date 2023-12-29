@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import "./style.css";
+import { Col, Row } from "react-bootstrap";
 
-const SearchableDropdown = ({ options, label, id, handleChange }) => {
+const SearchableDropdown = ({
+  options,
+  label,
+  id,
+  handleChange,
+  searchLabel = null,
+}) => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,9 +36,17 @@ const SearchableDropdown = ({ options, label, id, handleChange }) => {
   };
 
   const filter = (options) => {
-    return options.filter(
-      (option) => option[label].toLowerCase().indexOf(query.toLowerCase()) > -1
-    );
+    return options.filter((option) => {
+      if (searchLabel) {
+        if (
+          option[searchLabel].toLowerCase().indexOf(query.toLowerCase()) > -1
+        ) {
+          return true;
+        }
+      }
+
+      return option[label].toLowerCase().indexOf(query.toLowerCase()) > -1;
+    });
   };
 
   return (
@@ -62,7 +77,10 @@ const SearchableDropdown = ({ options, label, id, handleChange }) => {
               className={`option`}
               key={`${id}-${index}`}
             >
-              {option[label]}
+              <Row>
+                <Col>{option[label]}</Col>
+                <Col>Barcode: {searchLabel && option[searchLabel]}</Col>
+              </Row>
             </div>
           );
         })}

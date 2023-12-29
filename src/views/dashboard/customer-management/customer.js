@@ -55,7 +55,6 @@ const Customer = () => {
 
   const [product, dispatchProduct] = useReducer(
     (state, action) => {
-      console.log(action);
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -145,7 +144,6 @@ const Customer = () => {
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
-    console.log(imageList, addUpdateIndex);
     setImages(imageList);
   };
 

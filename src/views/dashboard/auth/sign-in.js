@@ -21,7 +21,6 @@ const SignIn = () => {
     useState(false);
 
   useEffect(() => {
-    console.log(isLoggedIn, "sign in page");
     if (isLoggedIn) {
       history("/dashboard");
     }
@@ -32,14 +31,12 @@ const SignIn = () => {
       email,
       password,
     };
-    console.log("qqqqqqqqqqqqqqqqqqq");
     axios
       .post(
         "https://mb-api-social-service.mangoads.com.vn/api/v1/multi-chanel/app-user/login",
         data
       )
       .then((response) => {
-        console.log(response.data);
         if (response.data.statusCode == 200) {
           setShowInvalidCredentialsError(false);
           const { user, accessToken, refreshToken } = response.data.data;
