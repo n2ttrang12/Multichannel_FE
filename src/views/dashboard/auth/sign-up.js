@@ -35,7 +35,6 @@ const SignUp = () => {
         data
       )
       .then((response) => {
-        console.log(response.data);
         history("/dashboard");
       })
       .catch((error) => {

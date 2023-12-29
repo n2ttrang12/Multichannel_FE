@@ -114,6 +114,7 @@ const OrderOffline = () => {
           const productVariant = {
             productId: product.id,
             productName: getProductVariantName(product, price),
+            productBarcode: product.barcode,
             productPriceId: price.id,
             price: price.exportPrice,
             quantity: 1,
@@ -145,7 +146,6 @@ const OrderOffline = () => {
 
   const [order, dispatchOrder] = useReducer(
     (state, action) => {
-      console.log(action);
       switch (action.type) {
         case "SET_NAME":
           return {
@@ -336,7 +336,6 @@ const OrderOffline = () => {
     }
   };
   const validateProvince = () => {
-    console.log(provinceId);
     if (!provinceId) {
       setInvalidProvince(true);
       return false;
@@ -646,6 +645,7 @@ const OrderOffline = () => {
                         options={productVariants}
                         label="productName"
                         id="productPriceId"
+                        searchLabel={"productBarcode"}
                         handleChange={(productPriceId) => {
                           if (productPriceId === null) {
                             return;

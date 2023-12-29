@@ -197,7 +197,6 @@ const CategoryManagement = () => {
         if (!data) {
           return;
         }
-        console.log(data);
         setResponse(data); // set data cho state respone
       })
       .finally(() => {
@@ -285,7 +284,6 @@ const CategoryManagement = () => {
           <Button
             variant="primary"
             onClick={() => {
-              console.log("add Category");
               Category.addCategory(name, parentCategory?.id)
                 .then((response) => fetchList(page, perPage))
                 .catch((error) => {
