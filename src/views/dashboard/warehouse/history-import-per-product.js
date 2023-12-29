@@ -191,7 +191,9 @@ const HistoryImportPerProduct = () => {
                               ? "Bán tại cửa hàng"
                               : item.type == "ONLINE"
                               ? "Bán tại website"
-                              : "Bán tại SENDO"}
+                              : item.type == "CHECK_PRODUCT_IN_STOCK"
+                              ? "Cân bằng kho"
+                              : "Bán tại website"}
                           </td>
                           <td>{item.quantity}</td>
                         </tr>

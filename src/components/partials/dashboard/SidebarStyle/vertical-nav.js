@@ -575,7 +575,7 @@ const VerticalNav = memo((props) => {
                   </i>
                   <i className="sidenav-mini-icon"> U </i>
                   <span style={{ fontSize: 14 }} className="item-name">
-                    Danh sách kho
+                    Tồn kho
                   </span>
                 </Link>
               </li>
