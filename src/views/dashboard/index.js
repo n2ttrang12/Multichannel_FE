@@ -651,7 +651,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Đơn hàng thành công</p>
+                          <p className="mb-2">ĐH thành công</p>
                           <h4 className="counter">
                             <CountUp
                               start={0}
@@ -694,7 +694,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Đơn hàng hủy</p>
+                          <p className="mb-2">ĐH thất bại</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalCancel} duration={3} />
                           </h4>
@@ -734,7 +734,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Tổng số đơn hàng</p>
+                          <p className="mb-2">Tổng đơn hàng</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalOrder} duration={3} />
                           </h4>
