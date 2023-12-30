@@ -104,50 +104,36 @@ const OrderDetail = () => {
               <Card.Body>
                 <Row>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Mã đơn hàng </p>
-                      </Col>
-                      <Col md="6">
-                        <p>{": " + id} </p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Mã đơn hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{id} </p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Kênh bán hàng </p>
-                      </Col>
-                      <Col md="6">
-                        <p> {": " + type}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Kênh bán hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}> {type}</p>
                   </Col>
                 </Row>
                 <Row>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Trạng thái thanh toán </p>
-                      </Col>
-                      <Col md="6">
-                        <p>
-                          {paymentStatus == "NOT_PAID"
-                            ? ": Chưa thanh toán"
-                            : ": Đã thanh toán"}
-                        </p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Trạng thái thanh toán{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {paymentStatus == "NOT_PAID"
+                        ? "Chưa thanh toán"
+                        : "Đã thanh toán"}
+                    </p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Ngày tạo</p>
-                      </Col>
-                      <Col md="6">
-                        <p>{": " + moment(createdAt).format("L")}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Ngày tạo
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {moment(createdAt).format("L")}
+                    </p>
                   </Col>
                 </Row>
                 <Row
@@ -158,128 +144,104 @@ const OrderDetail = () => {
                   }}
                 >
                   <Col md="6">
-                    <Row>
-                      <Col
-                        md="6"
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          flexDirection: "column",
-                        }}
-                      >
-                        <p>Trạng thái đơn hàng</p>
-                      </Col>
-                      <Col md="6">
-                        {isLoading ? (
-                          <Loading></Loading>
-                        ) : (
-                          <Form.Group className="form-group">
-                            {/* <Form.Label htmlFor="validationDefault02">
-                        Trạng thái
-                      </Form.Label> */}
-                            <Form.Select
-                              disabled={type != "WEBSITE" || !isStore}
-                              value={status}
-                              onChange={(e) => {
-                                const newStatus = e.target.value;
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Trạng thái đơn hàng
+                    </label>
 
-                                setModal(
-                                  <ConfirmModal
-                                    onConfirm={() => {
-                                      setModal(null);
-                                      setIsLoading(true);
-                                      OrderModel.updateStatusOrder(
-                                        id,
-                                        newStatus
-                                      )
-                                        .then(() => {
-                                          setOrder({
-                                            ...order,
-                                            status: newStatus,
-                                          });
-                                          setModal(
-                                            <SuccessModal
-                                              handleCloseModal={() => {
-                                                setModal(null);
-                                                // navigate(
-                                                //   "/dashboard/order-management/list"
-                                                // );
-                                              }}
-                                              message={`Đã chuyển trạng thái từ ${status} sang ${newStatus}`}
-                                            ></SuccessModal>
-                                          );
-                                        })
-                                        .catch((e) => {
-                                          setModal(
-                                            <ErrorModal
-                                              handleCloseModal={() =>
-                                                setModal(null)
-                                              }
-                                              errorMessage={`Chuyển trạng thái không thành công`}
-                                            ></ErrorModal>
-                                          );
-                                        })
-                                        .finally(() => setIsLoading(false));
-                                    }}
-                                    handleCloseModal={() => {
-                                      setModal(null);
-                                      // navigate(
-                                      //   "/dashboard/order-management/list"
-                                      // );
-                                    }}
-                                    message={`Bán có chắc muốn chuyển trạng thái từ ${status} sang ${newStatus}. Thao tác này sẽ không hoàn lại được`}
-                                  ></ConfirmModal>
-                                );
-                              }}
-                              id="validationDefault04"
-                              required
-                            >
-                              {orderStatuses?.map((orderStatus) => {
-                                const statuses = orderStatuses?.map(
-                                  (s) => Object.values(s)[0]
-                                );
-                                const _status = Object.values(orderStatus)[0];
-                                return _status == "NEW" ||
-                                  _status == "PROCESSING" ||
-                                  _status == "SHIPPING" ||
-                                  _status == "COMPLETED" ||
-                                  _status == "CANCELLED" ? (
-                                  <option
-                                    disabled={
-                                      statuses.indexOf(_status) <
-                                      statuses.indexOf(status)
-                                    }
-                                    value={_status}
-                                  >
-                                    {_status}
-                                  </option>
-                                ) : (
-                                  ""
-                                );
-                              })}
-                            </Form.Select>
-                          </Form.Group>
-                        )}
-                      </Col>
-                    </Row>
+                    {isLoading ? (
+                      <Loading></Loading>
+                    ) : (
+                      <Form.Group className="form-group">
+                        {/* <Form.Label htmlFor="validationDefault02">
+                          Trạng thái
+                        </Form.Label> */}
+                        <Form.Select
+                          disabled={type != "WEBSITE" || !isStore}
+                          value={status}
+                          onChange={(e) => {
+                            const newStatus = e.target.value;
+
+                            setModal(
+                              <ConfirmModal
+                                onConfirm={() => {
+                                  setModal(null);
+                                  setIsLoading(true);
+                                  OrderModel.updateStatusOrder(id, newStatus)
+                                    .then(() => {
+                                      setOrder({
+                                        ...order,
+                                        status: newStatus,
+                                      });
+                                      setModal(
+                                        <SuccessModal
+                                          handleCloseModal={() => {
+                                            setModal(null);
+                                            // navigate(
+                                            //   "/dashboard/order-management/list"
+                                            // );
+                                          }}
+                                          message={`Đã chuyển trạng thái từ ${status} sang ${newStatus}`}
+                                        ></SuccessModal>
+                                      );
+                                    })
+                                    .catch((e) => {
+                                      setModal(
+                                        <ErrorModal
+                                          handleCloseModal={() =>
+                                            setModal(null)
+                                          }
+                                          errorMessage={`Chuyển trạng thái không thành công`}
+                                        ></ErrorModal>
+                                      );
+                                    })
+                                    .finally(() => setIsLoading(false));
+                                }}
+                                handleCloseModal={() => {
+                                  setModal(null);
+                                  // navigate(
+                                  //   "/dashboard/order-management/list"
+                                  // );
+                                }}
+                                message={`Bán có chắc muốn chuyển trạng thái từ ${status} sang ${newStatus}. Thao tác này sẽ không hoàn lại được`}
+                              ></ConfirmModal>
+                            );
+                          }}
+                          id="validationDefault04"
+                          required
+                        >
+                          {orderStatuses?.map((orderStatus) => {
+                            const statuses = orderStatuses?.map(
+                              (s) => Object.values(s)[0]
+                            );
+                            const _status = Object.values(orderStatus)[0];
+                            return _status == "NEW" ||
+                              _status == "PROCESSING" ||
+                              _status == "SHIPPING" ||
+                              _status == "COMPLETED" ||
+                              _status == "CANCELLED" ? (
+                              <option
+                                disabled={
+                                  statuses.indexOf(_status) <
+                                  statuses.indexOf(status)
+                                }
+                                value={_status}
+                              >
+                                {_status}
+                              </option>
+                            ) : (
+                              ""
+                            );
+                          })}
+                        </Form.Select>
+                      </Form.Group>
+                    )}
                   </Col>
                   {status == "SHIPPING" ? (
                     <Col md="6">
-                      <Row>
-                        <Col
-                          md="6"
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <p>Trạng thái giao hàng</p>
-                        </Col>
-                        <Col md="6">
-                          <p>{": " + deliveryStatus}</p>
-                        </Col>
-                      </Row>
+                      <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                        Trạng thái giao hàng
+                      </label>
+                      <p style={{ fontWeight: "500" }}>{deliveryStatus}</p>
                     </Col>
                   ) : (
                     ""
@@ -306,46 +268,32 @@ const OrderDetail = () => {
                     </Row>
                   </Col> */}
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Tên khách hàng </p>
-                      </Col>
-                      <Col md="6">
-                        <p> {": " + customerName}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Tên khách hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{customerName}</p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Số điện thoại </p>
-                      </Col>
-                      <Col md="6">
-                        <p> {": " + phonenumber}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Số điện thoại{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}> {phonenumber}</p>
                   </Col>
                 </Row>
                 <Row>
                   <Col md="12">
-                    <Row>
-                      <Col md="3">
-                        <p>Địa chỉ </p>
-                      </Col>
-                      <Col>
-                        <p>
-                          {" "}
-                          {": " +
-                            address?.detail +
-                            ", " +
-                            address?.mtWard?.name +
-                            ", " +
-                            address?.mtDistrict?.name +
-                            ", " +
-                            address?.mtProvince?.name}
-                        </p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Địa chỉ{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {address?.detail +
+                        ", " +
+                        address?.mtWard?.name +
+                        ", " +
+                        address?.mtDistrict?.name +
+                        ", " +
+                        address?.mtProvince?.name}
+                    </p>
                   </Col>
                 </Row>
                 <Row>
