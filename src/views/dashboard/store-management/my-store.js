@@ -34,7 +34,8 @@ const MyStoreDetail = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const { id, name, phoneNumber, address, email, storeOwner } = store;
+  const { id, name, phoneNumber, address, email, storeOwner, connect3party } =
+    store;
 
   const onChange = () => {};
 
@@ -53,45 +54,30 @@ const MyStoreDetail = () => {
               <Card.Body>
                 <Row>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Mã cửa hàng </p>
-                      </Col>
-                      <Col>
-                        <p>{": " + id} </p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Mã cửa hàng
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{id}</p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Tên cửa hàng </p>
-                      </Col>
-                      <Col>
-                        <p> {": " + name}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Tên cửa hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{name}</p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Số điện thoại </p>
-                      </Col>
-                      <Col>
-                        <p> {": " + phoneNumber}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Số điện thoại{" "}
+                    </label>
+
+                    <p style={{ fontWeight: "500" }}> {phoneNumber}</p>
                   </Col>
                   {email ? (
                     <Col md="6">
-                      <Row>
-                        <Col md="6">
-                          <p>Email </p>
-                        </Col>
-                        <Col>
-                          <p> {": " + email}</p>
-                        </Col>
-                      </Row>
+                      <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                        Email{" "}
+                      </label>
+                      <p style={{ fontWeight: "500" }}> {email}</p>
                     </Col>
                   ) : (
                     ""
@@ -99,24 +85,18 @@ const MyStoreDetail = () => {
                 </Row>
                 <Row>
                   <Col md="12">
-                    <Row>
-                      <Col md="3">
-                        <p>Địa chỉ </p>
-                      </Col>
-                      <Col>
-                        <p>
-                          {" "}
-                          {": " +
-                            address?.detail +
-                            ", " +
-                            address?.mtDistrict?.name +
-                            ", " +
-                            address?.mtProvince?.name +
-                            ", " +
-                            address?.mtWard?.name}
-                        </p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Địa chỉ{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {address?.detail +
+                        ", " +
+                        address?.mtDistrict?.name +
+                        ", " +
+                        address?.mtProvince?.name +
+                        ", " +
+                        address?.mtWard?.name}
+                    </p>
                   </Col>
                 </Row>
               </Card.Body>
@@ -131,39 +111,63 @@ const MyStoreDetail = () => {
               <Card.Body>
                 <Row>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Tên chủ cửa hàng </p>
-                      </Col>
-                      <Col>
-                        <p> {": " + storeOwner?.name}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Tên chủ cửa hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{storeOwner?.name}</p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Số điện thoại </p>
-                      </Col>
-                      <Col>
-                        <p> {": " + storeOwner?.phonenumber}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Số điện thoại{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {storeOwner?.phonenumber}
+                    </p>
                   </Col>
                   {email ? (
                     <Col md="6">
-                      <Row>
-                        <Col md="6">
-                          <p>Email </p>
-                        </Col>
-                        <Col>
-                          <p> {": " + storeOwner?.email}</p>
-                        </Col>
-                      </Row>
+                      <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                        Email{" "}
+                      </label>
+                      <p style={{ fontWeight: "500" }}>{storeOwner?.email}</p>
                     </Col>
                   ) : (
                     ""
                   )}
+                </Row>
+              </Card.Body>
+            </Card>
+            <Card>
+              <Card.Header className="d-flex justify-content-between">
+                <div className="header-title">
+                  <h5 className="card-title"> Thông tin kênh bán hàng</h5>
+                </div>
+              </Card.Header>
+              <Card.Body>
+                <Row>
+                  <Col md="6">
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Tên kênh bán hàng
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{connect3party?.type}</p>
+                  </Col>
+                  <Col md="6">
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Shop key
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {connect3party?.shopKey}
+                    </p>
+                  </Col>
+
+                  <Col md="6">
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Secret key{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {connect3party?.secretKey}
+                    </p>
+                  </Col>
                 </Row>
               </Card.Body>
             </Card>

@@ -55,70 +55,46 @@ const CustomerDetail = () => {
               <Card.Body>
                 <Row>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Mã khách hàng </p>
-                      </Col>
-                      <Col>
-                        <p>{": " + id} </p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Mã khách hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{id} </p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Tên khách hàng </p>
-                      </Col>
-                      <Col>
-                        <p> {": " + name}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Tên khách hàng{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}> {name}</p>
                   </Col>
                   <Col md="6">
-                    <Row>
-                      <Col md="6">
-                        <p>Số điện thoại </p>
-                      </Col>
-                      <Col>
-                        <p> {": " + phonenumber}</p>
-                      </Col>
-                    </Row>
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Số điện thoại{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>{phonenumber}</p>
                   </Col>
                   {email ? (
                     <Col md="6">
-                      <Row>
-                        <Col md="6">
-                          <p>Email </p>
-                        </Col>
-                        <Col>
-                          <p> {": " + email}</p>
-                        </Col>
-                      </Row>
+                      <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                        Email{" "}
+                      </label>
+                      <p style={{ fontWeight: "500" }}> {email}</p>
                     </Col>
                   ) : (
                     ""
                   )}
-                </Row>
-                <Row>
-                  <Col md="12">
-                    <Row>
-                      <Col md="3">
-                        <p>Địa chỉ </p>
-                      </Col>
-                      <Col>
-                        <p>
-                          {" "}
-                          {": " +
-                            address?.detail +
-                            ", " +
-                            address?.mtDistrict?.name +
-                            ", " +
-                            address?.mtProvince?.name +
-                            ", " +
-                            address?.mtWard?.name}
-                        </p>
-                      </Col>
-                    </Row>
+                  <Col md="6">
+                    <label style={{ fontSize: "14px", paddingBottom: "8px" }}>
+                      Địa chỉ{" "}
+                    </label>
+                    <p style={{ fontWeight: "500" }}>
+                      {address?.detail +
+                        ", " +
+                        address?.mtDistrict?.name +
+                        ", " +
+                        address?.mtProvince?.name +
+                        ", " +
+                        address?.mtWard?.name}
+                    </p>
                   </Col>
                 </Row>
               </Card.Body>
