@@ -1179,7 +1179,7 @@ const Index = memo((props) => {
             <Card>
               <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
-                  <h4 className="mb-2 card-title">Danh thu theo đơn hàng</h4>
+                  <h4 className="mb-2 card-title">Doanh thu theo đơn hàng</h4>
                 </div>
                 <OverlayTrigger
                   trigger="click"
