@@ -651,7 +651,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Success Orders</p>
+                          <p className="mb-2">Đơn hàng thành công</p>
                           <h4 className="counter">
                             <CountUp
                               start={0}
@@ -694,7 +694,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Cancel Order</p>
+                          <p className="mb-2">Đơn hàng hủy</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalCancel} duration={3} />
                           </h4>
@@ -734,7 +734,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Total Orders</p>
+                          <p className="mb-2">Tổng số đơn hàng</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalOrder} duration={3} />
                           </h4>
@@ -773,7 +773,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Offline Orders</p>
+                          <p className="mb-2">Bán tại cửa hàng</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalOff} duration={3} />
                           </h4>
@@ -812,7 +812,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Website Orders</p>
+                          <p className="mb-2">Bán tại Website</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalWeb} duration={3} />
                           </h4>
@@ -851,7 +851,7 @@ const Index = memo((props) => {
                           </svg>
                         </Circularprogressbar>
                         <div className="progress-detail">
-                          <p className="mb-2">Sendo Orders</p>
+                          <p className="mb-2">Bán tại Sendo</p>
                           <h4 className="counter">
                             <CountUp start={0} end={totalSendo} duration={3} />
                           </h4>
@@ -980,7 +980,7 @@ const Index = memo((props) => {
             <div className="card" data-aos="fade-up" data-aos-delay="900">
               <div className="flex-wrap card-header d-flex justify-content-between">
                 <div className="header-title">
-                  <h4 className="card-title">Thống kê theo tháng</h4>
+                  <h4 className="card-title">Thống kê chi tiết</h4>
                 </div>
                 <div>
                   {/* <Form.Group controlId="startDate"> */}
@@ -1120,7 +1120,7 @@ const Index = memo((props) => {
                             </g>
                           </svg>
                           <div className="ms-3">
-                            <span className="text-gray">Offline</span>
+                            <span className="text-gray">Cửa hàng</span>
                             <h6>{chartDataCircleType?.seriesData[2]}</h6>
                           </div>
                         </div>
