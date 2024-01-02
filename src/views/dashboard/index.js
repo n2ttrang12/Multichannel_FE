@@ -1200,7 +1200,7 @@ const Index = memo((props) => {
                         justifyContent: "flex-end",
                       }}
                     >
-                      <Col md="6">
+                      <Col md="3">
                         <Row>
                           <Col
                             md="6"

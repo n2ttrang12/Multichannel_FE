@@ -202,12 +202,12 @@ const SignIn = () => {
                                        </ListGroup.Item>
                                     </ListGroup>
                                  </div> */}
-                      <p className="mt-3 text-center">
+                      {/* <p className="mt-3 text-center">
                         Don’t have an account?{" "}
                         <Link to="/auth/sign-up" className="text-underline">
                           Click here to leave your information
                         </Link>
-                      </p>
+                      </p> */}
                     </Form>
                   </Card.Body>
                 </Card>
