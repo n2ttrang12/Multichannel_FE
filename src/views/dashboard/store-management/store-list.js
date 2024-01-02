@@ -52,7 +52,7 @@ const StoreList = () => {
         {/* {modal} */}
         <Card.Header className="d-flex justify-content-between">
           <div className="header-title">
-            <h4 className="card-title">Danh sách khách hàng</h4>
+            <h4 className="card-title">Danh sách cửa hàng</h4>
           </div>
         </Card.Header>
         <Card.Body>
