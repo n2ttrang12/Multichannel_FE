@@ -99,7 +99,7 @@ const CustomerList = () => {
                     <th>Địa chỉ</th>
                     <th>Tổng số lượng hàng đã mua</th>
                     <th>Tổng số đơn hàng đã hủy</th>
-                    <th>Thao tác</th>
+                    {/* <th>Thao tác</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -144,7 +144,7 @@ const CustomerList = () => {
                         {item.status}
                       </span>
                     </td> */}
-                        <td>
+                        {/* <td>
                           <div style={{ float: "right" }}>
                             <Link
                               className="btn btn-sm btn-icon text-primary flex-end"
@@ -187,7 +187,7 @@ const CustomerList = () => {
                               </span>
                             </Link>
                           </div>
-                        </td>
+                        </td> */}
                       </tr>
                     );
                   })}

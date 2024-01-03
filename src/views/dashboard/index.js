@@ -1,4 +1,11 @@
-import React, { useEffect, memo, Fragment, useState, useReducer } from "react";
+import React, {
+  useEffect,
+  memo,
+  Fragment,
+  useState,
+  useReducer,
+  useContext,
+} from "react";
 import {
   Row,
   Col,
@@ -33,7 +40,7 @@ import "swiper/swiper-bundle.min.css";
 //progressbar
 import Progress from "../../components/progress.js";
 //img
-import shapes1 from "../../assets/images/shapes/01.png";
+import welcom from "../../assets/images/dashboard/welcom.png";
 import shapes2 from "../../assets/images/shapes/02.png";
 import shapes3 from "../../assets/images/shapes/03.png";
 import shapes4 from "../../assets/images/shapes/04.png";
@@ -52,6 +59,7 @@ import { StatisticModel } from "../../models/dashboard.js";
 import { createArrayFrom1ToN, currencyFormatter } from "../../helper.js";
 import { Loading } from "../../components/common/loading.js";
 import DateTimePicker from "react-datetime-picker";
+import UserContext from "../../contexts/userContext.js";
 
 // install Swiper modules
 SwiperCore.use([Navigation]);
@@ -59,7 +67,7 @@ SwiperCore.use([Navigation]);
 const Index = memo((props) => {
   useSelector(SettingSelector.theme_color);
   const [response, setResponse] = useState({});
-
+  const { isStore } = useContext(UserContext);
   const [total, setTotal] = useState({});
   const [totalOrderChart, setTotalOrderChart] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -592,762 +600,795 @@ const Index = memo((props) => {
       <div className="position-relative">
         <SubHeader />
       </div>
-      <div className="conatiner-fluid content-inner mt-n5">
-        <Row class="py-0">
-          <Col md="12" lg="12">
-            <Row className="row-cols-1">
-              <div
-                className="overflow-hidden d-slider1 "
-                data-aos="fade-up"
-                data-aos-delay="800"
-              >
-                <Swiper
-                  className="p-0 m-0 mb-2 list-inline "
-                  slidesPerView={5}
-                  spaceBetween={32}
-                  navigation={{
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                  }}
-                  breakpoints={{
-                    320: { slidesPerView: 1 },
-                    550: { slidesPerView: 2 },
-                    991: { slidesPerView: 3 },
-                    1400: { slidesPerView: 3 },
-                    1500: { slidesPerView: 4 },
-                    1920: { slidesPerView: 4 },
-                    2040: { slidesPerView: 7 },
-                    2440: { slidesPerView: 8 },
-                  }}
+      {isStore ? (
+        <div className="conatiner-fluid content-inner mt-n5">
+          <Row class="py-0">
+            <Col md="12" lg="12">
+              <Row className="row-cols-1">
+                <div
+                  className="overflow-hidden d-slider1 "
+                  data-aos="fade-up"
+                  data-aos-delay="800"
                 >
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.success}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          Linecap="rounded"
-                          style={{ width: 60, height: 60 }}
-                          value={50}
-                          id="circle-progress-05"
-                        >
-                          <svg
-                            class="icon-32"
-                            width="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {" "}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
-                              fill={variableColors.success}
-                            ></path>{" "}
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">ĐH thành công</p>
-                          <h4 className="counter">
-                            <CountUp
-                              start={0}
-                              end={totalSuccess}
-                              duration={3}
-                            />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.danger}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          Linecap="rounded"
-                          strokewidth="4px"
-                          value={(totalCancel / totalOrder) * 100}
-                          style={{ width: 60, height: 60 }}
-                          id="circle-progress-06"
-                        >
-                          <svg
-                            class="icon-32"
-                            width="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {" "}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
-                              fill={variableColors.danger}
-                            ></path>{" "}
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">ĐH thất bại</p>
-                          <h4 className="counter">
-                            <CountUp start={0} end={totalCancel} duration={3} />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-
-                  <SwiperSlide className="card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.primary}
-                          width="60px"
-                          height="60px"
-                          Linecap="rounded"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          style={{ width: 60, height: 60 }}
-                          value={100}
-                          id="circle-progress-01"
-                        >
-                          <svg
-                            class="icon-32"
-                            width="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {" "}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
-                              fill={variableColors.primary}
-                            ></path>{" "}
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Tổng đơn hàng</p>
-                          <h4 className="counter">
-                            <CountUp start={0} end={totalOrder} duration={3} />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.info}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          Linecap="rounded"
-                          style={{ width: 60, height: 60 }}
-                          value={(totalOff / totalOrder) * 100}
-                          id="circle-progress-02"
-                        >
-                          <svg
-                            class="icon-32"
-                            width="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {" "}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
-                              fill={variableColors.info}
-                            ></path>{" "}
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Bán tại cửa hàng</p>
-                          <h4 className="counter">
-                            <CountUp start={0} end={totalOff} duration={3} />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.primary_light}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          Linecap="rounded"
-                          style={{ width: 60, height: 60 }}
-                          value={(totalWeb / totalOrder) * 100}
-                          id="circle-progress-03"
-                        >
-                          <svg
-                            class="icon-32"
-                            width="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {" "}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
-                              fill={variableColors.primary_light}
-                            ></path>{" "}
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Bán tại Website</p>
-                          <h4 className="counter">
-                            <CountUp start={0} end={totalWeb} duration={3} />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                  <SwiperSlide className=" card card-slide">
-                    <div className="card-body">
-                      <div className="progress-widget">
-                        <Circularprogressbar
-                          stroke={variableColors.warning}
-                          width="60px"
-                          height="60px"
-                          trailstroke="#ddd"
-                          strokewidth="4px"
-                          Linecap="rounded"
-                          style={{ width: 60, height: 60 }}
-                          value={(totalSendo / totalOrder) * 100}
-                          id="circle-progress-04"
-                        >
-                          <svg
-                            class="icon-32"
-                            width="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {" "}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
-                              fill={variableColors.warning}
-                            ></path>{" "}
-                          </svg>
-                        </Circularprogressbar>
-                        <div className="progress-detail">
-                          <p className="mb-2">Bán tại Sendo</p>
-                          <h4 className="counter">
-                            <CountUp start={0} end={totalSendo} duration={3} />
-                          </h4>
-                        </div>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-
-                  <div className="swiper-button swiper-button-next"></div>
-                  <div className="swiper-button swiper-button-prev"></div>
-                </Swiper>
-              </div>
-            </Row>
-          </Col>
-          <Col md="12">
-            <Row>
-              <Col md="12">
-                <div className="card" data-aos="fade-up" data-aos-delay="800">
-                  <div className="flex-wrap card-header d-flex justify-content-between">
-                    <div className="header-title">
-                      <h4 className="card-title mb-3">Thống kê theo năm</h4>
-
-                      <h5>{isLoadingChart ? <Loading /> : totalOrderChart} </h5>
-                      <span className="mb-0">Đơn hàng / năm</span>
-                    </div>
-                    <div className="d-flex align-items-center align-self-center mt-3">
-                      <div className="d-flex align-items-center text-primary">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="12"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <g>
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="8"
-                              fill="currentColor"
-                            ></circle>
-                          </g>
-                        </svg>
-                        <div className="ms-2">
-                          <span className="text-gray">Tại cửa hàng</span>
-                        </div>
-                      </div>
-
-                      <div className="d-flex align-items-center ms-3 text-info">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="12"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <g>
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="8"
-                              fill="currentColor"
-                            ></circle>
-                          </g>
-                        </svg>
-                        <div className="ms-2">
-                          <span className="text-gray">Tại Website</span>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center ms-3 text-danger">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="12"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <g>
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="8"
-                              fill="currentColor"
-                            ></circle>
-                          </g>
-                        </svg>
-                        <div className="ms-2">
-                          <span className="text-gray">Tại Sendo</span>
-                        </div>
-                      </div>
-                    </div>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        as={Button}
-                        variant="text-gray"
-                        type="button"
-                        id="dropdownMenuButtonSM"
-                      >
-                        {year}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => setYear(2022)}>
-                          2022
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={() => setYear(2023)}>
-                          2023
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <div className="card-body">
-                    {chartData && !isLoadingChart ? (
-                      <Chart
-                        options={chartData.options}
-                        series={chartData.series}
-                        type="area"
-                        height="245"
-                      />
-                    ) : (
-                      <Loading />
-                    )}
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          </Col>
-
-          <Col md="12">
-            <div className="card" data-aos="fade-up" data-aos-delay="900">
-              <div className="flex-wrap card-header d-flex justify-content-between">
-                <div className="header-title">
-                  <h4 className="card-title">Thống kê chi tiết</h4>
-                </div>
-                <div>
-                  {/* <Form.Group controlId="startDate"> */}
-                  {/* <Form.Label>Bắt đầu </Form.Label> */}
-                  <DateTimePicker
-                    disableClock
-                    format="dd/MM/y"
-                    value={filter.dateFrom}
-                    onChange={(date) => {
-                      dispatchFilter({
-                        type: "SET_FROM_DATE",
-                        payload: date?.toISOString() ?? "",
-                      });
+                  <Swiper
+                    className="p-0 m-0 mb-2 list-inline "
+                    slidesPerView={5}
+                    spaceBetween={32}
+                    navigation={{
+                      nextEl: ".swiper-button-next",
+                      prevEl: ".swiper-button-prev",
                     }}
-                  />
-                  {/* </Form.Group> */}
-                  <span> - </span>
-                  {/* <Form.Group controlId="endDate"> */}
-                  {/* <Form.Label>Kết thúc </Form.Label> */}
-                  <DateTimePicker
-                    disableClock
-                    format="dd/MM/y"
-                    value={filter.dateTo}
-                    onChange={(date) => {
-                      dispatchFilter({
-                        type: "SET_TO_DATE",
-                        payload: date?.toISOString() ?? "",
-                      });
+                    breakpoints={{
+                      320: { slidesPerView: 1 },
+                      550: { slidesPerView: 2 },
+                      991: { slidesPerView: 3 },
+                      1400: { slidesPerView: 3 },
+                      1500: { slidesPerView: 4 },
+                      1920: { slidesPerView: 4 },
+                      2040: { slidesPerView: 7 },
+                      2440: { slidesPerView: 8 },
                     }}
-                  />
-                  {/* </Form.Group> */}
-                </div>
-              </div>
-              <Row>
-                <Col md="6">
-                  <div className="card-body">
-                    <div className="flex-wrap d-flex align-items-center justify-content-between">
-                      {isLoadingCircleChart || !chartDataCircleStatus ? (
-                        <Loading />
-                      ) : (
-                        <Chart
-                          className="col-md-8 col-lg-8"
-                          options={chartDataCircleStatus?.options}
-                          series={chartDataCircleStatus?.series}
-                          type="radialBar"
-                          height="250"
-                        />
-                      )}
-
-                      <div className="d-grid gap col-md-4 col-lg-4">
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill={variableColors.success}
+                  >
+                    <SwiperSlide className=" card card-slide">
+                      <div className="card-body">
+                        <div className="progress-widget">
+                          <Circularprogressbar
+                            stroke={variableColors.success}
+                            width="60px"
+                            height="60px"
+                            trailstroke="#ddd"
+                            strokewidth="4px"
+                            Linecap="rounded"
+                            style={{ width: 60, height: 60 }}
+                            value={50}
+                            id="circle-progress-05"
                           >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
+                            <svg
+                              class="icon-32"
+                              width="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
                                 fill={variableColors.success}
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Thành công</span>
-                            <h6>
-                              {isLoadingCircleChart
-                                ? ""
-                                : chartDataCircleStatus?.seriesData[0]}
-                            </h6>
+                              ></path>{" "}
+                            </svg>
+                          </Circularprogressbar>
+                          <div className="progress-detail">
+                            <p className="mb-2">ĐH thành công</p>
+                            <h4 className="counter">
+                              <CountUp
+                                start={0}
+                                end={totalSuccess}
+                                duration={3}
+                              />
+                            </h4>
                           </div>
                         </div>
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill={variableColors.danger}
+                      </div>
+                    </SwiperSlide>
+                    <SwiperSlide className=" card card-slide">
+                      <div className="card-body">
+                        <div className="progress-widget">
+                          <Circularprogressbar
+                            stroke={variableColors.danger}
+                            width="60px"
+                            height="60px"
+                            trailstroke="#ddd"
+                            Linecap="rounded"
+                            strokewidth="4px"
+                            value={(totalCancel / totalOrder) * 100}
+                            style={{ width: 60, height: 60 }}
+                            id="circle-progress-06"
                           >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
+                            <svg
+                              class="icon-32"
+                              width="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
                                 fill={variableColors.danger}
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Thất bại</span>
-                            <h6>
-                              {isLoadingCircleChart
-                                ? ""
-                                : chartDataCircleStatus?.seriesData[1]}
-                            </h6>
+                              ></path>{" "}
+                            </svg>
+                          </Circularprogressbar>
+                          <div className="progress-detail">
+                            <p className="mb-2">ĐH thất bại</p>
+                            <h4 className="counter">
+                              <CountUp
+                                start={0}
+                                end={totalCancel}
+                                duration={3}
+                              />
+                            </h4>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </Col>
-                <Col md="6">
-                  <div className="card-body">
-                    <div className="flex-wrap d-flex align-items-center justify-content-between">
-                      {isLoadingCircleChart || !chartDataCircleType ? (
-                        <Loading />
-                      ) : (
-                        <Chart
-                          className="col-md-8 col-lg-8"
-                          options={chartDataCircleType?.options}
-                          series={chartDataCircleType?.series}
-                          type="radialBar"
-                          height="250"
-                        />
-                      )}
-                      <div className="d-grid gap col-md-4 col-lg-4">
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill={variableColors.info}
+                    </SwiperSlide>
+
+                    <SwiperSlide className="card card-slide">
+                      <div className="card-body">
+                        <div className="progress-widget">
+                          <Circularprogressbar
+                            stroke={variableColors.primary}
+                            width="60px"
+                            height="60px"
+                            Linecap="rounded"
+                            trailstroke="#ddd"
+                            strokewidth="4px"
+                            style={{ width: 60, height: 60 }}
+                            value={100}
+                            id="circle-progress-01"
                           >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
+                            <svg
+                              class="icon-32"
+                              width="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                                fill={variableColors.primary}
+                              ></path>{" "}
+                            </svg>
+                          </Circularprogressbar>
+                          <div className="progress-detail">
+                            <p className="mb-2">Tổng đơn hàng</p>
+                            <h4 className="counter">
+                              <CountUp
+                                start={0}
+                                end={totalOrder}
+                                duration={3}
+                              />
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                    <SwiperSlide className=" card card-slide">
+                      <div className="card-body">
+                        <div className="progress-widget">
+                          <Circularprogressbar
+                            stroke={variableColors.info}
+                            width="60px"
+                            height="60px"
+                            trailstroke="#ddd"
+                            strokewidth="4px"
+                            Linecap="rounded"
+                            style={{ width: 60, height: 60 }}
+                            value={(totalOff / totalOrder) * 100}
+                            id="circle-progress-02"
+                          >
+                            <svg
+                              class="icon-32"
+                              width="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
                                 fill={variableColors.info}
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Cửa hàng</span>
-                            <h6>{chartDataCircleType?.seriesData[2]}</h6>
-                          </div>
-                        </div>
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill={variableColors.warning}
-                          >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
-                                fill={variableColors.warning}
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Sendo</span>
-                            <h6>{chartDataCircleType?.seriesData[0]}</h6>
-                          </div>
-                        </div>
-                        <div className="d-flex align-items-start">
-                          <svg
-                            className="mt-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            viewBox="0 0 24 24"
-                            fill={variableColors.primary_light}
-                          >
-                            <g>
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
-                                fill={variableColors.primary_light}
-                              ></circle>
-                            </g>
-                          </svg>
-                          <div className="ms-3">
-                            <span className="text-gray">Website</span>
-                            <h6>{chartDataCircleType?.seriesData[1]}</h6>
+                              ></path>{" "}
+                            </svg>
+                          </Circularprogressbar>
+                          <div className="progress-detail">
+                            <p className="mb-2">Bán tại cửa hàng</p>
+                            <h4 className="counter">
+                              <CountUp start={0} end={totalOff} duration={3} />
+                            </h4>
                           </div>
                         </div>
                       </div>
+                    </SwiperSlide>
+                    <SwiperSlide className=" card card-slide">
+                      <div className="card-body">
+                        <div className="progress-widget">
+                          <Circularprogressbar
+                            stroke={variableColors.primary_light}
+                            width="60px"
+                            height="60px"
+                            trailstroke="#ddd"
+                            strokewidth="4px"
+                            Linecap="rounded"
+                            style={{ width: 60, height: 60 }}
+                            value={(totalWeb / totalOrder) * 100}
+                            id="circle-progress-03"
+                          >
+                            <svg
+                              class="icon-32"
+                              width="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                                fill={variableColors.primary_light}
+                              ></path>{" "}
+                            </svg>
+                          </Circularprogressbar>
+                          <div className="progress-detail">
+                            <p className="mb-2">Bán tại Website</p>
+                            <h4 className="counter">
+                              <CountUp start={0} end={totalWeb} duration={3} />
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                    <SwiperSlide className=" card card-slide">
+                      <div className="card-body">
+                        <div className="progress-widget">
+                          <Circularprogressbar
+                            stroke={variableColors.warning}
+                            width="60px"
+                            height="60px"
+                            trailstroke="#ddd"
+                            strokewidth="4px"
+                            Linecap="rounded"
+                            style={{ width: 60, height: 60 }}
+                            value={(totalSendo / totalOrder) * 100}
+                            id="circle-progress-04"
+                          >
+                            <svg
+                              class="icon-32"
+                              width="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {" "}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.1213 11.2331H16.8891C17.3088 11.2331 17.6386 10.8861 17.6386 10.4677C17.6386 10.0391 17.3088 9.70236 16.8891 9.70236H14.1213C13.7016 9.70236 13.3719 10.0391 13.3719 10.4677C13.3719 10.8861 13.7016 11.2331 14.1213 11.2331ZM20.1766 5.92749C20.7861 5.92749 21.1858 6.1418 21.5855 6.61123C21.9852 7.08067 22.0551 7.7542 21.9652 8.36549L21.0159 15.06C20.8361 16.3469 19.7569 17.2949 18.4879 17.2949H7.58639C6.25742 17.2949 5.15828 16.255 5.04837 14.908L4.12908 3.7834L2.62026 3.51807C2.22057 3.44664 1.94079 3.04864 2.01073 2.64043C2.08068 2.22305 2.47038 1.94649 2.88006 2.00874L5.2632 2.3751C5.60293 2.43735 5.85274 2.72207 5.88272 3.06905L6.07257 5.35499C6.10254 5.68257 6.36234 5.92749 6.68209 5.92749H20.1766ZM7.42631 18.9079C6.58697 18.9079 5.9075 19.6018 5.9075 20.459C5.9075 21.3061 6.58697 22 7.42631 22C8.25567 22 8.93514 21.3061 8.93514 20.459C8.93514 19.6018 8.25567 18.9079 7.42631 18.9079ZM18.6676 18.9079C17.8282 18.9079 17.1487 19.6018 17.1487 20.459C17.1487 21.3061 17.8282 22 18.6676 22C19.4969 22 20.1764 21.3061 20.1764 20.459C20.1764 19.6018 19.4969 18.9079 18.6676 18.9079Z"
+                                fill={variableColors.warning}
+                              ></path>{" "}
+                            </svg>
+                          </Circularprogressbar>
+                          <div className="progress-detail">
+                            <p className="mb-2">Bán tại Sendo</p>
+                            <h4 className="counter">
+                              <CountUp
+                                start={0}
+                                end={totalSendo}
+                                duration={3}
+                              />
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+
+                    <div className="swiper-button swiper-button-next"></div>
+                    <div className="swiper-button swiper-button-prev"></div>
+                  </Swiper>
+                </div>
+              </Row>
+            </Col>
+            <Col md="12">
+              <Row>
+                <Col md="12">
+                  <div className="card" data-aos="fade-up" data-aos-delay="800">
+                    <div className="flex-wrap card-header d-flex justify-content-between">
+                      <div className="header-title">
+                        <h4 className="card-title mb-3">Thống kê theo năm</h4>
+
+                        <h5>
+                          {isLoadingChart ? <Loading /> : totalOrderChart}{" "}
+                        </h5>
+                        <span className="mb-0">Đơn hàng / năm</span>
+                      </div>
+                      <div className="d-flex align-items-center align-self-center mt-3">
+                        <div className="d-flex align-items-center text-primary">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="currentColor"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-2">
+                            <span className="text-gray">Tại cửa hàng</span>
+                          </div>
+                        </div>
+
+                        <div className="d-flex align-items-center ms-3 text-info">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="currentColor"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-2">
+                            <span className="text-gray">Tại Website</span>
+                          </div>
+                        </div>
+                        <div className="d-flex align-items-center ms-3 text-danger">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <g>
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                                fill="currentColor"
+                              ></circle>
+                            </g>
+                          </svg>
+                          <div className="ms-2">
+                            <span className="text-gray">Tại Sendo</span>
+                          </div>
+                        </div>
+                      </div>
+                      <Dropdown>
+                        <Dropdown.Toggle
+                          as={Button}
+                          variant="text-gray"
+                          type="button"
+                          id="dropdownMenuButtonSM"
+                        >
+                          {year}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item onClick={() => setYear(2022)}>
+                            2022
+                          </Dropdown.Item>
+                          <Dropdown.Item onClick={() => setYear(2023)}>
+                            2023
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
+                    <div className="card-body">
+                      {chartData && !isLoadingChart ? (
+                        <Chart
+                          options={chartData.options}
+                          series={chartData.series}
+                          type="area"
+                          height="245"
+                        />
+                      ) : (
+                        <Loading />
+                      )}
                     </div>
                   </div>
                 </Col>
               </Row>
-            </div>
-          </Col>
-          <Col md="12">
-            <Card>
-              <Card.Header className="d-flex justify-content-between">
-                <div className="header-title">
-                  <h4 className="mb-2 card-title">Doanh thu theo đơn hàng</h4>
-                </div>
-                <OverlayTrigger
-                  trigger="click"
-                  placement="bottom"
-                  overlay={popover}
-                >
-                  <Button variant="outline-gray">Bộ lọc</Button>
-                </OverlayTrigger>
-              </Card.Header>
-              <Card.Body>
-                {isLoading ? (
-                  <Loading></Loading>
-                ) : (
-                  <div className="border-bottom my-3">
-                    <Row
-                      style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
+            </Col>
+
+            <Col md="12">
+              <div className="card" data-aos="fade-up" data-aos-delay="900">
+                <div className="flex-wrap card-header d-flex justify-content-between">
+                  <div className="header-title">
+                    <h4 className="card-title">Thống kê chi tiết</h4>
+                  </div>
+                  <div>
+                    {/* <Form.Group controlId="startDate"> */}
+                    {/* <Form.Label>Bắt đầu </Form.Label> */}
+                    <DateTimePicker
+                      disableClock
+                      format="dd/MM/y"
+                      value={filter.dateFrom}
+                      onChange={(date) => {
+                        dispatchFilter({
+                          type: "SET_FROM_DATE",
+                          payload: date?.toISOString() ?? "",
+                        });
                       }}
-                    >
-                      <Col md="3">
-                        <Row>
-                          <Col
-                            md="6"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            <p style={{ fontWeight: "500" }}>Doanh thu </p>
-                          </Col>
-                          <Col>
-                            <p style={{ fontWeight: "700" }}>
-                              {" "}
-                              {": " + currencyFormatter.format(totalAllOrder)}
-                            </p>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Table
-                      responsive
-                      striped
-                      id="datatable"
-                      className=""
-                      data-toggle="data-table"
-                    >
-                      <thead>
-                        <tr>
-                          <th>Mã đơn hàng</th>
-                          <th>Kênh</th>
-                          <th>Trạng thái thanh toán</th>
-                          <th>Thành tiền</th>
-                          <th>Giảm giá</th>
-                          <th>Tổng tiền</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {revenue?.map((item) => {
-                          const { orderItems, voucher } = item;
-                          const subTotalAllOrder = orderItems
-                            ?.map((orderItem) => orderItem.subTotal)
-                            .reduce((total, price) => total + price, 0);
-                          const discountAllOrder = voucher
-                            ? voucher?.discount +
-                              (voucher?.percent * subTotalAllOrder) / 100
-                            : 0;
-                          const totalAllOrder = !discountAllOrder
-                            ? subTotalAllOrder
-                            : subTotalAllOrder - discountAllOrder;
-                          return (
-                            <tr>
-                              <td>{item.id}</td>
-                              <td>{item.type}</td>
-                              <td>{item.paymentStatus}</td>
-                              <td>{currencyFormatter.format(item.subTotal)}</td>
-                              <td>
-                                {item.voucher
-                                  ? item.voucher?.discount
-                                    ? currencyFormatter.format(
-                                        item.voucher?.discount
-                                      )
-                                    : currencyFormatter.format(
-                                        (item.voucher?.percent *
-                                          item.subTotal) /
-                                          100
-                                      )
-                                  : currencyFormatter.format(0)}
-                              </td>
-                              <td>
-                                {item.voucher
-                                  ? item.voucher?.discount
-                                    ? currencyFormatter.format(
-                                        item.subTotal - item.voucher?.discount
-                                      )
-                                    : currencyFormatter.format(
-                                        item.subTotal -
+                    />
+                    {/* </Form.Group> */}
+                    <span> - </span>
+                    {/* <Form.Group controlId="endDate"> */}
+                    {/* <Form.Label>Kết thúc </Form.Label> */}
+                    <DateTimePicker
+                      disableClock
+                      format="dd/MM/y"
+                      value={filter.dateTo}
+                      onChange={(date) => {
+                        dispatchFilter({
+                          type: "SET_TO_DATE",
+                          payload: date?.toISOString() ?? "",
+                        });
+                      }}
+                    />
+                    {/* </Form.Group> */}
+                  </div>
+                </div>
+                <Row>
+                  <Col md="6">
+                    <div className="card-body">
+                      <div className="flex-wrap d-flex align-items-center justify-content-between">
+                        {isLoadingCircleChart || !chartDataCircleStatus ? (
+                          <Loading />
+                        ) : (
+                          <Chart
+                            className="col-md-8 col-lg-8"
+                            options={chartDataCircleStatus?.options}
+                            series={chartDataCircleStatus?.series}
+                            type="radialBar"
+                            height="250"
+                          />
+                        )}
+
+                        <div className="d-grid gap col-md-4 col-lg-4">
+                          <div className="d-flex align-items-start">
+                            <svg
+                              className="mt-2"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              viewBox="0 0 24 24"
+                              fill={variableColors.success}
+                            >
+                              <g>
+                                <circle
+                                  cx="12"
+                                  cy="12"
+                                  r="8"
+                                  fill={variableColors.success}
+                                ></circle>
+                              </g>
+                            </svg>
+                            <div className="ms-3">
+                              <span className="text-gray">Thành công</span>
+                              <h6>
+                                {isLoadingCircleChart
+                                  ? ""
+                                  : chartDataCircleStatus?.seriesData[0]}
+                              </h6>
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start">
+                            <svg
+                              className="mt-2"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              viewBox="0 0 24 24"
+                              fill={variableColors.danger}
+                            >
+                              <g>
+                                <circle
+                                  cx="12"
+                                  cy="12"
+                                  r="8"
+                                  fill={variableColors.danger}
+                                ></circle>
+                              </g>
+                            </svg>
+                            <div className="ms-3">
+                              <span className="text-gray">Thất bại</span>
+                              <h6>
+                                {isLoadingCircleChart
+                                  ? ""
+                                  : chartDataCircleStatus?.seriesData[1]}
+                              </h6>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col md="6">
+                    <div className="card-body">
+                      <div className="flex-wrap d-flex align-items-center justify-content-between">
+                        {isLoadingCircleChart || !chartDataCircleType ? (
+                          <Loading />
+                        ) : (
+                          <Chart
+                            className="col-md-8 col-lg-8"
+                            options={chartDataCircleType?.options}
+                            series={chartDataCircleType?.series}
+                            type="radialBar"
+                            height="250"
+                          />
+                        )}
+                        <div className="d-grid gap col-md-4 col-lg-4">
+                          <div className="d-flex align-items-start">
+                            <svg
+                              className="mt-2"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              viewBox="0 0 24 24"
+                              fill={variableColors.info}
+                            >
+                              <g>
+                                <circle
+                                  cx="12"
+                                  cy="12"
+                                  r="8"
+                                  fill={variableColors.info}
+                                ></circle>
+                              </g>
+                            </svg>
+                            <div className="ms-3">
+                              <span className="text-gray">Cửa hàng</span>
+                              <h6>{chartDataCircleType?.seriesData[2]}</h6>
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start">
+                            <svg
+                              className="mt-2"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              viewBox="0 0 24 24"
+                              fill={variableColors.warning}
+                            >
+                              <g>
+                                <circle
+                                  cx="12"
+                                  cy="12"
+                                  r="8"
+                                  fill={variableColors.warning}
+                                ></circle>
+                              </g>
+                            </svg>
+                            <div className="ms-3">
+                              <span className="text-gray">Sendo</span>
+                              <h6>{chartDataCircleType?.seriesData[0]}</h6>
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-start">
+                            <svg
+                              className="mt-2"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              viewBox="0 0 24 24"
+                              fill={variableColors.primary_light}
+                            >
+                              <g>
+                                <circle
+                                  cx="12"
+                                  cy="12"
+                                  r="8"
+                                  fill={variableColors.primary_light}
+                                ></circle>
+                              </g>
+                            </svg>
+                            <div className="ms-3">
+                              <span className="text-gray">Website</span>
+                              <h6>{chartDataCircleType?.seriesData[1]}</h6>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+            <Col md="12">
+              <Card>
+                <Card.Header className="d-flex justify-content-between">
+                  <div className="header-title">
+                    <h4 className="mb-2 card-title">Doanh thu theo đơn hàng</h4>
+                  </div>
+                  <OverlayTrigger
+                    trigger="click"
+                    placement="bottom"
+                    overlay={popover}
+                  >
+                    <Button variant="outline-gray">Bộ lọc</Button>
+                  </OverlayTrigger>
+                </Card.Header>
+                <Card.Body>
+                  {isLoading ? (
+                    <Loading></Loading>
+                  ) : (
+                    <div className="border-bottom my-3">
+                      <Row
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Col md="3">
+                          <Row>
+                            <Col
+                              md="6"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <p style={{ fontWeight: "500" }}>Doanh thu </p>
+                            </Col>
+                            <Col>
+                              <p style={{ fontWeight: "700" }}>
+                                {" "}
+                                {": " + currencyFormatter.format(totalAllOrder)}
+                              </p>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Table
+                        responsive
+                        striped
+                        id="datatable"
+                        className=""
+                        data-toggle="data-table"
+                      >
+                        <thead>
+                          <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Kênh</th>
+                            <th>Trạng thái thanh toán</th>
+                            <th>Thành tiền</th>
+                            <th>Giảm giá</th>
+                            <th>Tổng tiền</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {revenue?.map((item) => {
+                            const { orderItems, voucher } = item;
+                            const subTotalAllOrder = orderItems
+                              ?.map((orderItem) => orderItem.subTotal)
+                              .reduce((total, price) => total + price, 0);
+                            const discountAllOrder = voucher
+                              ? voucher?.discount +
+                                (voucher?.percent * subTotalAllOrder) / 100
+                              : 0;
+                            const totalAllOrder = !discountAllOrder
+                              ? subTotalAllOrder
+                              : subTotalAllOrder - discountAllOrder;
+                            return (
+                              <tr>
+                                <td>{item.id}</td>
+                                <td>{item.type}</td>
+                                <td>{item.paymentStatus}</td>
+                                <td>
+                                  {currencyFormatter.format(item.subTotal)}
+                                </td>
+                                <td>
+                                  {item.voucher
+                                    ? item.voucher?.discount
+                                      ? currencyFormatter.format(
+                                          item.voucher?.discount
+                                        )
+                                      : currencyFormatter.format(
                                           (item.voucher?.percent *
                                             item.subTotal) /
                                             100
-                                      )
-                                  : currencyFormatter.format(item.subTotal - 0)}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </Table>
-                    <Row className="align-items-center">
-                      <Col md="6">
-                        <div
-                          className="dataTables_info"
-                          id="datatable_info"
-                          role="status"
-                          aria-live="polite"
-                        >
-                          {totalCount !== 0
-                            ? `Showing ${(page - 1) * perPage + 1} to ${
-                                page * perPage <= totalCount
-                                  ? page * perPage
-                                  : totalCount
-                              } of ${pagination?.total ?? 0} entries`
-                            : null}
-                        </div>
-                      </Col>
-                      <Col md="6" style={{ paddingTop: 16 }}>
-                        <div
-                          className="dataTables_paginate paging_simple_numbers"
-                          id="datatable_paginate"
-                        >
-                          <ul
-                            style={{ justifyContent: "end" }}
-                            className="pagination"
+                                        )
+                                    : currencyFormatter.format(0)}
+                                </td>
+                                <td>
+                                  {item.voucher
+                                    ? item.voucher?.discount
+                                      ? currencyFormatter.format(
+                                          item.subTotal - item.voucher?.discount
+                                        )
+                                      : currencyFormatter.format(
+                                          item.subTotal -
+                                            (item.voucher?.percent *
+                                              item.subTotal) /
+                                              100
+                                        )
+                                    : currencyFormatter.format(
+                                        item.subTotal - 0
+                                      )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                      <Row className="align-items-center">
+                        <Col md="6">
+                          <div
+                            className="dataTables_info"
+                            id="datatable_info"
+                            role="status"
+                            aria-live="polite"
                           >
-                            {createArrayFrom1ToN(totalPage).map((pageIndex) => {
-                              return (
-                                <li
-                                  className={
-                                    "paginate_button page-item " +
-                                    (page === pageIndex ? "active" : "")
-                                  }
-                                  id={pageIndex}
-                                  onClick={() => setPage(pageIndex)}
-                                >
-                                  <Link
-                                    to="#"
-                                    aria-controls="datatable"
-                                    aria-disabled="true"
-                                    data-dt-idx="previous"
-                                    tabIndex="0"
-                                    className="page-link"
-                                  >
-                                    {pageIndex}
-                                  </Link>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      </Col>
-                    </Row>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                            {totalCount !== 0
+                              ? `Showing ${(page - 1) * perPage + 1} to ${
+                                  page * perPage <= totalCount
+                                    ? page * perPage
+                                    : totalCount
+                                } of ${pagination?.total ?? 0} entries`
+                              : null}
+                          </div>
+                        </Col>
+                        <Col md="6" style={{ paddingTop: 16 }}>
+                          <div
+                            className="dataTables_paginate paging_simple_numbers"
+                            id="datatable_paginate"
+                          >
+                            <ul
+                              style={{ justifyContent: "end" }}
+                              className="pagination"
+                            >
+                              {createArrayFrom1ToN(totalPage).map(
+                                (pageIndex) => {
+                                  return (
+                                    <li
+                                      className={
+                                        "paginate_button page-item " +
+                                        (page === pageIndex ? "active" : "")
+                                      }
+                                      id={pageIndex}
+                                      onClick={() => setPage(pageIndex)}
+                                    >
+                                      <Link
+                                        to="#"
+                                        aria-controls="datatable"
+                                        aria-disabled="true"
+                                        data-dt-idx="previous"
+                                        tabIndex="0"
+                                        className="page-link"
+                                      >
+                                        {pageIndex}
+                                      </Link>
+                                    </li>
+                                  );
+                                }
+                              )}
+                            </ul>
+                          </div>
+                        </Col>
+                      </Row>
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      ) : (
+        <div className="conatiner-fluid content-inner">
+          <Row class="py-0">
+            <img
+              src={welcom}
+              // style={{ height: "640px" }}
+              className="img-fluid rounded mb-2"
+              alt=""
+            />
+          </Row>
+        </div>
+      )}
     </Fragment>
   );
 });
