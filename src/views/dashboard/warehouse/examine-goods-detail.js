@@ -142,7 +142,7 @@ const ExamineGoodsDetail = () => {
             <Card>
               <Card.Header className="d-flex justify-content-between">
                 <div className="header-title">
-                  <h5 className="card-title">Danh sách kiểm kho</h5>
+                  <h5 className="card-title">Kiểm kho</h5>
                 </div>
               </Card.Header>
               <Card.Body>
@@ -285,8 +285,9 @@ const ExamineGoodsDetail = () => {
           </Col>
         </Row>
 
-        <div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Button
+            style={{ marginRight: "24px" }}
             onClick={() => {
               // const isValidProduct = validateProduct();
               if (!isNewMode) {
@@ -317,7 +318,7 @@ const ExamineGoodsDetail = () => {
                 })
                 .catch((e) => console.log(e));
             }}
-            variant="btn btn-primary"
+            variant="btn btn-outline-primary"
             type="submit"
           >
             Lưu thông tin
@@ -339,7 +340,7 @@ const ExamineGoodsDetail = () => {
                   })
                   .catch((e) => console.log(e));
               }}
-              variant="btn btn-outline-primary"
+              variant="btn btn-primary"
               type="submit"
             >
               Cân bằng

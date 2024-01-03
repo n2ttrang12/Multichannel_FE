@@ -143,6 +143,8 @@ const ExamineGoods = () => {
                 </thead>
                 <tbody>
                   {supplier?.map((item) => {
+                    const statusColor =
+                      item.status === "INPROCCESS" ? "warning" : "success";
                     return (
                       <tr key={item.id}>
                         <td>{item.id}</td>
@@ -165,7 +167,13 @@ const ExamineGoods = () => {
 
                         <td>{item.warehouseHistory?.length}</td>
                         <td>{item.creater?.name}</td>
-                        <td>{item.status}</td>
+                        <td>
+                          <span className={`badge bg-${statusColor}`}>
+                            {item.status === "INPROCCESS"
+                              ? "Đang kiểm hàng"
+                              : "Hoàn thành"}
+                          </span>
+                        </td>
 
                         <td>
                           {isStore && item.status === "INPROCCESS" ? (
