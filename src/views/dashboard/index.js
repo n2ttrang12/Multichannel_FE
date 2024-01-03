@@ -79,7 +79,7 @@ const Index = memo((props) => {
   const [page, setPage] = useState(1);
   const [year, setYear] = useState("2023");
   const [month, setMonth] = useState();
-  const [perPage, setPerpage] = useState(5);
+  const [perPage, setPerpage] = useState(20);
   const totalPage = Math.ceil(totalCount / perPage); // dư 1 sp vân là 1 page
   const [chartData, setChartData] = useState(null);
   const [chartDataCircleStatus, setChartDataCircleStatus] = useState(null);
