@@ -54,6 +54,27 @@ const StoreList = () => {
           <div className="header-title">
             <h4 className="card-title">Danh sách cửa hàng</h4>
           </div>
+          <Button className="btn-link text-center btn-primary btn-icon me-2 mt-lg-0 mt-md-0 mt-3">
+            <Link to="/dashboard/supplier/new">
+              <i className="btn-inner">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </i>
+              <span>Thêm cửa hàng</span>
+            </Link>
+          </Button>
         </Card.Header>
         <Card.Body>
           <div>
